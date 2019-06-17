@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://saito1369.github.io/sitemap.xml 

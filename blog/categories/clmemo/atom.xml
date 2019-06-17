@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: clmemo | easy cure]]></title>
+  <link href="http://saito1369.github.io/blog/categories/clmemo/atom.xml" rel="self"/>
+  <link href="http://saito1369.github.io/"/>
+  <updated>2019-04-08T19:14:07+09:00</updated>
+  <id>http://saito1369.github.io/</id>
+  <author>
+    <name><![CDATA[saito1369]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[thing-at-point を応用したファイルの検索]]></title>
+    <link href="http://saito1369.github.io/blog/2017-06-01-134010.html"/>
+    <updated>2017-06-01T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/134010</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. 問題点</a></li>
+<li><a href="#sec-3">3. 解決策</a></li>
+<li><a href="#sec-4">4. elisp プログラム</a></li>
+<li><a href="#sec-5">5. 使い方例</a></li>
+<li><a href="#sec-6">6. elisp 書き方めも</a></li>
+<li><a href="#sec-7">7. 参照 URL</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2016-06-28 Tue 13:40&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-21 Wed 20:51&gt;</span></span><br />
+</p>
+<p>
+<!-- more --><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+私はここ 10 年ほど, 普段の業務日誌を ChangeLog メモで書いている.<br />
+シンプルな形式なので自分で色々加工が出来るし, 1 ファイルなので管理も楽で気にいっている.<br />
+一時期 org-mode でメモをとろうかなと思って色々やってみたこともあったが, 結局続かなかった.<br />
+自分にとって, やっぱり母艦となるメモは 1 つのファイルにしておくのが性にあってると思った.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 問題点</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+メモは 1 つのファイルが良いとは言え, 作業自身はいろんなところでやるわけで, その場所を忘れないように書いておくことがある.<br />
+あるいは「メモ」では書ききれない「文書」を org-mode 等で書いてその場所を書いておくこともある.<br />
+以下のような感じである.<br />
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name">ある日の ChangeLog めも</label>
+<pre class="src src-mac">2016-06-28 (Tue)  Taro YAMADA  &lt;taro@example.jp&gt;
+
+   * 設定 elisp の変更 [elisp][setup]: find-file
+   (file: ~/.emacs.d/inits/51-file.el)
+   上記ファイルを変更して fugafuga 出来るようにした.
+
+   * hogehoge 開発 [log]: 進捗確認
+   (file: /work/foo/bar/hogehoge.py)
+
+   * ○○の改善案 [foo][log]: 文書下書きの作成
+   (file: /work/doc/2016/foo.org)
+   あす 4 章目の修正を行う.
+   文字数のチェック.
+</pre>
+</div>
+
+<p>
+作成したファイルのある場所を書いておくことで, 作業場所を確認すると共に必要なファイルをさっさと取り出すことが出来る.<br />
+ここから M-x find-file-at-point で直接ファイルが開ける.<br />
+</p>
+
+<p>
+例えば hogehoge.pl というプログラムを書いたらその場所をメモしておく.<br />
+</p>
+<pre class="example">
+$: pwd
+   /work/theme/
+$: ls
+   hogehoge.pl
+</pre>
+
+<div class="org-src-container">
+<label class="org-src-name">hogehoge.pl の場所を ChangeLog に抜かりなくメモる筆者</label>
+<pre class="src src-mac">2016-06-28 (Tue)  Taro YAMADA  &lt;taro@example.jp&gt;
+
+   * theme 開発 [log]: 一応完成
+   (file: /work/theme/hogehoge.pl)
+</pre>
+</div>
+
+<p>
+しかし私の場合, ファイルのパスは結構変わることも多いのだ.<br />
+例えば, 最初は場所として /work/theme で問題なかったものの,<br />
+後日 version2 のデータがやってきたので<br />
+最初のやつは version1 以下に置いておきたい, ということがあったり.<br />
+</p>
+
+<p>
+version1 のデータ用プログラム hogehoge.pl は version1 という directory を作ってそこに入れとこう.<br />
+</p>
+<pre class="example">
+$: pwd
+   /work/theme/
+$: mkdir version01
+$: mv hogehoge.pl version01/
+</pre>
+
+<p>
+パスが変わってしまうと, ChangeLog との整合性が保てなくなってしまう！！<br />
+directory の構成を変える度に一々 ChangeLog の該当部分を探して修正をするのはめんどくさすぎるし.<br />
+</p>
+<div class="org-src-container">
+<label class="org-src-name">ファイルのあるパスが変わってしまい整合性がとれなくなってしまったメモファイル</label>
+<pre class="src src-mac">2016-06-28 (Tue)  Taro YAMADA  &lt;taro@example.jp&gt;
+
+   * theme 開発 [log]: 一応完成
+   (file: /work/theme/hogehoge.pl)
+</pre>
+</div>
+
+<p>
+どーしたらいいんだろう&#x2026;<br />
+と思って色々探してみましたが問題を解決してくれそーなプログラムは落ちてないようだった.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 解決策</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+ファイルを移動したらそれに連動して ChangeLog のリンクの内容を変える.<br />
+そんな魔法のようなことが出来れば超ナイスなのだが,<br />
+やっぱ無理っぽいんじゃないかなぁと思ったので,<br />
+以下のように動くプログラムを作ることでお茶を濁すことにする.<br />
+</p>
+
+<ol class="org-ol">
+<li>ChangeLog のリンク部分からパスを抽出し, その存在をチェックする.<br />
+</li>
+<li>抽出したパスにファイルが存在すればファイルの存在を示して終了する.<br />
+</li>
+<li>無ければその近辺のディレクトリを探して同名のファイルがあるかどうか検索.<br />
+</li>
+<li>同名のファイルがあればそのパスに ChangeLog を書き換える.<br />
+</li>
+</ol>
+<p>
+注: ChangeLog めも上じゃなくても使えるようにしたい.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> elisp プログラム</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+ChangeLog 上に書いてあるファイルが無ければその近辺の dir を探して,<br />
+同名のファイルを探してくれる elisp プログラムを色々調べながらつくってみた.<br />
+以下の 3 つの関数を導入する.<br />
+ChangeLog 上じゃなくても動くかと思う.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span class="linenr"> 1: </span>(ffap-bindings)
+<span class="linenr"> 2: </span><span style="color: #cd853f;">; </span><span style="color: #cd853f;">main function</span>
+<span class="linenr"> 3: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">search-file-at-point-with-dir-search</span>()
+<span class="linenr"> 4: </span>  (interactive)
+<span class="linenr"> 5: </span>  (<span style="color: #20b2aa; font-weight: bold;">let*</span> (
+<span class="linenr"> 6: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12459;&#12540;&#12477;&#12523;&#19978;&#12398;&#12501;&#12449;&#12452;&#12523;&#21517;&#12425;&#12375;&#12365;&#25991;&#23383;&#21015;&#12434;&#12392;&#12427;</span>
+<span class="linenr"> 7: </span>         (my-path  (thing-at-point 'filename))           <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">fname with dir</span>
+<span class="linenr"> 8: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">(&#26368;&#21021;&#12398;&#20301;&#32622;, &#26368;&#24460;&#12398;&#20301;&#32622;)&#12434;&#12522;&#12473;&#12488;&#12391;&#21462;&#24471;</span>
+<span class="linenr"> 9: </span>         (bounds   (bounds-of-thing-at-point 'filename))
+<span class="linenr">10: </span>         (my-dir   nil)
+<span class="linenr">11: </span>         (my-pdir  nil)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35242; directory</span>
+<span class="linenr">12: </span>         (my-fname nil)
+<span class="linenr">13: </span>         (stt      nil)
+<span class="linenr">14: </span>         (end      nil)
+<span class="linenr">15: </span>         )
+<span class="linenr">16: </span>    (setq stt      (car bounds))
+<span class="linenr">17: </span>    (setq end      (cdr bounds))
+<span class="linenr">18: </span>    (setq my-dir   (file-name-directory    my-path)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">dir name</span>
+<span class="linenr">19: </span>    (setq my-fname (file-name-nondirectory my-path)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">file name</span>
+<span class="linenr">20: </span>    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "my-path =%s" my-path))</span>
+<span class="linenr">21: </span>    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35242; dir &#12391;&#12418;&#26908;&#32034;(dir &#12364;&#20108;&#12388;&#12378;&#12428;&#12390;&#12427;&#12392;&#12365;&#12418;&#23550;&#20966;&#12377;&#12427;&#12424;&#12358;&#12395;</span>
+<span class="linenr">22: </span>    (setq my-pdir  (file-name-directory    (directory-file-name my-dir)))
+<span class="linenr">23: </span>    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "my-path =%s" my-path))</span>
+<span class="linenr">24: </span>    (<span style="color: #20b2aa; font-weight: bold;">cond</span>
+<span class="linenr">25: </span>     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#12364;&#23384;&#22312;&#12375;&#12390;&#12428;&#12400;&#38283;&#12367;</span>
+<span class="linenr">26: </span>     <span style="color: #cd853f;">;</span><span style="color: #cd853f;">((file-exists-p    my-path) (find-file my-path))</span>
+<span class="linenr">27: </span>     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12420;&#12387;&#12401;&#38283;&#12367;&#12398;&#12399;&#12420;&#12417;&#12390;&#23384;&#22312;&#12434;&#20027;&#24373;&#12375;&#12390;&#32066;&#20102;</span>
+<span class="linenr">28: </span>     ((file-exists-p    my-path) (message <span style="color: #ffa07a;">"file %s exists"</span> my-path))
+<span class="linenr">29: </span>     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#12364;&#23384;&#22312;&#12375;&#12390;&#12394;&#12367;&#12390; dir &#12364;&#12354;&#12428;&#12400;&#26908;&#32034;</span>
+<span class="linenr">30: </span>     ((file-directory-p my-dir)  (my-search-path-file my-dir  my-fname stt end))
+<span class="linenr">31: </span>     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">my-dir &#12364;&#23384;&#22312;&#12375;&#12390;&#12394;&#12367;&#12390;&#12418;&#12418;&#12358;&#23569;&#12375;&#38929;&#24373;&#12427;. &#35242; dir &#12364;&#12354;&#12428;&#12400;&#26908;&#32034;&#12434;&#12377;&#12427;.</span>
+<span class="linenr">32: </span>     ((file-directory-p my-pdir) (my-search-path-file my-pdir my-fname stt end))
+<span class="linenr">33: </span>     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35242; dir &#12418;&#23384;&#22312;&#12375;&#12390;&#12394;&#12369;&#12428;&#12400;&#35558;&#12417;&#12390;&#35430;&#21512;&#32066;&#20102;</span>
+<span class="linenr">34: </span>     (t (message <span style="color: #ffa07a;">"dir %s is not found"</span> my-dir))
+<span class="linenr">35: </span>     )
+<span class="linenr">36: </span>    )
+<span class="linenr">37: </span>  )
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-search-path-file</span>(my-dir my-fname stt end)
+<span class="linenr"> 2: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((files    nil)
+<span class="linenr"> 3: </span>        (fpath    nil)
+<span class="linenr"> 4: </span>        (maxdepth nil)
+<span class="linenr"> 5: </span>        (home-dir (substitute-in-file-name <span style="color: #ffa07a;">"$HOME"</span>)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">see clmemo.el</span>
+<span class="linenr"> 6: </span>        )
+<span class="linenr"> 7: </span>    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35519;&#26619;&#12377;&#12427; dir &#12398;&#28145;&#12373;&#12434; minifuffer &#12363;&#12425;&#20837;&#12428;&#12383;&#12369;&#12428;&#12400;</span>
+<span class="linenr"> 8: </span>    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(setq maxdepth (string-to-number (read-string "depth:" "3" nil "3")))</span>
+<span class="linenr"> 9: </span>    (setq maxdepth 3)
+<span class="linenr">10: </span>    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26465;&#20214;&#12395;&#12354;&#12358;&#12501;&#12449;&#12452;&#12523;&#12434;&#12522;&#12473;&#12488;&#12391;&#21462;&#12426;&#20986;&#12377;</span>
+<span class="linenr">11: </span>    (setq files    (directory-files-recursive my-dir my-fname maxdepth nil))
+<span class="linenr">12: </span>    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26368;&#21021;&#12398;&#12501;&#12449;&#12452;&#12523;&#12434;&#21462;&#12426;&#20986;&#12375;&#12390;, $HOME -&gt; "~" &#12395;&#22793;&#26356;</span>
+<span class="linenr">13: </span>    (setq fpath    (replace-regexp-in-string home-dir <span style="color: #ffa07a;">"~"</span> (car files)))
+<span class="linenr">14: </span>    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26360;&#12365;&#30452;&#12375;</span>
+<span class="linenr">15: </span>    (<span style="color: #20b2aa; font-weight: bold;">save-excursion</span>
+<span class="linenr">16: </span>      (delete-region stt end)
+<span class="linenr">17: </span>      (goto-char stt)
+<span class="linenr">18: </span>      (insert fpath)
+<span class="linenr">19: </span>      )
+<span class="linenr">20: </span>    )
+<span class="linenr">21: </span>  )
+</pre>
+</div>
+
+<p>
+directory-files-recursive は以下の URL から拾ってきた.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span class="linenr"> 1: </span><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">Recursively listing directories in elisp - turingMachine</span>
+<span class="linenr"> 2: </span><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">http://turingmachine.org/bl/2013-05-29-recursively-listing-directories-in-elisp.html</span>
+<span class="linenr"> 3: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">directory-files-recursive</span>(directory match maxdepth ignore)
+<span class="linenr"> 4: </span>  (<span style="color: #20b2aa; font-weight: bold;">let*</span> ((files-list '())
+<span class="linenr"> 5: </span>         (current-directory-list (directory-files directory t))
+<span class="linenr"> 6: </span>         )
+<span class="linenr"> 7: </span>    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">while we are in the current directory</span>
+<span class="linenr"> 8: </span>    (<span style="color: #20b2aa; font-weight: bold;">while</span> current-directory-list
+<span class="linenr"> 9: </span>      (<span style="color: #20b2aa; font-weight: bold;">let</span> ((f (car current-directory-list)))
+<span class="linenr">10: </span>        (<span style="color: #20b2aa; font-weight: bold;">cond</span>
+<span class="linenr">11: </span>         ((and
+<span class="linenr">12: </span>           ignore <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">make sure it is not nil</span>
+<span class="linenr">13: </span>           (string-match ignore f))
+<span class="linenr">14: </span>           <span style="color: #cd853f;">; </span><span style="color: #cd853f;">ignore</span>
+<span class="linenr">15: </span>          nil
+<span class="linenr">16: </span>          )
+<span class="linenr">17: </span>         ((and
+<span class="linenr">18: </span>           (file-regular-p f)
+<span class="linenr">19: </span>           (file-readable-p f)
+<span class="linenr">20: </span>           (string-match match f))
+<span class="linenr">21: </span>          (setq files-list (cons f files-list))
+<span class="linenr">22: </span>          )
+<span class="linenr">23: </span>         ((and
+<span class="linenr">24: </span>           (file-directory-p f)
+<span class="linenr">25: </span>           (file-readable-p f)
+<span class="linenr">26: </span>           (not (string-equal <span style="color: #ffa07a;">".."</span> (substring f -2)))
+<span class="linenr">27: </span>           (not (string-equal <span style="color: #ffa07a;">"."</span> (substring f -1)))
+<span class="linenr">28: </span>           (&gt; maxdepth 0))
+<span class="linenr">29: </span>          <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">recurse only if necessary</span>
+<span class="linenr">30: </span>          (setq files-list (append files-list (directory-files-recursive f match (- maxdepth -1) ignore)))
+<span class="linenr">31: </span>          <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(setq files-list (cons f files-list))</span>
+<span class="linenr">32: </span>          )
+<span class="linenr">33: </span>         (t)
+<span class="linenr">34: </span>         )
+<span class="linenr">35: </span>        )
+<span class="linenr">36: </span>      (setq current-directory-list (cdr current-directory-list))
+<span class="linenr">37: </span>      )
+<span class="linenr">38: </span>    files-list
+<span class="linenr">39: </span>    )
+<span class="linenr">40: </span>  )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 使い方例</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+<label class="org-src-name">ChangeLog メモに書いてある file のありか(既にここにはないんだけど)</label>
+<pre class="src src-mac">(file: /work/theme/hogehoge.pl)
+</pre>
+</div>
+<p>
+パス名がある場所にカーソルがある状態で M-x search-file-at-point-with-dir-search<br />
+もしファイルがあれば "/work/theme/hogehoge.el exists." というメッセージを書いて終わる.<br />
+無ければ周辺の dir を探して hogehoge.pl が存在すれば<br />
+</p>
+<div class="org-src-container">
+<label class="org-src-name">修正後</label>
+<pre class="src src-mac">(file: /work/theme/version1/hogehoge.pl)
+</pre>
+</div>
+<p>
+のようにメモを書き換えてくれます.<br />
+探しても無ければ "not found" と書いて何もしません(のでその場合は手動で何とかするしかない&#x2026;).<br />
+</p>
+
+<p>
+注意点: dir を探して最初に見つかった hogehoge.pl の場所を返す仕様になっている.<br />
+/work/theme/version0/hogehoge.pl とか /work/theme/version1/hogehoge.pl とかがある場合は, 実際には一意に特定出来ていない.<br />
+先に見つかった方を書き出す.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> elisp 書き方めも</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+<label class="org-src-name">親 dir を取得</label>
+<pre class="src src-emacs-lisp">(setq pdir (file-name-directory (directory-file-name dir)))
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">dir                   = /foo/bar/hoge/</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">/foo/bar/hoge         = (directory-file-name dir)</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">/foo/bar/             = (file-name-directory "/foo/bar/hoge")</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<label class="org-src-name">minibuffer から入れた文字列を数値へ変更する</label>
+<pre class="src src-emacs-lisp">(setq hoge (read-string <span style="color: #ffa07a;">"prompt:"</span> default&#20516; nil &#20309;&#12418;&#20837;&#12428;&#12394;&#12363;&#12383;&#12392;&#12365;&#12398;&#20516;))
+(setq num  (string-to-number hoge)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#25968;&#20516;&#12395;&#12377;&#12427;</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<label class="org-src-name">カーソルにある文字列を取得</label>
+<pre class="src src-emacs-lisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">(file: /work/theme/hogehoge.pl)</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">'filename &#12395;&#12377;&#12427;&#12392;, &#26368;&#24460;&#12398; ")" &#12399;&#12392;&#12387;&#12390;&#12356;&#12356;&#24863;&#12376;&#12391;&#12501;&#12449;&#12452;&#12523;&#21517;&#12434;&#21462;&#12426;&#20986;&#12379;&#12427;</span>
+(setq    st  (thing-at-point           'filename))
+(setq bounds (bounds-of-thing-at-point 'filename))
+</pre>
+</div>
+
+<div class="org-src-container">
+<label class="org-src-name">ffap-file-at-point で文字列を取得する際には, ファイルの存在を確認している.</label>
+<pre class="src src-emacs-lisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12459;&#12540;&#12477;&#12523;&#12399; /foo/bar/hoge/file.pptm &#12398;&#19978;&#12395;&#12354;&#12387;&#12390;,</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">/foo/bar/hoge &#20197;&#19979;&#12395;&#12399;&#23455;&#38555;&#12399; file.pptm &#12392;&#12356;&#12358;&#12501;&#12449;&#12452;&#12523;&#12364;&#28961;&#12356;&#22580;&#21512;&#12395;&#12399;</span>
+(setq fname (ffap-file-at-point))
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">fname="/foo/bar/hoge/" &#12392;&#12394;&#12427;.</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<label class="org-src-name">リスト dir-list を書き出したいときは, そのまま書き出せばよい.</label>
+<pre class="src src-emacs-lisp">(message <span style="color: #ffa07a;">"%s"</span> dir-list)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 参照 URL</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+ChangeLog memo<br />
+<a href="http://0xcc.net/unimag/1/">横着プログラミング 第1回: Unixのメモ技術</a><br />
+<a href="http://masui.org.s3.amazonaws.com/6/4/64dbe7ef223e73dc9eec1805dd514353.pdf">ChangeLogメモによる自分データベースの構築</a><br />
+clmemo<br />
+<a href="https://at-aka.blogspot.jp/p/change-log.html">clmemo@aka: Change Log メモを試してみよう</a><br />
+chalow<br />
+<a href="http://chalow.org/">chalow - CHAngeLog On the Web</a><br />
+<a href="http://chalow.net/">たつをの ChangeLog</a><br />
+quasi-howm<br />
+<a href="https://at-aka.blogspot.jp/2005/06/changelog-howm-quasi-howm.html">clmemo@aka: ChangeLog メモで Howm を使う quasi-howm |ChangeLogメモ|Howm|Emacs|</a><br />
+私は大きなメモは quasi-howm を利用して書いてます<br />
+(howm の中で org-mode 形式でかいています. howm の機能はほとんど使ってません).<br />
+</p>
+
+<p>
+emacs-lisp 関連<br />
+ディレクトリ上位方向へ進む際のイディオム - syohex’s diary<br />
+(url: <a href="http://syohex.hatenablog.com/entry/20121008/1349681293">http://syohex.hatenablog.com/entry/20121008/1349681293</a>)<br />
+GNU Emacs Lispリファレンスマニュアル: String Conversion<br />
+(url: <a href="http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_76.html">http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_76.html</a>)<br />
+GNU Emacs Lispリファレンス・マニュアル: 27. 位置<br />
+(url: <a href="http://www.fan.gr.jp/~ring/doc/elisp_19/elisp-jp_29.html">http://www.fan.gr.jp/~ring/doc/elisp_19/elisp-jp_29.html</a>)<br />
+GNU Emacs Lisp Reference Manual - ファイルに関する情報<br />
+(url: <a href="http://flex.phys.tohoku.ac.jp/texi/eljman/eljman_154.html">http://flex.phys.tohoku.ac.jp/texi/eljman/eljman_154.html</a>)<br />
+再帰的に file を探す elisp プログラム<br />
+Recursively listing directories in elisp - turingMachine<br />
+(url: <a href="http://turingmachine.org/bl/2013-05-29-recursively-listing-directories-in-elisp.html">http://turingmachine.org/bl/2013-05-29-recursively-listing-directories-in-elisp.html</a>)<br />
+cond の使い方<br />
+GNU Emacs Lispリファレンスマニュアル: 9. 制御構造<br />
+(url: <a href="http://www.fan.gr.jp/~ring/doc/elisp_20/elisp_10.html">http://www.fan.gr.jp/~ring/doc/elisp_20/elisp_10.html</a>)<br />
+その他参考 URL:<br />
+Emacs Lisp デバッグ — ありえるえりあ<br />
+(url: <a href="http://dev.ariel-networks.com/articles/software-design-200802/elisp-debug/">http://dev.ariel-networks.com/articles/software-design-200802/elisp-debug/</a>)<br />
+カーソル位置の情報で遊ぼう。 - 日々、とんは語る。<br />
+(url: <a href="http://d.hatena.ne.jp/tomoya/20101213/1292166026">http://d.hatena.ne.jp/tomoya/20101213/1292166026</a>)<br />
+[Home] Thing At Point<br />
+(url: <a href="https://www.emacswiki.org/emacs/ThingAtPoint">https://www.emacswiki.org/emacs/ThingAtPoint</a>)<br />
+GNU Emacs Lisp Reference Manual - ファイルに関する情報<br />
+(url: <a href="http://flex.phys.tohoku.ac.jp/texi/eljman/eljman_154.html">http://flex.phys.tohoku.ac.jp/texi/eljman/eljman_154.html</a>)<br />
+GNU Emacs Lispリファレンスマニュアル: ファイル<br />
+(url: <a href="http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_25.html#SEC385">http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_25.html#SEC385</a>)<br />
+</p>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+</feed>
