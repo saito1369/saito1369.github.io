@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>desmond/maestro による MD 計算準備の自動化 - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2018-10-17-172030.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2018-10-17-172030.html">
+  <meta property="og:title" content="desmond/maestro による MD 計算準備の自動化 - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-10-17T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-10-17 (Wed)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        desmond/maestro による MD 計算準備の自動化
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/md/'>md</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. Protein Preparation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. PDB ファイルの読み込み</a></li>
+<li><a href="#sec-2-2">2.2. 水素付加</a></li>
+<li><a href="#sec-2-3">2.3. 化合物の削除</a></li>
+<li><a href="#sec-2-4">2.4. 変異体の作成</a></li>
+<li><a href="#sec-2-5">2.5. mae ファイルへの変換</a></li>
+<li><a href="#sec-2-6">2.6. 水素位置の optimize</a></li>
+<li><a href="#sec-2-7">2.7. fake X server</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. System Setup(multisim)</a></li>
+<li><a href="#sec-4">4. Molecular Dynamics</a></li>
+<li><a href="#sec-5">5. 手順まとめ</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-10-17 Wed 17:20&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-02-13 Wed 19:06&gt;</span></span><br  />
+</p>
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+maestro/desmond による MD 計算手順の典型例は以下である.<br  />
+</p>
+
+<p>
+maestro を立ち上げる.<br  />
+</p>
+<ol class="org-ol">
+<li>Protein Preparation ウインドウから<br  />
+1.1. Import and Process タブ<br  />
+1.1.1. PDB ファイルを読み込む<br  />
+1.1.2. 水素付加(Preprocess)<br  />
+<ul class="org-ul">
+<li>CAP termini にチェックして N端, C端の処理<br  />
+</li>
+<li>Delete waters beyond 5 (default) (チェック入れたり入れなかったり)<br  />
+</li>
+</ul>
+<p>
+1.2. Review and Modify タブ<br  />
+     EDO 等のいらない化合物の削除<br  />
+     (この時点での PDB ファイル保存しておく)  PDBID_addH_delEDO.pdb<br  />
+1.3. mutant 作成(ex. E66K)<br  />
+     (この時点での PDB ファイル保存しておく)  PDBID_addH_delEDO_E66K.pdb<br  />
+     maestro 形式のファイルを保存する必要あり PDBID_addH_delEDO_E66K.mae<br  />
+1.4. Refine タブ<br  />
+     Optimize(水素位置の optimize)<br  />
+     maestro 形式のファイルを読み込んで,<br  />
+     maestro 形式のファイルが出力される PDBID_addH_delEDO_E66K_opt.mae<br  />
+</p>
+</li>
+<li>System Setup<br  />
+2.1. Solvation タブ<br  />
+     Minimize Volume<br  />
+2.2. Ions タブ<br  />
+     Na+ (or Cl-) での neutralize<br  />
+     Ad salt 0.15M<br  />
+     (この時点での cms ファイル保存しておく) PDBID_addH_delEDO_E66K_opt_sol.cms<br  />
+</li>
+<li>MD パラメータについて<br  />
+MD 計算に必要なファイルは cms/msj/cfg ファイル.<br  />
+cms は上で作成済<br  />
+msj/cfg ファイルは maestro で一度作成したのを使い回すことにする.<br  />
+基本的には毎回同じなので.(cfg ファイルのパラメータ seed は毎回変更する)<br  />
+</li>
+</ol>
+
+<p>
+これらを自動化(script 化)したいというのがここでの目標.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Protein Preparation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> PDB ファイルの読み込み</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+まずは PDB ファイルを読み込む.<br  />
+getpdb コマンドを使えば良い.<br  />
+</p>
+
+<p>
+getpdb PDBID<br  />
+getpdb PDBID:CHAIN_NAME<br  />
+のように使えば良いらしい.<br  />
+詳しくは getpdb -h とやれば詳細なパラメタが出てくる.<br  />
+とりあえず以下でいいだろう.<br  />
+</p>
+
+<p>
+001getpdb.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="001getpdb.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/getpdb PDBID
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">$SCHRODINGER/utilities/getpdb PDBID:A  # chain &#25351;&#23450;&#12391;&#35501;&#12415;&#36796;&#12415;&#12383;&#12356;&#22580;&#21512;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 水素付加</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+続いて水素付加を行う.<br  />
+水素付加は prepwizard コマンドで出来る.<br  />
+prepwizard -h で詳細がみられる.<br  />
+</p>
+
+<p>
+002addH.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="002addH.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/prepwizard -c -WAIT -NOJOBID <span style="color: #ffa07a;">\</span>
+         -noepik -noimpref -noprotassign PDBID.pdb PDBID_addH.pdb
+</pre>
+</div>
+<p>
+-c option は Cap termini のチェック<br  />
+Delete waters beyond 5 (default) のチェックを外すときには -keepfarwat option を追加.<br  />
+-noepik -noimpref -nopropassign は, maestro Academic Only 版を使ってる場合は必須？これが無いとエラーとなる.<br  />
+</p>
+
+<p>
+注: 水素付加プログラムを上記コマンドでやるときと, maestro の GUI でやるときでは, 微妙に構造が異なる場合がある. =&gt; 小数点第三位の数値が異なる場合がある.<br  />
+    maestro(GUI) と全く同じ座標を使いたい場合には, 水素付加までは maestro(GUI)でやったほうがいいかも知れない(wild-type のを一回やればいいだけなんで問題ないかと思われる).<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 化合物の削除</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+これは mutation と一緒にやってもよい.<br  />
+GUI の maestro を起動しないとできないが, コマンドからで立ち上げて処理が終われば終了する.<br  />
+</p>
+
+<p>
+maestro -c file.com<br  />
+で, file.com にある命令を実行出来るので, コマンドをファイル(file.com)内に書いておく.<br  />
+</p>
+
+<p>
+具体的な命令の内容については, 以下を参照せよ.<br  />
+$SCHROGINGER/docs/Documentation.htm#maestro_command_reference/Command-Language.html<br  />
+</p>
+
+<p>
+011delHET.m<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="011delHET.m"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">PDB &#12501;&#12449;&#12452;&#12523;&#12398;&#35501;&#12415;&#36796;&#12415;</span>
+entryimport PDBID_addH.pdb
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">EDO &#12392;&#12356;&#12358;&#21517;&#21069;&#12398;&#27531;&#22522;&#12434;&#21066;&#38500;&#12377;&#12427;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12394;&#12380;&#12363;&#30693;&#12425;&#12435;&#12364; res. &#12398;&#24460;&#12429;&#12395;&#12473;&#12506;&#12540;&#12473;&#12364;&#28961;&#12356;&#12392;&#12456;&#12521;&#12540;&#12392;&#12394;&#12427;.</span>
+delete res. EDO
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">PDB &#12501;&#12449;&#12452;&#12523;&#12398;&#26360;&#12365;&#36796;&#12415;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">format=pdb &#12434;&#25351;&#23450;&#12375;&#12394;&#12356;&#12392;&#21029;&#12501;&#12457;&#12540;&#12510;&#12483;&#12488;&#12395;&#12394;&#12427;</span>
+entryexport <span style="color: #9acd32;">format</span>=pdb PDBID_addH_delHET.pdb
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#32066;&#20102;</span>
+quit
+</pre>
+</div>
+
+<p>
+上記ファイルを使って実行する.<br  />
+</p>
+
+<p>
+012delHET.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="012delHET.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/maestro -c 011delHET.m
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 変異体の作成</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+これも maestro 本体を動かさないといけない.<br  />
+</p>
+
+<p>
+maestro -c file.com で, file.com の中に変異体作成の命令を書く.<br  />
+</p>
+
+<p>
+013mut.m<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="013mut.m">entryimport PDBID_addH_delHET.pdb
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21407;&#23376;&#25968;&#12364;&#22793;&#12431;&#12427;&#12398;&#12391;(&#24565;&#12398;&#28858;)&#24460;&#12429;&#12398;&#26041;&#12363;&#12425;&#22793;&#30064;&#20307;&#12434;&#20316;&#25104;&#12377;&#12427;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">chain B &#12391; residue id = 66 &#12398;&#22580;&#25152;&#12434;&#35211;&#12388;&#12369;&#12427;</span>
+find chain.name B and res.num 66
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">LYS &#12398; fragment &#12434;&#20316;&#25104;</span>
+fragment peptide LYS
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21407;&#23376;&#30058;&#21495; 6634 &#20197;&#19979;&#12398;&#27531;&#22522;( residue id =66) &#12395;&#22793;&#30064;&#12434;&#12363;&#12369;&#12427;.</span>
+mutate at.n 6634
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">chain A &#12391;&#21516;&#27096;&#12398;&#35336;&#31639;</span>
+find chain.name A and res.num 66
+fragment peptide LYS
+mutate at.n 527
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26360;&#12365;&#20986;&#12375;</span>
+entryexport <span style="color: #9acd32;">format</span>=pdb PDBID_addH_delHET_E66K.pdb
+</pre>
+</div>
+
+<p>
+上記を以下のように実行<br  />
+013mut.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="013mut.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/maestro -c 0130mut.m
+</pre>
+</div>
+
+<p>
+化合物の削除と同時にやる version<br  />
+普段はこっちを使えばよい<br  />
+</p>
+
+<p>
+01mut.m<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="01mut.m"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">PDB &#12501;&#12449;&#12452;&#12523;&#12391;&#12418;&#12356;&#12356;&#12364;, maestro(GUI)&#12391;&#27700;&#32032;&#20184;&#21152;&#12398;&#24460;&#12395; mae &#12501;&#12449;&#12452;&#12523;&#12434;&#20445;&#23384;&#12375;&#12390;&#12362;&#12367;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">mae &#12501;&#12449;&#12452;&#12523;&#12398;&#26041;&#12364;&#24773;&#22577;&#37327;&#12364;&#22810;&#12356;&#12398;&#12391;</span>
+entryimport PDBID_addH.mae
+
+delete res. EDO
+
+
+fragment peptide LYS
+mutate chain.name B and res.num 66
+
+fragment peptide LYS
+mutate chain.name A and res.num 66
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">mae &#12501;&#12449;&#12452;&#12523;&#12391;&#20445;&#23384;&#12377;&#12427;. &#27425;&#12398;&#12467;&#12510;&#12531;&#12489;&#12408;&#12399; mae &#12501;&#12449;&#12452;&#12523;&#12375;&#12363;&#28193;&#12379;&#12394;&#12356;&#12398;&#12391;</span>
+entryexport <span style="color: #9acd32;">format</span>=maestro PDBID_addH_delHET_E66K.mae
+
+quit
+</pre>
+</div>
+
+<p>
+01mut.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="01mut.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/maestro -c 01mut.m
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> mae ファイルへの変換</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+pdb -&gt; mae ファイルへ変換(確認用)<br  />
+様々な形式変換が出来る.<br  />
+詳しくは pdbconvert -h で見られる.<br  />
+</p>
+
+<p>
+基本は pdbconvert -i(input_format) hoge.pdb -o(output_format) fuga.mae<br  />
+</p>
+
+<p>
+0140conv.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="0140conv.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/pdbconvert -ipdb PDBID_addH_delHET_E66K.pdb -omae PDBID_addH_delHET_E66K.mae
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> 水素位置の optimize</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+$SCHRODINGER/utilities/protassign を用いる.<br  />
+protassign -h で詳細な情報が見られる.<br  />
+とりあえず今回使うのは -propka_pH 位か？<br  />
+</p>
+
+<p>
+02refine.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="02refine.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/protassign -WAIT -NOJOBID -propka_pH 7 PDBID_addH_delHET_E66K.mae PDBID_addH_delHET_E66K_opt.mae
+</pre>
+</div>
+
+
+<p>
+ついでに mae -&gt; pdb ファイルへの変換は以下のように実行する.<br  />
+conv.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="conv.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/pdbconvert -imae PDBID_addH_delHET_E66K_opt.mae -opdb PDBID_addH_delHET_E66K_opt.pdb
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> fake X server</h3>
+<div class="outline-text-3" id="text-2-7">
+<p>
+化合物の削除, 及び変異体の作成の際には maestro の GUI が起動してしまう.<br  />
+このままではいらん GUI のせいで terminal 上のコマンドでプログラムを動かせない.<br  />
+そこで xvfb を使う.<br  />
+desmond/maestro が動いている linux server 上で<br  />
+</p>
+
+<p>
+server@: sudo apt-get install xvfb<br  />
+server@: export DISPLAY=:2     # 値は何でもいい. :1 とか.<br  />
+server@: Xvfb :2 -screen 2 1280x800x24 &amp;<br  />
+</p>
+
+<p>
+これで化合物の削除, 変異体の作成の script がいらん GUI が立ち上がらずに動く.<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> System Setup(multisim)</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+System Setup の window で Run を実行せずに保存すると<br  />
+desmond_setup_1/ 以下に実行 script が保存されることを見つけた.<br  />
+この設定ファイルを使うことにする.<br  />
+</p>
+
+<p>
+入力ファイル desmond_setup_1.mae として上の計算(水素付加関連の一連の作業)後の mae ファイルを使う.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">ln -s PDBID_addH_delHET_E66K_opt.mae desmond_setup_1.mae
+</pre>
+</div>
+<p>
+こんな感じで入力構造ファイルを確保しておく.<br  />
+</p>
+
+<p>
+multisim の設定ファイル.<br  />
+minimize_volume = true が無ければ手動で追加.<br  />
+</p>
+
+<p>
+desmond_setup_1.msj<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_setup_1.msj">ask {
+  <span style="color: #9acd32;">task</span> = <span style="color: #ffa07a;">"desmond:auto"</span>
+}
+
+build_geometry {
+  <span style="color: #9acd32;">add_counterion</span> = {
+     <span style="color: #9acd32;">ion</span> = Cl
+     <span style="color: #9acd32;">number</span> = neutralize_system
+  }
+  <span style="color: #9acd32;">add_counterion</span> = {
+     <span style="color: #9acd32;">ion</span> = Na
+     <span style="color: #9acd32;">number</span> = neutralize_system
+  }
+  <span style="color: #9acd32;">box</span> = {
+     <span style="color: #9acd32;">shape</span> = orthorhombic
+     <span style="color: #9acd32;">size</span> = [10.0 10.0 10.0 ]
+     <span style="color: #9acd32;">size_type</span> = buffer
+  }
+  <span style="color: #9acd32;">minimize_volume</span> = true   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25163;&#21205;&#12391;&#36861;&#21152;</span>
+  <span style="color: #9acd32;">rezero_system</span> = false
+  <span style="color: #9acd32;">salt</span> = {
+     <span style="color: #9acd32;">concentration</span> = 0.15
+     <span style="color: #9acd32;">negative_ion</span> = Cl
+     <span style="color: #9acd32;">positive_ion</span> = Na
+  }
+  <span style="color: #9acd32;">solvent</span> = SPC
+}
+
+assign_forcefield {
+}
+</pre>
+</div>
+
+<p>
+shell script<br  />
+desmond_setup_1.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_setup_1.sh">${<span style="color: #9acd32;">SCHRODINGER</span>}/utilities/multisim<span style="color: #ffa07a;">" -JOBNAME desmond_setup_1 -m desmond_setup_1.msj \</span>
+<span style="color: #ffa07a;">   desmond_setup_1.mae -o desmond_setup_1-out.cms -HOST localhost -TMPLAUNCHDIR -ATTACHED</span>
+</pre>
+</div>
+
+<p>
+中身は正直よくわかってないけど.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Molecular Dynamics</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+このあと水及びイオンが溶かされた系を読み込んで,<br  />
+MD 計算のパラメータを書き出して MD 計算(multisim)を行っていく.<br  />
+書き出しの際に得られるファイルは,<br  />
+</p>
+<ul class="org-ul">
+<li>cms ファイル (上で作成)<br  />
+</li>
+<li>msj ファイル<br  />
+</li>
+<li>cfg ファイル<br  />
+</li>
+</ul>
+
+<p>
+msj と cfg は一度 maestro で作っておけば使い回しが出来るのでそれを使うでいいかも(？)<br  />
+cfg ファイルの seed (random seed) の値は変更すること.<br  />
+</p>
+
+<p>
+demond_md_job_1.cfg<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.cfg"><span style="color: #9acd32;">annealing</span> = false
+<span style="color: #9acd32;">backend</span> = {
+}
+<span style="color: #9acd32;">bigger_rclone</span> = false
+<span style="color: #9acd32;">checkpt</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 240.06
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME.cpt"</span>
+   <span style="color: #9acd32;">write_last_step</span> = true
+}
+<span style="color: #9acd32;">cpu</span> = 1
+<span style="color: #9acd32;">cutoff_radius</span> = 9.0
+<span style="color: #9acd32;">elapsed_time</span> = 0.0
+<span style="color: #9acd32;">energy_group</span> = false
+<span style="color: #9acd32;">eneseq</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 1.2
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$].ene"</span>
+}
+<span style="color: #9acd32;">ensemble</span> = {
+   <span style="color: #9acd32;">barostat</span> = {
+      <span style="color: #9acd32;">tau</span> = 2.0
+   }
+   <span style="color: #9acd32;">class</span> = NPT
+   <span style="color: #9acd32;">method</span> = MTK
+   <span style="color: #9acd32;">thermostat</span> = {
+      <span style="color: #9acd32;">tau</span> = 1.0
+   }
+}
+<span style="color: #9acd32;">glue</span> = solute
+<span style="color: #9acd32;">maeff_output</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 120.0
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]-out.cms"</span>
+   <span style="color: #9acd32;">periodicfix</span> = true
+   <span style="color: #9acd32;">trjdir</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]_trj"</span>
+}
+<span style="color: #9acd32;">meta</span> = false
+<span style="color: #9acd32;">meta_file</span> = ?
+<span style="color: #9acd32;">pressure</span> = [1.01325 isotropic ]
+<span style="color: #9acd32;">randomize_velocity</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = inf
+   <span style="color: #9acd32;">seed</span> = 2007
+   <span style="color: #9acd32;">temperature</span> = <span style="color: #ffa07a;">"@*.temperature"</span>
+}
+<span style="color: #9acd32;">restrain</span> = none
+<span style="color: #9acd32;">simbox</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 1.2
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]_simbox.dat"</span>
+}
+<span style="color: #9acd32;">surface_tension</span> = 0.0
+<span style="color: #9acd32;">taper</span> = false
+<span style="color: #9acd32;">temperature</span> = [
+   [300.0 0 ]
+]
+<span style="color: #9acd32;">time</span> = 100000.0
+<span style="color: #9acd32;">timestep</span> = [0.002 0.002 0.006 ]
+<span style="color: #9acd32;">trajectory</span> = {
+   <span style="color: #9acd32;">center</span> = []
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">format</span> = dtr
+   <span style="color: #9acd32;">frames_per_file</span> = 250
+   <span style="color: #9acd32;">interval</span> = 10.0
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]_trj"</span>
+   <span style="color: #9acd32;">periodicfix</span> = true
+   <span style="color: #9acd32;">write_velocity</span> = false
+}
+</pre>
+</div>
+
+<p>
+desmond_md_job_1.msj<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.msj"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">Desmond standard NPT relaxation protocol</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">All times are in the unit of ps.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">Energy is in the unit of kcal/mol.</span>
+task {
+   <span style="color: #9acd32;">task</span> = <span style="color: #ffa07a;">"desmond:auto"</span>
+   <span style="color: #9acd32;">set_family</span> = {
+      <span style="color: #9acd32;">desmond</span> = {
+         checkpt.write_last_step = no
+      }
+   }
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"Brownian Dynamics NVT, T = 10 K, small timesteps, and restraints on solute heavy atoms, 100ps"</span>
+   <span style="color: #9acd32;">annealing</span>   = off
+   <span style="color: #9acd32;">time</span>        = 100
+   <span style="color: #9acd32;">timestep</span>    = [0.001 0.001 0.003 ]
+   <span style="color: #9acd32;">temperature</span> = 10.0
+   <span style="color: #9acd32;">ensemble</span> = {
+      <span style="color: #9acd32;">class</span> = <span style="color: #ffa07a;">"NVT"</span>
+      <span style="color: #9acd32;">method</span> = <span style="color: #ffa07a;">"Brownie"</span>
+      <span style="color: #9acd32;">brownie</span> = {
+         <span style="color: #9acd32;">delta_max</span> = 0.1
+      }
+   }
+   <span style="color: #9acd32;">restrain</span> = {
+      <span style="color: #9acd32;">atom</span> = <span style="color: #ffa07a;">"solute_heavy_atom"</span>
+      <span style="color: #9acd32;">force_constant</span> = 50.0
+   }
+}
+
+simulate {
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NVT, T = 10 K, small timesteps, and restraints on solute heavy atoms, 12ps"</span>
+   <span style="color: #9acd32;">annealing</span>   = off
+   <span style="color: #9acd32;">time</span>        = 12
+   <span style="color: #9acd32;">timestep</span>    = [0.001 0.001 0.003]
+   <span style="color: #9acd32;">temperature</span> = 10.0
+   <span style="color: #9acd32;">restrain</span>    = { <span style="color: #9acd32;">atom</span> = solute_heavy_atom <span style="color: #9acd32;">force_constant</span> = 50.0 }
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NVT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NPT, T = 10 K, and restraints on solute heavy atoms, 12ps"</span>
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">annealing</span>   = off
+   <span style="color: #9acd32;">time</span>        = 12
+   <span style="color: #9acd32;">temperature</span> = 10.0
+   <span style="color: #9acd32;">restrain</span>    = retain
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NPT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 50.0
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+solvate_pocket {
+   <span style="color: #9acd32;">should_skip</span> = true
+   <span style="color: #9acd32;">ligand_file</span> = ?
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NPT and restraints on solute heavy atoms, 12ps"</span>
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"@*.*.annealing"</span>] <span style="color: #ffa07a;">'annealing = off temperature = "@*.*.temperature[0][0]"'</span>
+                  [<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">time</span>        = 12
+   <span style="color: #9acd32;">restrain</span>    = retain
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NPT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 50.0
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NPT and no restraints, 24ps"</span>
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"@*.*.annealing"</span>] <span style="color: #ffa07a;">'annealing = off temperature = "@*.*.temperature[0][0]"'</span>
+                  [<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">time</span>        = 24
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NPT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 2.0
+   }
+
+   eneseq.interval   = 0.3
+   trajectory.center = solute
+}
+
+simulate {
+   <span style="color: #9acd32;">cfg_file</span> = <span style="color: #ffa07a;">"desmond_md_job_1.cfg"</span>
+   <span style="color: #9acd32;">jobname</span>  = <span style="color: #ffa07a;">"$MASTERJOBNAME"</span>
+   <span style="color: #9acd32;">dir</span>      = <span style="color: #ffa07a;">"."</span>
+   <span style="color: #9acd32;">compress</span> = <span style="color: #ffa07a;">""</span>
+}
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">Job launching command:</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">$SCHRODINGER/utilities/multisim -VIEWNAME desmond_molecular_dynamics_gui.MDApp -JOBNAME desmond_md_job_1</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">-HOST localhost -maxjob 1 -cpu 1 -m desmond_md_job_1.msj -c desmond_md_job_1.cfg -description 'Molecular Dynamics'</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">desmond_md_job_1.cms -mode umbrella -PROJ /home/vagrant/.schrodinger/tmp/tproj36567a6821</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">-DISP append -o desmond_md_job_1-out.cms -ATTACHED</span>
+</pre>
+</div>
+
+<p>
+MD 計算の shell script もついでに載せておく.<br  />
+desmond_md_job_1.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.sh"><span style="color: #ffa07a;">"${SCHRODINGER}/utilities/multisim"</span> -JOBNAME desmond_md_job_1 -HOST localhost -maxjob 1 -cpu 1 -m desmond_md_job_1.msj
+     -c desmond_md_job_1.cfg -description <span style="color: #ffa07a;">"Molecular Dynamics"</span>
+           desmond_md_job_1.cms -mode umbrella
+               -o desmond_md_job_1-out.cms -ATTACHED
+</pre>
+</div>
+
+<p>
+GPU 計算の場合<br  />
+desmond_md_job_1.GPU.sh<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.GPU.sh"><span style="color: #ffa07a;">"${SCHRODINGER}/utilities/multisim"</span> -JOBNAME desmond_md_job_1 -HOST localhost -maxjob 1 -cpu 1 -m desmond_md_job_1.msj
+      -c desmond_md_job_1.cfg -description <span style="color: #ffa07a;">"Molecular Dynamics"</span>
+            desmond_md_job_1.cms -mode umbrella  -set <span style="color: #ffa07a;">'stage[1].set_family.md.jlaunch_opt=["-gpu"]'</span>
+                -o desmond_md_job_1-out.cms -ATTACHED
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 手順まとめ</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+タンパク質の mutant を MD 計算したい場合<br  />
+wild type の水素付加したものを maestro(GUI)で作成しておく. これはまぁしょうがない.<br  />
+mae ファイルとして保存する.<br  />
+出発点: PDBID_addH.mae<br  />
+</p>
+<ol class="org-ol">
+<li>変異体作成(+いらない HET の削除): 01mut.sh (01mut.m に実行内容を書く)<br  />
+必要ならば fake X server を立ち上げておくこと.<br  />
+</li>
+<li>水素の refine: 02refine.sh PDBID_addH_delHET_E66K_opt.mae が出来る.<br  />
+PDBID_addH_delHET_E66K_opt.mae -&gt; desmond_setup_1.mae<br  />
+</li>
+<li>03setup/ system setup: desmond_setup_1.sh の実行<br  />
+desmond_setup_1-out.cms -&gt; desmond_md_job_1.cms<br  />
+</li>
+<li>04md/ MD run: desmond_md_job_1.GPU.sh の実行<br  />
+desmond_md_job_1.cfg ファイルの seed の値を変えて疑似乱数の初期値を変更.<br  />
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-10-17T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-10-17 (Wed)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/md/'>md</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2018-10-17-172030.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2018-10-17-172030.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2018-03-09-layout.html" title="Previous Post: 教材 ppt のレイアウト半自動作成">&laquo; 教材 ppt のレイアウト半自動作成</a></li>
+            
+            
+            <li class="next"><a href="/blog/2018-11-05-201433.html" title="Next Post: CHARMM-GUI 使い方まとめ">CHARMM-GUI 使い方まとめ &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2018-10-17-172030.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2018-10-17-172030.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>diary-float による org-mode の日付作成 - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2017-05-18-diary_float.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2017-05-18-diary_float.html">
+  <meta property="og:title" content="diary-float による org-mode の日付作成 - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-05-18T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-05-18 (Thu)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        diary-float による org-mode の日付作成
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/org-mode/'>org-mode</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. 問題点</a></li>
+<li><a href="#sec-3">3. 解決策</a></li>
+<li><a href="#sec-4">4. 結果</a>
+<ul>
+<li><a href="#sec-4-1">4.1. 毎月月末の特定曜日を指定</a></li>
+<li><a href="#sec-4-2">4.2. 毎週特定曜日(複数)を指定</a></li>
+<li><a href="#sec-4-3">4.3. 毎週特定曜日にやることがある(始まり, 終わりなどその他複雑な条件あり)</a></li>
+<li><a href="#sec-4-4">4.4. その他いくつか作ったプログラム</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 感想</a></li>
+<li><a href="#sec-6">6. 参考 URL</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-05-24 Sun 16:31&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-02-21 Wed 19:38&gt;</span></span><br  />
+</p>
+
+<p>
+概要:<br  />
+emacs/org-mode での予定の作成方法について,<br  />
+特に繰り返して起こるタスクや予定のスケジュール(日時)作成についてのはなし.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+私はエディタとして emacs を使っており, 予定やタスクを org-mode のファイルで管理している.<br  />
+日時が定まっている予定は<br  />
+</p>
+<pre class="example">
+SCHEDULED: &lt;2015-05-24 Sun 19:00&gt;
+</pre>
+
+<p>
+のような感じで書いておけばよい.<br  />
+しかし, 一回やればそれで終わりではないことや,<br  />
+定期的に繰り返して起こるような予定やタスクに関して,<br  />
+日付をどのように書けばいいのかよくわからなかったのでしらべてみた.<br  />
+</p>
+
+<p>
+org-mode の version は 8.2.10, emacs の version は 24.5.4 です.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 問題点</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+週単位で動いたり月単位で動くような仕事をしている場合,<br  />
+それらを周期とした少し複雑な予定を書く必要に迫られることがあったりする.<br  />
+例えば,<br  />
+</p>
+<ul class="org-ul">
+<li>毎月月末の木曜日には定例会議がある.<br  />
+</li>
+<li>毎週月, 水, 金にやることがある.<br  />
+</li>
+<li>4/11  から 15 週に渡って毎週水曜日にやることがあるが,<br  />
+3 週目と 4 週目はやらない.<br  />
+その代わり 7/3 と 7/4 にちにその代わりをやる.<br  />
+</li>
+</ul>
+<p>
+とか.<br  />
+私の場合, 週及び月単位, 四半期単位での繰り返しがあり,<br  />
+上のような結構めんどくさい条件もあったりすることがわかった.<br  />
+最初は手で予定を書き換えてたのだが, 一応ルールがあるのに手で修正するのはめんどくさいし, 何とか自動で出来ないかなぁと思っていた.<br  />
+いくつか調べたが, こういうのはもしかして org-mode のカレンダー日付で書くやりかたではちょっと表現しにくい, というか出来ないんじゃないかなーと思ったのであった.<br  />
+例えば<br  />
+</p>
+<pre class="example">
+&lt;2015-05-24 Sun +1w&gt;
+</pre>
+<p>
+とかは +1w で毎週を示せますが週一回やることしか表現できないし,<br  />
+月末の最後の金曜日のつもりで<br  />
+</p>
+<pre class="example">
+&lt;2015-05-29 Fri +1m&gt;
+</pre>
+<p>
+のように書いても, これが終わった後の次の月の予定は<br  />
+</p>
+<pre class="example">
+&lt;2015-06-29 Mon +1m&gt;
+</pre>
+<p>
+に書き換えられてしまいます.<br  />
++1m はひと月後という意味なので間違ってはないんだけど&#x2026;<br  />
+曜日を揃えるにはどーすればいいんだろう.<br  />
+こっちの方が何かと使うと思うんだけど. 外人は毎月末の金曜日に会議, とかいう予定は無いんかなぁ.<br  />
+それとも自分が知らない何かワザがあるんだろうか&#x2026;<br  />
+この辺何とかならないかなぁというのがここでの問題点である.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 解決策</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+色々調べたけど日付の後ろに +1w とかで修飾していくようなやり方では出来ないみたい？<br  />
+探してたら出てきたのが diary-float (diary-lib.el) というやつである.<br  />
+</p>
+
+<p>
+以下のようにかく. diary パッケージの S 式というらしい.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-float t 4 2)&gt;
+</pre>
+<p>
+何これ.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 結果</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+調べてみた結果を以下にまとめた.<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> 毎月月末の特定曜日を指定</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+毎月第二木曜日 の場合は以下のように書く.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-float t 4 2)&gt;
+</pre>
+<p>
+パラメータの意味は<br  />
+毎月:   t<br  />
+木曜日: 4 (0:日 1:月 2:火 3:水 4:木 5:金 6:土)<br  />
+第二:   2<br  />
+</p>
+
+<p>
+10 月の第二木曜日は,<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-float 10 4 2)&gt;
+</pre>
+
+<p>
+10,11,12 月の第二木曜日は<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-float '(10 11 12) 4 2)&gt;
+</pre>
+
+<p>
+更にしらべたら, 毎月月末の週の木曜日の会議は以下のように書けることが判明した.<br  />
+-1 で月末になるっぽい. ナイスな感じ.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-float t 4 -1)&gt;
+</pre>
+<p>
+何と, 結構わかりやすいかも.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> 毎週特定曜日(複数)を指定</h3>
+<div class="outline-text-3" id="text-4-2">
+<pre class="example">
+&lt;%%(memq (calendar-day-of-week date) '(1 3 5))&gt;
+</pre>
+<p>
+date というのは何なのか&#x2026;<br  />
+書かせてみたりして調べてみると,<br  />
+どうやらこの行を評価した日付が '(12 13 2015) みたいな形式で date の中に入るっぽい.<br  />
+</p>
+
+<p>
+ちなみに date の書かせ方は<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(y-or-n-p (message <span style="color: #ffa07a;">"date=%s"</span> date))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> 毎週特定曜日にやることがある(始まり, 終わりなどその他複雑な条件あり)</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+<a href="http://orgmode.org/worg/org-faq.html#Appointments/Diary">http://orgmode.org/worg/org-faq.html#Appointments/Diary</a><br  />
+に例となる関数(diary-limited-cyclic)があったので,<br  />
+これを参考に見よう見まねで自分でも作ってみよう！！<br  />
+</p>
+
+<p>
+要は今日(date)が条件を満たしてれば t を返し, 満たしてなければ nil を返す,<br  />
+そんなプログラムを作ればいいんじゃないでしょうか.<br  />
+私は断固そー思うわけです.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-lecture</span>(stt ival recc <span style="color: #9370db;">&amp;optional</span> exs <span style="color: #9370db;">&amp;rest</span> sbs)
+  (<span style="color: #20b2aa; font-weight: bold;">let*</span> (
+         (sttd  (calendar-absolute-from-gregorian stt ))  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">stt &#12398;&#26085;&#20184;&#12434; 6 &#26689;&#25968;&#20516;&#12391;</span>
+         (today (calendar-absolute-from-gregorian date))  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12398;&#26085;&#20184;</span>
+         (diffd (- today sttd)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">stt &#12398;&#26085;&#20184;&#12392;&#20170;&#26085;&#12398;&#24046;&#20998;. stt &#12424;&#12426;&#20170;&#26085;&#12398;&#26041;&#12364;&#24460;&#12391;&#12354;&#12428;&#12400; &gt;0</span>
+         (nths   nil)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12399;&#20309;&#21608;&#30446;&#12363;&#12434;&#24471;&#12427;</span>
+         (jst    nil)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#25147;&#12426;&#20516; t or nil</span>
+         )
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">diary-limited-cyclic &#12434;&#21442;&#29031;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> (not (minusp diffd))
+             (zerop (% diffd ival))
+             (&lt; (floor diffd ival) recc))
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> nths (+ (/ diffd ival) 1)))
+
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#19978;&#12398;&#26465;&#20214;&#12434;&#28288;&#12383;&#12375;&#12390;&#12356;&#12428;&#12400; nths &#12395;&#20309;&#12363;&#20516;&#12364;&#20837;&#12387;&#12390;&#12427;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> nths
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (diary-lecture-exception nths exs))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (diary-lecture-substitution today sbs))
+      )
+    jst))
+
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12364;&#20363;&#22806;&#36913;(exs) &#12391;&#12354;&#12428;&#12400; nil &#12434;&#36820;&#12377;</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-lecture-exception</span>(nths exs)
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((jst t)
+        (ex  nil))
+    (<span style="color: #20b2aa; font-weight: bold;">while</span> exs
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> ex (car exs))
+      (<span style="color: #20b2aa; font-weight: bold;">if</span> (= nths ex) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst nil))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> exs (cdr exs)))
+    jst))
+
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12364;&#20195;&#12431;&#12426;&#12398;&#26085;&#20184;&#12391;&#12354;&#12428;&#12400; t &#12434;&#36820;&#12377;</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-lecture-substitution</span>(today sbs)
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((jst nil)
+        (sb  nil)
+        (sbg nil))
+    (<span style="color: #20b2aa; font-weight: bold;">while</span> sbs
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> sb (car sbs))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> sbg (calendar-absolute-from-gregorian sb))
+      (<span style="color: #20b2aa; font-weight: bold;">if</span> (= today sbg) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst t))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> sbs (cdr sbs)))
+    jst))
+</pre>
+</div>
+
+<pre class="example">
+(diary-lecture stt ival recc &amp;optional exs &amp;rest sbs)
+</pre>
+<p>
+引数の意味は以下です:<br  />
+</p>
+<ul class="org-ul">
+<li>stt:  始まりの日    '(4 11 2017)<br  />
+</li>
+<li>ival: 何日おき      7<br  />
+</li>
+<li>recc: 繰り返し回数  16<br  />
+</li>
+<li>exs:  除外週        '(3 4 6)<br  />
+</li>
+<li>sbs:  代わりの日付(配列) '(5 11 2017) '(3 11 2017)<br  />
+</li>
+</ul>
+
+<p>
+&amp;optional 以降の引数(exs, sbs) は無くてもいい<br  />
+&amp;rest 右隣の引数(sbs) は, これ以降の変数のリストは全て sbs に入るという意味<br  />
+</p>
+
+<p>
+例:<br  />
+2017/04/14 から毎週, 17 回やる. 4 回目と 10 回目は休み. その代わり 2018/08/08 2018/08/09にやる<br  />
+</p>
+<pre class="example">
+SCHEDULED: &lt;%%(diary-lecture '(4 14 2017) 7 17 '(4 10) '(8 8 2018) '(8 9 2018))&gt;
+</pre>
+
+<p>
+追記:<br  />
+diary-lecture を半年程使ってましたが, 繰り返し回数, 除外週のような, 始まりの週を 1 週目として何周目をというのを数えるのは超めんどくさいことが判明した.<br  />
+いちいちカレンダーを見て指折り数えないといけない. やってられないので diary-lecture2 を作った.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#32368;&#12426;&#36820;&#12375;&#22238;&#25968;&#12399;&#20351;&#12356;&#12395;&#12367;&#12356;&#12398;&#12391;&#26085;&#20184;&#12391;&#25351;&#23450;&#12377;&#12427;</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">stt:    &#22987;&#12414;&#12426;&#12398;&#26085; '(4 11 2018)</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">ival:   &#20309;&#26085;&#12362;&#12365;   7</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">end:    &#32066;&#20102;&#26085;     '(8 10 2018)</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">exdays: &#38500;&#22806;&#26085;     '((5 11 2018) (3 11 2018))</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">sbdays: &#20195;&#12431;&#12426;&#26085;   '((5 12 2018) (3 12 2018))</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-lecture2</span>(stt ival end <span style="color: #9370db;">&amp;optional</span> exdays sbdays)
+  (<span style="color: #20b2aa; font-weight: bold;">let*</span> (
+         (sttd  (calendar-absolute-from-gregorian stt ))  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">stt &#12398;&#26085;&#20184;&#12434; 6 &#26689;&#25968;&#20516;&#12391;</span>
+         (today (calendar-absolute-from-gregorian date))  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12398;&#26085;&#20184;</span>
+         (endd  (calendar-absolute-from-gregorian end))   <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">end &#12398;&#26085;&#20184;&#12434; 6 &#26689;&#25968;&#20516;&#12391;</span>
+         (diffd (- today sttd))
+         (diffe (- endd  today))
+         (nths   nil)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12399;&#20309;&#21608;&#30446;&#12363;&#12434;&#24471;&#12427;</span>
+         (jst    nil)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#25147;&#12426;&#20516; t or nil</span>
+         )
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> (not (minusp diffd))
+             (not (minusp diffe))
+             (zerop (% diffd ival)))
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> nths (+ (/ diffd ival) 1)))
+
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#19978;&#12398;&#26465;&#20214;&#12434;&#28288;&#12383;&#12375;&#12390;&#12356;&#12428;&#12400;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> nths
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (not (diary-lecture-substitution today exdays)))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (diary-lecture-substitution today sbdays)))
+    jst))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> その他いくつか作ったプログラム</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+いちおう何となく作り方がわかったんで, 必要に応じていくつか書いてみた.<br  />
+基本すべて同じぱたーんで書ける筈！！<br  />
+</p>
+
+<p>
+月末にやることを指定.<br  />
+月の締めの作業とか.<br  />
+2015/03/07 以降の月末日にやることを指定.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-habit-last-day-of-month '(3 7 2015)&gt;
+</pre>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-habit-last-day-of-month</span>(stt)
+  (<span style="color: #20b2aa; font-weight: bold;">let*</span> ((jst0 nil)
+         (jst  nil)
+         (sttd  (calendar-absolute-from-gregorian stt ))
+         (today (calendar-absolute-from-gregorian date))
+         (diffd (- today sttd))
+         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">(calendar-last-day-of-month 3&#26376; 2017&#24180;) ;=&gt; 31 &#26085;</span>
+         (lday (calendar-last-day-of-month (nth 0 date) (nth 2 date)))
+         )
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (not (minusp diffd)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst0 t))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 (= (nth 1 date) lday)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst t))
+    jst
+    ))
+</pre>
+</div>
+
+<p>
+2015/03/07 以降の月水金だけやることを指定.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-habit-weekday '(3 7 2015) 1 3 5)&gt;
+</pre>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-habit-weekday</span>(stt <span style="color: #9370db;">&amp;rest</span> wds)
+  (<span style="color: #20b2aa; font-weight: bold;">let*</span> ((jst0 nil)
+         (jst  nil)
+         (sttd  (calendar-absolute-from-gregorian stt ))
+         (today (calendar-absolute-from-gregorian date))
+         (diffd (- today sttd)))
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "date=%s" date))</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (not (minusp diffd)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst0 t))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 (not wds)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst  t)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27598;&#26085;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 wds)       (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (diary-habit-weekday-week date wds)))
+    jst
+    ))
+
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-habit-weekday-week</span>(date wds)
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((wd nil)
+        (jst nil))
+    (<span style="color: #20b2aa; font-weight: bold;">while</span> wds
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> wd (car wds))
+      (<span style="color: #20b2aa; font-weight: bold;">if</span> (= wd (calendar-day-of-week date)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst t))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> wds (cdr wds))
+      )
+    jst))
+</pre>
+</div>
+
+<p>
+指定した月の毎日やることを指定, 除外曜日があればそれも指定.<br  />
+2015/05 の毎日. 但し火曜(2)水曜(3)を除く.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-every-day-in-month2 2015 5 2 3)&gt;
+</pre>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-every-day-in-month</span>(y m <span style="color: #9370db;">&amp;rest</span> wds)
+  (<span style="color: #20b2aa; font-weight: bold;">let*</span> (
+         (l     (calendar-last-day-of-month m y))
+         (endd  (calendar-absolute-from-gregorian (list m l y)))
+         (sttd  (calendar-absolute-from-gregorian (list m 1 y)))
+         (today (calendar-absolute-from-gregorian date))
+         (jst0  nil)
+         (jst   nil)
+         )
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> (not (minusp (- today sttd)))
+             (not (minusp (- endd  today))))
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst0 t))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 (not wds)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst  t)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27598;&#26085;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 wds)       (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (not (diary-habit-weekday-week date wds))))
+    jst
+   ))
+</pre>
+</div>
+
+<p>
+毎月やる会議の指定.<br  />
+2017/04/01 から 2018/03/31 まで, ある委員に任命されてしまった&#x2026;<br  />
+月末の金曜日に会議がある.<br  />
+だけど夏休みの 8 月と春休みの 2 月には会議がない.<br  />
+その代わり 2017/05/08 と 2017/03/11 に余計な会議がある予定なのであった.<br  />
+そんな場合の予定として, 以下のように書く私であった.<br  />
+</p>
+<pre class="example">
+&lt;%%(diary-monthly-meeting '(4 1 2017) '(3 31 2018) 5 -1 (8 2) '(5 8 2017) '(3 11 2017))&gt;
+</pre>
+<ul class="org-ul">
+<li>stt: はじまりの日: '(4 1 2017)<br  />
+</li>
+<li>end: 終わりの日:   '(3 31 2018)<br  />
+</li>
+<li>何曜日(week)<br  />
+</li>
+<li>第何週(num)<br  />
+</li>
+<li>除外月(exs): (5 8)<br  />
+</li>
+<li>代わりの日付(配列) sbs = '(5 8 2017) '(3 11 2017)<br  />
+</li>
+</ul>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-monthly-meeting</span>(stt end week num <span style="color: #9370db;">&amp;optional</span> exs <span style="color: #9370db;">&amp;rest</span> sbs)
+  (<span style="color: #20b2aa; font-weight: bold;">let*</span> (
+         (doweek (calendar-day-of-week   date)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12398;&#26332;&#26085;(1-7)</span>
+         (month  (calendar-extract-month date)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26376;(1-12)</span>
+         (sttd   (calendar-absolute-from-gregorian stt))
+         (endd   (calendar-absolute-from-gregorian end))
+         (today  (calendar-absolute-from-gregorian date))
+         (diffs  (- today sttd))
+         (diffe  (- endd  today))
+         (ist    nil)
+         (dst    nil)
+         (mst    t)
+         (sst    nil)
+         (jst    nil) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#25147;&#12426;&#20516; t or nil</span>
+         )
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#23569;&#12394;&#12367;&#12392;&#12418;&#20170;&#26085;&#12364; stt - end &#12398;&#38291;&#12395;&#28961;&#12356;&#12392; nil</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> (not (minusp diffs)) (not (minusp diffe))) (<span style="color: #20b2aa; font-weight: bold;">setq</span> ist t))
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27598;&#26376; num &#36913; week &#26332;&#26085;&#12394;&#12425; t</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (diary-float t week num) (<span style="color: #20b2aa; font-weight: bold;">setq</span> dst t))
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#38500;&#22806;&#26376;&#12364;&#25351;&#23450;&#12373;&#12428;&#12390;&#12390;&#19969;&#24230;&#12381;&#12398;&#26376;&#12394;&#12425; nil</span>
+    (<span style="color: #20b2aa; font-weight: bold;">setq</span> mst (diary-months-excepts month exs))
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26222;&#36890;&#12398;&#22580;&#21512;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (<span style="color: #20b2aa; font-weight: bold;">and</span> ist dst mst))
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "ist=%s" ist))</span>
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "dst=%s" dst))</span>
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "mst=%s" mst))</span>
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "jst=%s" jst))</span>
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(if (and ist (and dst mst)) (setq jst t))</span>
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#26085;&#12364;&#20195;&#12431;&#12426;&#12398;&#26085;&#12391;&#12354;&#12428;&#12400; t</span>
+    (<span style="color: #20b2aa; font-weight: bold;">unless</span> jst
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (diary-lecture-substitution today sbs)))
+    jst
+    ))
+
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-months-excepts</span>(month exs)
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((mst t) (ex nil))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> exs
+        (<span style="color: #20b2aa; font-weight: bold;">progn</span>
+          (<span style="color: #20b2aa; font-weight: bold;">while</span> exs
+            (<span style="color: #20b2aa; font-weight: bold;">setq</span> ex (car exs))
+            (<span style="color: #20b2aa; font-weight: bold;">if</span> (= ex month) (<span style="color: #20b2aa; font-weight: bold;">setq</span> mst nil))
+            (<span style="color: #20b2aa; font-weight: bold;">setq</span> exs (cdr exs))
+            )
+          )
+      )
+    mst))
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 感想</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+結構すっきりしてわかりやすいと思ったので, 繰り返し予定やタスクのスケジューリングは<br  />
+全てこの形式で統一した方がいいんじゃないかなーとか思ったが&#x2026;<br  />
+org-habit とか org-gcal とかを使おうとするといまいちな感じになってしまう.<br  />
+これらに対する修正はまた別の記事で書こうかと思う.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> 参考 URL</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Org-mode Frequently Asked Questions<br  />
+<a href="http://orgmode.org/worg/org-faq.html#Appointments/Diary">http://orgmode.org/worg/org-faq.html#Appointments/Diary</a><br  />
+</p>
+
+<p>
+GNU Emacs Lispリファレンスマニュアル: Sexp Diary Entries<br  />
+<a href="http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_654.html">http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_654.html</a><br  />
+</p>
+
+<p>
+GNU Emacs Manual: カレンダーとダイアリー<br  />
+<a href="http://www.bookshelf.jp/texi/emacs-24.5/emacs_33.html">http://www.bookshelf.jp/texi/emacs-24.5/emacs_33.html</a><br  />
+</p>
+
+<p>
+GNU Emacs Lispリファレンス・マニュアル - 関数<br  />
+<a href="http://bit.ly/2mZvhnD">http://bit.ly/2mZvhnD</a><br  />
+</p>
+
+<p>
+Lispプログラミング入門<br  />
+<a href="http://bach.istc.kobe-u.ac.jp/lect/ProLang/org/lisp.html">http://bach.istc.kobe-u.ac.jp/lect/ProLang/org/lisp.html</a><br  />
+</p>
+
+<p>
+Org-mode, Emacs, and Getting Things Done<br  />
+<a href="http://members.optusnet.com.au/~charles57/GTD/index.html">http://members.optusnet.com.au/~charles57/GTD/index.html</a><br  />
+</p>
+
+<p>
+Org mode for Emacs: あなたの生活をプレーンテキストで<br  />
+<a href="http://orgmode.org/ja/index.html">http://orgmode.org/ja/index.html</a><br  />
+</p>
+
+<p>
+Org Mode マニュアル<br  />
+<a href="http://orgmode.jp/doc-ja/org-ja.html">http://orgmode.jp/doc-ja/org-ja.html</a><br  />
+</p>
+
+<p>
+Emacs org-modeを使ってみる - 屯遁のパズルとプログラミングの日記<br  />
+<a href="http://d.hatena.ne.jp/tamura70/20100203/org">http://d.hatena.ne.jp/tamura70/20100203/org</a><br  />
+</p>
+
+<p>
+How to create calendar entry for last weekday of every month? - Emacs Stack Exchange<br  />
+<a href="https://emacs.stackexchange.com/questions/30448/how-to-create-calendar-entry-for-last-weekday-of-every-month">https://emacs.stackexchange.com/questions/30448/how-to-create-calendar-entry-for-last-weekday-of-every-month</a><br  />
+</p>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-05-18T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-05-18 (Thu)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/org-mode/'>org-mode</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2017-05-18-diary_float.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2017-05-18-diary_float.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2017-05-04-fread.html" title="Previous Post: tab 区切りファイルの読込み">&laquo; tab 区切りファイルの読込み</a></li>
+            
+            
+            <li class="next"><a href="/blog/2017-06-01-134010.html" title="Next Post: thing-at-point を応用したファイルの検索">thing-at-point を応用したファイルの検索 &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

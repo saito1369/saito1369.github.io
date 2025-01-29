@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>diary-float による org-mode の日付作成 (3) - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2019-04-08-161532.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2019-04-08-161532.html">
+  <meta property="og:title" content="diary-float による org-mode の日付作成 (3) - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2019-04-08T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2019-04-08 (Mon)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        diary-float による org-mode の日付作成 (3)
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/org-mode/'>org-mode</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. これまでのあらすじ</a></li>
+<li><a href="#sec-2">2. はじめに</a></li>
+<li><a href="#sec-3">3. 問題点</a></li>
+<li><a href="#sec-4">4. 解決策</a></li>
+<li><a href="#sec-5">5. 結果</a></li>
+<li><a href="#sec-6">6. その他</a></li>
+<li><a href="#sec-7">7. 参考URL</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-08 Mon 16:15&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-08 Mon 19:14&gt;</span></span><br  />
+</p>
+<p>
+このメモは, <a href="http://saito1369.github.io/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a> の続きである.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> これまでのあらすじ</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+少々複雑な繰り返しタスクを org-mode 内でうまく処理したい.<br  />
+そのため, 繰り返しタスクの PROPERTIES の中に DIARYF という property を作り, そこに diary-float 形式で繰り返し日付のルールを elisp program として書くことにした.<br  />
+</p>
+
+<p>
+以下のような感じ<br  />
+</p>
+<pre class="example">
+:PROPERTIES:
+:DIARYF: %%(diary-lecture '(04 01 2019) 7 15 '(3 10))
+:END:
+</pre>
+
+<p>
+この状態で org-todo を実行すると, DIARYF にある elisp program に基づいて次の予定日が計算され更新される. また, この予定日の次の予定も計算されて日付の差分(+1d とか)として更新される.<br  />
+こうすることで, 複雑な繰り返し日付のルールを DIARYF に押し込めることができ, 実際のスケジュールは常に具体的な日付となって org-mode の他のいろんなツールの利用と矛盾しないようになった(ような気がする).<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> はじめに</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+一応使えてはいるのだが&#x2026;<br  />
+予定日からずれた使い方をすると途端によくわからん状態になってしまうことが判明.<br  />
+</p>
+
+<p>
+例えば今日が <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-05 Fri&gt;</span></span> で, SCHEDULED された日付が例えば以下のように書かれているとする.<br  />
+</p>
+
+<pre class="example">
+** task hoge
+    SCHEDULED: &lt;2019-04-01 Mon +2d&gt;
+    :PROPERTIES:
+    :DIARYF: %%(diary-habit-weekday '(04 01 2019) 1 3 5)
+    :END:
+</pre>
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-01 Mon&gt;</span></span> にやるつもりだったが出来てなくて, 今日 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-05 Fri&gt;</span></span> にやろうかなーと思った, そんなよくある状況を想定している.<br  />
+</p>
+
+<p>
+ちなみに DIARYF の後ろの関数はこんなやつで,<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-habit-weekday</span>(stt <span style="color: #9370db;">&amp;rest</span> wds)
+<span class="linenr"> 2: </span>  <span style="color: #cd5c5c;">""</span>
+<span class="linenr"> 3: </span>  (<span style="color: #20b2aa; font-weight: bold;">let*</span> ((jst0 nil)
+<span class="linenr"> 4: </span>         (jst  nil)
+<span class="linenr"> 5: </span>         (sttd  (calendar-absolute-from-gregorian stt ))
+<span class="linenr"> 6: </span>         (today (calendar-absolute-from-gregorian date))
+<span class="linenr"> 7: </span>         (diffd (- today sttd)))
+<span class="linenr"> 8: </span>    <span style="color: #cd853f;">;;</span><span style="color: #cd853f;">(y-or-n-p (message "date=%s" date))</span>
+<span class="linenr"> 9: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> (not (minusp diffd)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst0 t))
+<span class="linenr">10: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 (not wds)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst  t)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27598;&#26085;</span>
+<span class="linenr">11: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> jst0 wds)       (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst (diary-habit-weekday-week date wds)))
+<span class="linenr">12: </span>    jst
+<span class="linenr">13: </span>    ))
+<span class="linenr">14: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-habit-weekday-week</span>(date wds)
+<span class="linenr">15: </span>  <span style="color: #cd5c5c;">""</span>
+<span class="linenr">16: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((wd nil)
+<span class="linenr">17: </span>        (jst nil))
+<span class="linenr">18: </span>    (<span style="color: #20b2aa; font-weight: bold;">while</span> wds
+<span class="linenr">19: </span>      (<span style="color: #20b2aa; font-weight: bold;">setq</span> wd (car wds))
+<span class="linenr">20: </span>      (<span style="color: #20b2aa; font-weight: bold;">if</span> (= wd (calendar-day-of-week date)) (<span style="color: #20b2aa; font-weight: bold;">setq</span> jst t))
+<span class="linenr">21: </span>      (<span style="color: #20b2aa; font-weight: bold;">setq</span> wds (cdr wds))
+<span class="linenr">22: </span>      )
+<span class="linenr">23: </span>    jst))
+</pre>
+</div>
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-01 Mon&gt;</span></span> 以降の月, 水, 金曜日にやるという意味である.<br  />
+</p>
+
+
+<p>
+このタスクを今日 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-05 Fri&gt;</span></span> に行って DONE にする(org-todo) と&#x2026;<br  />
+何と以下のようになってしまうのであった.<br  />
+</p>
+<pre class="example">
+** task hoge
+    SCHEDULED: &lt;2019-04-03 Wed +2d&gt;
+    :PROPERTIES:
+    :DIARYF: %%(diary-habit-weekday '(04 01 2019) 1 3 5)
+    :END:
+</pre>
+
+<p>
+うーん違うだろって感じだ.<br  />
+繰り返し日付で今日は金曜日なんで,<br  />
+</p>
+<pre class="example">
+** task hoge
+    SCHEDULED: &lt;2019-04-08 Mon +2d&gt;
+    :PROPERTIES:
+    :DIARYF: %%(diary-habit-weekday '(04 01 2019) 1 3 5)
+    :END:
+</pre>
+<p>
+こうなって欲しいことは明らかなのだが, どうすればいいんだろ？<br  />
+</p>
+
+<p>
+.+2d (DONE にした日付から 2 日後), ++2d (DONE した日付から直近の 2 日後) で行けるのかなと思ったが, それもなかなか難しいことが判明.<br  />
+</p>
+
+<p>
+例えばこうしておく.<br  />
+</p>
+<pre class="example">
+** task hoge
+    SCHEDULED: &lt;2019-04-01 Wed .+2d&gt;
+    :PROPERTIES:
+    :DIARYF: %%(diary-habit-weekday '(04 01 2019) 1 3 5)
+    :END:
+</pre>
+
+<p>
+04/05 (金) に DONE にすると<br  />
+</p>
+<pre class="example">
+** task hoge
+    SCHEDULED: &lt;2019-04-07 Sun .+1d&gt;
+    :PROPERTIES:
+    :DIARYF: %%(diary-habit-weekday '(04 01 2019) 1 3 5)
+    :END:
+</pre>
+<p>
+次の日付を作るときは .+2d しか見ないから, こうなってしまうのであった.<br  />
+うーんイマイチだなぁ. このタスクは日曜日にやる予定はないのだ.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 問題点</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+スケジュールされた日に実行すると仮定して日付差分(+2d など)が作成されているため, スケジュールされた日 + 差分 よりも今日の方が新しい場合には, DONE にした後の再スケジューリングが過去の日付になってしまう.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 解決策</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+スケジュールされた日が今日よりも前の場合には, スケジュールを今日に変更し, DIARYF を見て次のスケジュールを差分で書くように変更する.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 結果</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+いくつかの部品をまず作成する.<br  />
+日付の format が色々あってめんどくさい.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr">1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-org-diary-float-get-sexp</span>()
+<span class="linenr">2: </span>  <span style="color: #cd5c5c;">"&#12459;&#12540;&#12477;&#12523;&#12364;&#12354;&#12427;&#22580;&#25152;&#12398; DIARYF &#12395;&#12354;&#12427; S &#24335;&#12434;&#21462;&#24471;&#12375;&#12390;&#36820;&#12377;"</span>
+<span class="linenr">3: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> (elem sexp)
+<span class="linenr">4: </span>    (end-of-line)
+<span class="linenr">5: </span>    (org-back-to-heading)
+<span class="linenr">6: </span>    (<span style="color: #20b2aa; font-weight: bold;">setq</span> elem (org-element-headline-parser (point-max) t))
+<span class="linenr">7: </span>    (<span style="color: #20b2aa; font-weight: bold;">setq</span> sexp (org-element-property <span style="color: #76ee00;">:DIARYF</span> elem))   <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">PROPERTIES: &#12398;&#20013;&#36523;&#12398;&#12487;&#12540;&#12479;&#12434;&#21462;&#12426;&#20986;&#12377;&#26041;&#27861;</span>
+<span class="linenr">8: </span>    sexp
+<span class="linenr">9: </span>    ))
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">diary-float-to-diff</span>(sexp day <span style="color: #9370db;">&amp;optional</span> pdays)
+<span class="linenr"> 2: </span>  <span style="color: #cd5c5c;">"sexp: DIARYF &#12398; S &#24335;               %%(diary-lecture ......)</span>
+<span class="linenr"> 3: </span><span style="color: #cd5c5c;">   day:  &#26085;&#20184;&#12522;&#12473;&#12488;&#24418;&#24335;              '(50 7 20 4 5 2019 5 nil 32400)   =&gt; 2019/04/05</span>
+<span class="linenr"> 4: </span><span style="color: #cd5c5c;">   pdays: &#20309;&#26085;&#24460;&#12398;&#20104;&#23450;&#12414;&#12391;&#32771;&#12360;&#12427;&#12363;.   60"</span>
+<span class="linenr"> 5: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((ii       0)
+<span class="linenr"> 6: </span>        (cdate  nil)
+<span class="linenr"> 7: </span>        (result nil))
+<span class="linenr"> 8: </span>    (<span style="color: #20b2aa; font-weight: bold;">unless</span> pdays (<span style="color: #20b2aa; font-weight: bold;">setq</span> pdays 0))
+<span class="linenr"> 9: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> (string-match <span style="color: #ffa07a;">"^%%"</span> sexp) (<span style="color: #20b2aa; font-weight: bold;">setq</span> sexp (substring-no-properties sexp 2)))
+<span class="linenr">10: </span>    (<span style="color: #20b2aa; font-weight: bold;">catch</span> '<span style="color: #1e90ff;">break</span>
+<span class="linenr">11: </span>      (<span style="color: #20b2aa; font-weight: bold;">while</span> (&lt; ii (1+ pdays))
+<span class="linenr">12: </span>        (<span style="color: #20b2aa; font-weight: bold;">setq</span> cdate  (my-calendar-format-nth-day-after day ii))
+<span class="linenr">13: </span>        (<span style="color: #20b2aa; font-weight: bold;">setq</span> result (org-diary-sexp-entry sexp t cdate))
+<span class="linenr">14: </span>        (<span style="color: #20b2aa; font-weight: bold;">if</span> result (<span style="color: #20b2aa; font-weight: bold;">throw</span> '<span style="color: #1e90ff;">break</span> nil))
+<span class="linenr">15: </span>        (<span style="color: #20b2aa; font-weight: bold;">incf</span> ii)
+<span class="linenr">16: </span>        ))
+<span class="linenr">17: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> result
+<span class="linenr">18: </span>        ii <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27425;&#12398;&#20104;&#23450;&#26085;&#12414;&#12391;&#20309;&#26085;&#20998;&#12354;&#12427;&#12363;&#65311;&#12434;&#36820;&#12377;.</span>
+<span class="linenr">19: </span>        -1 <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35211;&#12388;&#12363;&#12425;&#12394;&#12369;&#12428;&#12400; -1 &#12434;&#36820;&#12377;.</span>
+<span class="linenr">20: </span>      )
+<span class="linenr">21: </span>    ))
+<span class="linenr">22: </span>
+<span class="linenr">23: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-calendar-format</span>(dayl)
+<span class="linenr">24: </span>  <span style="color: #cd5c5c;">"dayl = '(50 7 20 12 5 2017 5 nil 32400) &#26085;&#20184;&#12522;&#12473;&#12488;&#24418;&#24335;</span>
+<span class="linenr">25: </span><span style="color: #cd5c5c;">&#12363;&#12425; calendar-format '(5 12 2017) &#12408;&#22793;&#26356;&#12377;&#12427;"</span>
+<span class="linenr">26: </span>  (list (nth 4 dayl) (nth 3 dayl) (nth 5 dayl)))
+<span class="linenr">27: </span>
+<span class="linenr">28: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-calendar-format-nth-day-after</span>(dayl n)
+<span class="linenr">29: </span>  <span style="color: #cd5c5c;">"&#26085;&#20184;&#12522;&#12473;&#12488;&#24418;&#24335;&#12398;&#26085;&#20184; dayl &#12363;&#12425; n(=2) &#26085;&#30446;&#12398;&#26085;&#20184;&#12434; calendar-format &#12391;&#36820;&#12377;.</span>
+<span class="linenr">30: </span><span style="color: #cd5c5c;">   dayl='(50 7 20 12 5 2017 5 nil 32400) n=2 &#12398;&#22580;&#21512;</span>
+<span class="linenr">31: </span><span style="color: #cd5c5c;">  '(5 14 2017) &#12434;&#36820;&#12377;."</span>
+<span class="linenr">32: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((unday (apply #'encode-time dayl)))
+<span class="linenr">33: </span>    (my-calendar-format (decode-time (time-add unday (days-to-time n))))
+<span class="linenr">34: </span>    ))
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-org-diary-float-replace-scheduled-repeat</span>(sch-format next-diff)
+<span class="linenr"> 2: </span>  <span style="color: #cd5c5c;">"sch-format= 2019-04-02 Tue</span>
+<span class="linenr"> 3: </span><span style="color: #cd5c5c;">next-diff= 8</span>
+<span class="linenr"> 4: </span><span style="color: #cd5c5c;">&#12398;&#12392;&#12365;, SCHEDULED: &#12398;&#25991;&#23383;&#21015;&#12434;&#19978;&#12398;&#20516;&#12395;&#32622;&#12365;&#25563;&#12360;&#12427;.</span>
+<span class="linenr"> 5: </span><span style="color: #cd5c5c;">SCHEDULED: &lt;2019-04-01 Mon&gt; =&gt; SCHEDULED: &lt;2019-04-02 Tue +8d&gt; &#12395;&#32622;&#12365;&#25563;&#12360;"</span>
+<span class="linenr"> 6: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> (sch-format-with-repeat)
+<span class="linenr"> 7: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> (= next-diff 0) (<span style="color: #20b2aa; font-weight: bold;">setq</span> sch-format-with-repeat (format <span style="color: #ffa07a;">"SCHEDULED: &lt;%s&gt;"</span> sch-format))
+<span class="linenr"> 8: </span>      (<span style="color: #20b2aa; font-weight: bold;">setq</span> sch-format-with-repeat (format <span style="color: #ffa07a;">"SCHEDULED: &lt;%s %s&gt;"</span> sch-format (concat <span style="color: #ffa07a;">"+"</span> (number-to-string next-diff) <span style="color: #ffa07a;">"d"</span>))))
+<span class="linenr"> 9: </span>    (org-back-to-heading)
+<span class="linenr">10: </span>    (re-search-forward <span style="color: #ffa07a;">"</span><span style="color: #ffa07a; font-weight: bold;">\\</span><span style="color: #ffa07a; font-weight: bold;">(</span><span style="color: #ffa07a;">SCHEDULED: &lt;</span><span style="color: #ffa07a; font-weight: bold;">\\</span><span style="color: #ffa07a; font-weight: bold;">(</span><span style="color: #ffa07a;">.*?</span><span style="color: #ffa07a; font-weight: bold;">\\</span><span style="color: #ffa07a; font-weight: bold;">)</span><span style="color: #ffa07a;">&gt;</span><span style="color: #ffa07a; font-weight: bold;">\\</span><span style="color: #ffa07a; font-weight: bold;">)</span><span style="color: #ffa07a;">"</span> (<span style="color: #20b2aa; font-weight: bold;">save-excursion</span> (outline-next-heading) (point)))
+<span class="linenr">11: </span>    (replace-match sch-format-with-repeat)
+<span class="linenr">12: </span>    ))
+</pre>
+</div>
+
+<p>
+unix-sch-date (UNIX 形式日付)から数えた次のスケジュールについての情報を以下で計算.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-org-diary-float-get-next-schedule</span>(unix-sch-date sexp)
+<span class="linenr"> 2: </span>  <span style="color: #cd5c5c;">"unix-date &#12434;&#24341;&#25968;&#12395;&#12375;&#12390;, &#12371;&#12398;&#26085;&#12363;&#12425;&#25968;&#12360;&#12383; (&#27425;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12523;&#12398;&#26085;&#20184;, &#36861;&#21152;&#12377;&#12427;&#26085;&#25968;) &#12434;&#36820;&#12377;</span>
+<span class="linenr"> 3: </span><span style="color: #cd5c5c;">&#20363;: unix-sch-date = &lt;2019-04-01 Mon&gt; (&#12398; unix-date &#34920;&#35352;)</span>
+<span class="linenr"> 4: </span><span style="color: #cd5c5c;">sexp = %%(diary-habit-weekday '(4 1 2019) 1)    ;; 2019/04/01 &#12363;&#12425;&#12398;&#27598;&#26376;&#26332;&#26085;</span>
+<span class="linenr"> 5: </span><span style="color: #cd5c5c;">     =&gt; (list \"2019-04-08 Mon\" 7) &#12364;&#36820;&#12427;"</span>
+<span class="linenr"> 6: </span>  (<span style="color: #20b2aa; font-weight: bold;">let*</span> (
+<span class="linenr"> 7: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27425;&#12398;&#26085;&#12395;&#12377;&#12427;.</span>
+<span class="linenr"> 8: </span>         (unix-sch-next-date (time-add unix-sch-date (days-to-time 1)))
+<span class="linenr"> 9: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26085;&#20184;&#12522;&#12473;&#12488;&#24418;&#24335; (0 0 0 11 3 2019 0 nil 32400) &#12395;&#22793;&#25563;</span>
+<span class="linenr">10: </span>         (lst-sch-next-date (decode-time unix-sch-next-date))
+<span class="linenr">11: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27425;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12523;&#12414;&#12391;&#12398;&#26085;&#20184;&#35336;&#31639;(&#27425;&#12398;&#26085;&#12363;&#12425;&#35336;&#31639;&#12375;&#12390;&#12427;&#12398;&#12391; + 1 &#12434;&#20837;&#12428;&#12390;&#12362;&#12367;)</span>
+<span class="linenr">12: </span>         (next-diff (+ 1 (diary-float-to-diff sexp lst-sch-next-date org-gcal-down-days)))
+<span class="linenr">13: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27425;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12523;&#12398;&#26085;&#20184;</span>
+<span class="linenr">14: </span>         (unix-sch-next-scheduled-date (time-add unix-sch-date (days-to-time next-diff)))
+<span class="linenr">15: </span>         <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12501;&#12457;&#12540;&#12510;&#12483;&#12488;&#22793;&#26356;</span>
+<span class="linenr">16: </span>         (sch-format (format-time-string <span style="color: #ffa07a;">"%Y-%m-%d %a %H:%M"</span> unix-sch-next-scheduled-date))
+<span class="linenr">17: </span>         )
+<span class="linenr">18: </span>    (list sch-format next-diff) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12522;&#12473;&#12488;&#12391;&#36820;&#12377;</span>
+<span class="linenr">19: </span>    ))
+</pre>
+</div>
+<p>
+これらの部品を使って&#x2026;<br  />
+</p>
+
+<p>
+カーソル上にあるタスクの予定日付と DIARYF の elisp program を見て次の予定との差分を計算し書き出す.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-org-diary-float-next-schedule-diff</span>()
+<span class="linenr"> 2: </span>    <span style="color: #cd5c5c;">"DIARYF: &#12503;&#12525;&#12497;&#12486;&#12451;&#12398; diary-float &#24418;&#24335;&#26085;&#20184;(habit)&#12364;&#12354;&#12428;&#12400;</span>
+<span class="linenr"> 3: </span><span style="color: #cd5c5c;">&#35501;&#12415;&#36796;&#12435;&#12391;&#27425;&#22238;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12522;&#12531;&#12464;&#12434;&#34892;&#12358;.</span>
+<span class="linenr"> 4: </span><span style="color: #cd5c5c;">&#20855;&#20307;&#30340;&#12395;&#12399;, SCHUEDULED: &lt;&#26085;&#20184;&gt; =&gt; SCHEDULED: &lt;&#26085;&#20184; +8d&gt; &#12392;&#12363;&#12395;&#12377;&#12427;.</span>
+<span class="linenr"> 5: </span><span style="color: #cd5c5c;">(&#27425;&#12398;&#20104;&#23450;&#12364; 8 &#26085;&#24460;&#12395;&#12354;&#12427;&#12392; diary-float &#20869;&#12398;&#38306;&#25968;&#12391;&#35336;&#31639;&#12373;&#12428;&#12383;&#22580;&#21512;&#12398;&#20363;)"</span>
+<span class="linenr"> 6: </span>  (<span style="color: #20b2aa; font-weight: bold;">interactive</span>)
+<span class="linenr"> 7: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> (unix-sch-date lst next-diff sch-format sexp)
+<span class="linenr"> 8: </span>    (<span style="color: #20b2aa; font-weight: bold;">save-excursion</span>
+<span class="linenr"> 9: </span>      (end-of-line)
+<span class="linenr">10: </span>      (org-back-to-heading)
+<span class="linenr">11: </span>      (<span style="color: #20b2aa; font-weight: bold;">setq</span> sexp (my-org-diary-float-get-sexp))
+<span class="linenr">12: </span>      (<span style="color: #20b2aa; font-weight: bold;">if</span> sexp
+<span class="linenr">13: </span>          (<span style="color: #20b2aa; font-weight: bold;">progn</span>
+<span class="linenr">14: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> unix-sch-date (org-get-scheduled-time (point))) <span style="color: #cd853f;">;;</span><span style="color: #cd853f;">UNIX date</span>
+<span class="linenr">15: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> lst (my-org-diary-float-get-next-schedule unix-sch-date sexp))
+<span class="linenr">16: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> sch-format (format-time-string <span style="color: #ffa07a;">"%Y-%m-%d %a %H:%M"</span> unix-sch-date))
+<span class="linenr">17: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> next-diff  (nth 1 lst))
+<span class="linenr">18: </span>            (<span style="color: #20b2aa; font-weight: bold;">if</span> (string-match <span style="color: #ffa07a;">" 00:00"</span> sch-format) (<span style="color: #20b2aa; font-weight: bold;">setf</span> (substring sch-format (match-beginning 0) (match-end 0)) <span style="color: #ffa07a;">""</span>))
+<span class="linenr">19: </span>            (my-org-diary-float-replace-scheduled-repeat sch-format next-diff)
+<span class="linenr">20: </span>            )
+<span class="linenr">21: </span>        )
+<span class="linenr">22: </span>      )
+<span class="linenr">23: </span>    ))
+</pre>
+</div>
+
+<p>
+スケジュールされた日と今日を比較して今日の方が新しければスケジュールを今日に変更.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr"> 1: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-org-diary-float-next-schedule-diff-replace-today</span>()
+<span class="linenr"> 2: </span>  <span style="color: #cd5c5c;">":DIARYF: &#12398; diary-float &#24418;&#24335;&#26085;&#20184;&#12364;&#12354;&#12428;&#12400;&#27425;&#22238;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12522;&#12531;&#12464;&#12434;&#34892;&#12358;.</span>
+<span class="linenr"> 3: </span><span style="color: #cd5c5c;">SCHEDULE &#12364; &lt;2019-04-01 Mon&gt; &#12391;&#20170;&#26085;&#12364;&#20363;&#12360;&#12400; &lt;2019-04-03 Wed&gt; &#12398;&#22580;&#21512;,</span>
+<span class="linenr"> 4: </span><span style="color: #cd5c5c;">&#12388;&#12414;&#12426;&#12473;&#12465;&#12472;&#12517;&#12540;&#12522;&#12531;&#12464;&#12373;&#12428;&#12383;&#26085;&#20184;&#12364;&#36942;&#21435;&#12398;&#22580;&#21512;&#12395;&#12399;, &#12473;&#12465;&#12472;&#12517;&#12540;&#12523;&#12434;&#20170;&#26085;&#12395;&#12377;&#12427;."</span>
+<span class="linenr"> 5: </span>  (<span style="color: #20b2aa; font-weight: bold;">interactive</span>)
+<span class="linenr"> 6: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> (unix-today unix-sch-date sch-format-today stime ext)
+<span class="linenr"> 7: </span>    (<span style="color: #20b2aa; font-weight: bold;">save-excursion</span>
+<span class="linenr"> 8: </span>      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">SCHEDULE &#12373;&#12428;&#12383;&#26085;&#20184;&#12424;&#12426;&#20170;&#26085;&#12398;&#12411;&#12358;&#12364;&#26032;&#12375;&#12356;&#22580;&#21512;</span>
+<span class="linenr"> 9: </span>      (<span style="color: #20b2aa; font-weight: bold;">setq</span> unix-today (current-time))
+<span class="linenr">10: </span>      (<span style="color: #20b2aa; font-weight: bold;">setq</span> unix-sch-date (org-get-scheduled-time (point)))
+<span class="linenr">11: </span>      (<span style="color: #20b2aa; font-weight: bold;">if</span> (&lt; (float-time unix-sch-date) (float-time unix-today))
+<span class="linenr">12: </span>          (<span style="color: #20b2aa; font-weight: bold;">progn</span>
+<span class="linenr">13: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> stime (format-time-string <span style="color: #ffa07a;">"%H:%M"</span> unix-sch-date))
+<span class="linenr">14: </span>            <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">org-extend-today-until &#12424;&#12426;&#12418;&#26178;&#21051;&#12364;&#21069;&#12394;&#12425;&#21069;&#26085;&#12395;&#12377;&#12427;</span>
+<span class="linenr">15: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> unix-today (my-org-diary-float-replace-date-extend-today unix-today))
+<span class="linenr">16: </span>            <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26178;&#21051;&#12399;&#20837;&#12428;&#26367;&#12360;&#12427;</span>
+<span class="linenr">17: </span>            (<span style="color: #20b2aa; font-weight: bold;">setq</span> sch-format-today (concat (format-time-string <span style="color: #ffa07a;">"%Y-%m-%d %a"</span> unix-today) <span style="color: #ffa07a;">" "</span> stime))
+<span class="linenr">18: </span>            <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">SCHEDULED &#26085;&#20184;&#12434;&#20170;&#26085;&#12395;&#22793;&#26356;&#12377;&#12427;</span>
+<span class="linenr">19: </span>            (my-org-diary-float-replace-scheduled-repeat sch-format-today 0)
+<span class="linenr">20: </span>            )
+<span class="linenr">21: </span>        )
+<span class="linenr">22: </span>      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27425;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12523; +nd &#12434;&#20316;&#25104;&#12375;&#30452;&#12375;</span>
+<span class="linenr">23: </span>      (my-org-diary-float-next-schedule-diff)
+<span class="linenr">24: </span>      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12371;&#12398;&#12354;&#12392; +nd &#12364;&#35336;&#31639;&#12373;&#12428;&#27425;&#12398;&#12473;&#12465;&#12472;&#12517;&#12540;&#12523;&#26085;&#20184;&#12395;&#26360;&#12365;&#25563;&#12431;&#12427;</span>
+<span class="linenr">25: </span>      )))
+<span class="linenr">26: </span>
+<span class="linenr">27: </span>(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">my-org-diary-float-replace-date-extend-today</span>(unix-date)
+<span class="linenr">28: </span>  <span style="color: #cd5c5c;">"unix-date &#12398;&#26178;&#21051;&#12364; 5:00(org-extend-today-until) &#12424;&#12426;&#12418;&#21069;&#12384;&#12387;&#12383;&#12425;, &#21069;&#12398;&#26085;&#12395;&#12420;&#12387;&#12383;&#12371;&#12392;&#12395;&#12377;&#12427;"</span>
+<span class="linenr">29: </span>  (<span style="color: #20b2aa; font-weight: bold;">let</span> (ext)
+<span class="linenr">30: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> org-extend-today-until
+<span class="linenr">31: </span>        (<span style="color: #20b2aa; font-weight: bold;">progn</span>
+<span class="linenr">32: </span>          (<span style="color: #20b2aa; font-weight: bold;">setq</span> ext (string-to-number (format-time-string <span style="color: #ffa07a;">"%H.%M"</span> unix-date)))
+<span class="linenr">33: </span>          <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "ext=%f" ext))</span>
+<span class="linenr">34: </span>          <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(y-or-n-p (message "extend=%d" org-extend-today-until))</span>
+<span class="linenr">35: </span>          (<span style="color: #20b2aa; font-weight: bold;">if</span> (&gt; org-extend-today-until ext)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">5 &gt; 4.50 (unix-date &#12398;&#26085;&#26178;&#12364; 4:50 &#12398;&#22580;&#21512;)</span>
+<span class="linenr">36: </span>              <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#21069;&#12398;&#26085;&#12395;&#12377;&#12427;</span>
+<span class="linenr">37: </span>              (<span style="color: #20b2aa; font-weight: bold;">setq</span> unix-date (time-add unix-date (days-to-time -1)))
+<span class="linenr">38: </span>            )))
+<span class="linenr">39: </span>    unix-date
+<span class="linenr">40: </span>    ))
+</pre>
+</div>
+
+<p>
+org-todo の後で計算するように設定.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span class="linenr">1: </span>(<span style="color: #20b2aa; font-weight: bold;">defadvice</span> <span style="color: #00ff7f;">org-todo</span>(after my-org-next-todo-migration-automatic-hook)
+<span class="linenr">2: </span>  <span style="color: #cd5c5c;">""</span>
+<span class="linenr">3: </span>  (<span style="color: #20b2aa; font-weight: bold;">let*</span> ((end   (my-org-get-end-head))
+<span class="linenr">4: </span>         (elem  (org-element-headline-parser end t))
+<span class="linenr">5: </span>         (todo  (org-element-property <span style="color: #76ee00;">:todo-keyword</span> elem)))
+<span class="linenr">6: </span>    (<span style="color: #20b2aa; font-weight: bold;">if</span> (org-element-property <span style="color: #76ee00;">:DIARYF</span> elem) (my-org-diary-float-next-schedule-diff-replace-today)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">[2019-04-03 Wed]</span>
+<span class="linenr">7: </span>      ))
+<span class="linenr">8: </span>(ad-activate-regexp <span style="color: #ffa07a;">"my-org-next-todo-migration-automatic-hook"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> その他</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+この件で色々調べてるときに, 有用そうな変数を見つけた.<br  />
+一つはこれ.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">setq</span> org-extend-today-until 5) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">05:00 &#12414;&#12391;&#12399;&#21069;&#12398;&#26085;&#25201;&#12356;</span>
+</pre>
+</div>
+<p>
+org-extend-today-until を 5 にしておくと, 05:00 までは前の日扱いで処理してくれるらしい.<br  />
+上のプログラムでもこの値が定義されてるときを考慮した.<br  />
+</p>
+
+<p>
+このパラメータを設定しとかないと, 夜更かしの人は結構めんどくさいことになる.<br  />
+例えば, <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-02 Tue +1d&gt;</span></span> のタスクを <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-03 Wed 1:00&gt;</span></span> に実行した場合などである.<br  />
+ここで DONE とすると, 次のスケジュールは <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-04 Thu +1d&gt;</span></span> となるが, これはやっぱ違うだろーと思うわけである.<br  />
+こうなってると, <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-03 Wed&gt;</span></span>  中は org-agenda でこのタスクが見えてこない.<br  />
+今日の夜もやる筈なのでスケジュールとしては <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-03 Wed +1d&gt;</span></span> になってて欲しいわけである.<br  />
+org-extend-today-until に値があれば, この時間までは前の日扱いとなるため, <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-03 Wed 1:00&gt;</span></span> に DONE とすると <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-02 Tue&gt;</span></span> にやったこととなり次のスケジュールは <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-03 Wed +1d&gt;</span></span> となってめでたしめでたしとなる.<br  />
+</p>
+
+
+<p>
+もう一つの変数はこれ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">setq</span> org-use-effective-time t) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">05:00 &#21069;&#12398; timestamp &#12434;&#21069;&#26085;&#12398; 25:59 &#12395;&#12377;&#12427;.</span>
+</pre>
+</div>
+<p>
+STYLE: habit でグラフを描いているときなどにいいのではないだろーか.<br  />
+<span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-03 Wed 1:00&gt;</span></span> に実行し DONE にしたときに, State ログが前日のものになってくれる.<br  />
+</p>
+
+<p>
+これが設定されてない場合, 繰り返し日付で DONE とすると State ログが書き出されて,<br  />
+</p>
+<pre class="example">
+:LOGBOOK:
+- State "DONE"       from ""           [2019-04-03 Wed 01:00]
+- State "DONE"       from ""           [2019-04-01 Mon 23:30]
+:END:
+</pre>
+<p>
+とこんな感じになる.<br  />
+</p>
+
+<p>
+これを基にグラフが描かれるわけだが, 気持ち的には <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-02 Tue&gt;</span></span>  の夜にやってるつもりなんだけどなーと思うわけである.<br  />
+次の日とかがこんな感じになってると, ほんとは毎日やってる筈なのにグラフ上では <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-02 Tue&gt;</span></span> には何もやってない感じが出てしまう.<br  />
+</p>
+<pre class="example">
+:LOGBOOK:
+- State "DONE"       from ""           [2019-04-03 Wed 23:45]
+- State "DONE"       from ""           [2019-04-03 Wed 01:00]
+- State "DONE"       from ""           [2019-04-01 Mon 23:30]
+:END:
+</pre>
+
+<p>
+一方, 上の変数 org-use-effective-time が t になってると, ログは以下のようになる.<br  />
+</p>
+<pre class="example">
+:LOGBOOK:
+- State "DONE"       from ""           [2019-04-03 Wed 23:45]
+- State "DONE"       from ""           [2019-04-02 Tue 23:59]  ;; 変わったところ
+- State "DONE"       from ""           [2019-04-01 Mon 23:30]
+:END:
+</pre>
+<p>
+つまり, org-extend-today-until に指定された時刻の前までは前日の 23:59 にやったことにしてくれる.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 参考URL</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+<a href="http://shuzo-kino.hateblo.jp/entry/2016/06/24/231844">emacs lisp で日付を表示する</a><br  />
+<a href="https://qiita.com/yewton/items/5e134065a9d4478b27d2">人類滅亡までのカウントダウンを Emacs に表示する</a><br  />
+<a href="https://stackoverflow.com/questions/50186949/parse-a-unix-timestamp-to-date-in-emacs-elisp">parse a unix timestamp to date in emacs (elisp)</a><br  />
+<a href="http://ergoemacs.org/emacs/elisp_datetime.html">Elisp: Date Time</a><br  />
+<a href="https://www42.atwiki.jp/elisp/pages/17.html">逆引き Emacs Lisp 日付と時刻</a><br  />
+<a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-Parsing.html#Time-Parsing">40.8 Parsing and Formatting Times</a><br  />
+<a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-Conversion.html">40.7 Time Conversion</a><br  />
+<a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-of-Day.html#Time-of-Day">40.5 Time of Day</a><br  />
+</p>
+
+<p>
+<a href="https://www42.atwiki.jp/elisp/pages/12.html#id_644a4277">部分文字列を置き換える</a><br  />
+<a href="http://bit.ly/2JfSAJ1">Replace string in buffer programatically</a><br  />
+</p>
+
+<p>
+<a href="http://bit.ly/2Ujsh9J">Make agenda clockreport respect org-extend-today-until</a><br  />
+<a href="https://github.com/Fuco1/org-timeline">org-timeline</a><br  />
+<a href="https://orgmode.org/worg/doc.html">Documentation for Org hooks, commands and options</a><br  />
+</p>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2019-04-08T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2019-04-08 (Mon)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/org-mode/'>org-mode</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2019-04-08-161532.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2019-04-08-161532.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2019-03-22-141849.html" title="Previous Post: diary-float による org-mode の日付作成 (2)">&laquo; diary-float による org-mode の日付作成 (2)</a></li>
+            
+            
+            <li class="next"><a href="/blog/2021-05-03-DataFrame2021.html" title="Next Post: dataframe の取り扱い [2021 版]">dataframe の取り扱い [2021 版] &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item active" href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2019-04-08-161532.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2019-04-08-161532.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

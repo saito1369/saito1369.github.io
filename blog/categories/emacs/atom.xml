@@ -1,0 +1,707 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: emacs | easy cure]]></title>
+  <link href="http://saito1369.github.io/blog/categories/emacs/atom.xml" rel="self"/>
+  <link href="http://saito1369.github.io/"/>
+  <updated>2025-01-29T16:44:35+09:00</updated>
+  <id>http://saito1369.github.io/</id>
+  <author>
+    <name><![CDATA[saito1369]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[isearch の改良]]></title>
+    <link href="http://saito1369.github.io/blog/2017-09-04-164431.html"/>
+    <updated>2017-09-04T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/164431</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. 問題点</a></li>
+<li><a href="#sec-3">3. elisp プログラムの作成</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 作成ほうしん</a></li>
+<li><a href="#sec-3-2">3.2. パラメータ</a></li>
+<li><a href="#sec-3-3">3.3. isearch-mode-hook</a></li>
+<li><a href="#sec-3-4">3.4. isearch-mode-end-hook</a></li>
+<li><a href="#sec-3-5">3.5. defadvice</a></li>
+<li><a href="#sec-3-6">3.6. idive&#x2013;get-dive-file</a></li>
+<li><a href="#sec-3-7">3.7. プログラム全体</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 反省点</a></li>
+<li><a href="#sec-5">5. 参考文献</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-09-04 Mon 16:44&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-02-21 Wed 20:12&gt;</span></span><br />
+</p>
+<p>
+emacs でメモを検索する isearch (Ctrl-s/Ctrl-r) にちょっと機能をついかしてみた.<br />
+elisp の書き方はよくわかってないけど, 不安定ながらも動くものができたのでその記録を書いておく.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+私はここ何年か, ChangeLog メモという形式でメモを残している.<br />
+最初に書いた日付を見てみたら 2003 年 10 月であった. なんと, 気づかないうちに 10 年以上も続いてることになるのか&#x2026;<br />
+</p>
+
+<p>
+ChangeLog 上でのメモは, 短いメモを書くぶんには問題ないのだが, 少し長めのまとめ文書とかを書こうとするといまいちであった.<br />
+長い文書では, 階層的な構造とか, 図とかを適宜文書の中に入れていきたいことがあるからである.<br />
+</p>
+
+<p>
+この問題を解決するために, 私は <a href="https://at-aka.blogspot.jp/2005/06/changelog-howm-quasi-howm.html">https://at-aka.blogspot.jp/2005/06/changelog-howm-quasi-howm.html</a> で示されている quasi-howm という方法を使っている.<br />
+これを使うと, ChangeLog メモの中に, howm ファイルへのリンクを自動で作ってくれるのだ.<br />
+これを使って, 私は ChangeLog では書きにくい長いまとめ文書などをこの howm ファイルの中に書いている.<br />
+ChangeLog 上に howm へのリンクが張られるので, とりあえずポケット一つの原則は守られている(はず)ので安心だ.<br />
+ちなみに私は org-mode の形式で howm メモを書いている.<br />
+howm の機能はほぼ使っていないので, 今から考えると, 一定の場所へのリンクを自動で作ってくれれば何でもよかった感じだが, 今までずっと使ってきて慣れてるのでこの形式で書き続けている.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 問題点</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+私は ChangeLog メモを検索する際に, インクリメンタルサーチ (isearch. Ctrl-s/Ctrl-r) での検索をよく使う.<br />
+私は基本残しておきたいことは全て ChangeLog メモに書くので, キーワードを覚えてれば ChangeLog ファイル上で Ctrl-s を使ってメモの該当ぶぶんを探し出し, その部分メモを見て思い出したりそこに書いてある URL に行ったりする.<br />
+しかし最近, ChangeLog メモのどっかに書いてた筈なのにインクリメンタルサーチで探し出せないことが頻発してきた.<br />
+キーワードも覚えられない程記憶力が死んできたのかとも考えましたがそーでもなさそうだ.<br />
+よくよく調べてみると, ChangeLog メモには直接書いてないけど, howm(org-mode)の文書中にキーワードが書いてあった場合があって, その場合は当然のことながら ChangeLog ファイルのインクリメンタルサーチでは検索出来ないことがわかった.<br />
+メモとして ChangeLog に書いてたつもりだったけど, 実際は howm(org-mode)のメモに書いていた. そのときのキーワードが ChangeLog ファイル内にあるかと思って探したけどなかった. 理由は探す所を間違ってたから. ほんとは howm(org-mode)のファイルの中を探さないといけない.<br />
+そんな感じである.<br />
+この状況も記憶力的にあんまり良くないような気もするのだが&#x2026;<br />
+</p>
+
+<p>
+というわけで, インクリメンタルサーチで以下のようなことが出来ればいいんだけどなぁ&#x2026;<br />
+ChangeLog ファイルをインクリメンタルサーチしたときに,<br />
+</p>
+<ol class="org-ol">
+<li>ChangeLog 内に howm ファイルへのリンクが書いてあれば途中でそのファイルに立ち寄ってインクリメンタルサーチをする.<br />
+</li>
+<li>howm ファイルを探し終わったら ChangeLog ファイルに戻ってきて ChangeLog のその場所からのインクリメンタルサーチを再開.<br />
+</li>
+<li>1. に戻る.<br />
+</li>
+</ol>
+
+<p>
+図で描くと, 以下のような感じになります.<br />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2017-09-04-164431-2017-09-04-164431.jpg" alt="2017-09-04-164431-2017-09-04-164431.jpg" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> elisp プログラムの作成</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+この問題を解決するために, まずは同じようなことでめんどくさがってる人がいないかどうかを探した.<br />
+誰かやってる人いないかと思って色々検索してみたが, うまく見つけられなかった.<br />
+こういうことやりたい人いないのかなぁ. 普通は何かもっと効率の良い方法でやるんだろうか？<br />
+やってる人がいなさそうだったので, elisp プログラミングの勉強も兼ねて自分で作ってみることにした.<br />
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 作成ほうしん</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Ctrl-s を二回以上押下すると isearch-repeat という命令が動くっぽい.<br />
+これの直前で(次の検索ワードへ移動する前に) howm ファイルがあるかどうかを探し, あればその buffer へ移動して検索を続けるようにする.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defadvice</span> <span style="color: #00ff7f;">isearch-repeat</span> (before hogehoge activate)
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">1. &#27425;&#12398;&#26908;&#32034;&#12527;&#12540;&#12489;&#12434;&#25506;&#12375;&#12390;&#20301;&#32622;&#12434;&#35519;&#12409;&#12390;&#12362;&#12367;.</span>
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">2. &#27425;&#12398; howm &#12501;&#12449;&#12452;&#12523;&#12398;&#12354;&#12426;&#12363;&#12434;&#25506;&#12375;&#12390;&#20301;&#32622;&#12434;&#35519;&#12409;&#12390;&#12362;&#12367;.</span>
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">3. &#27425;&#12398; howm &#12398;&#12354;&#12426;&#12363; &gt; &#27425;&#12398; hogehoge &#12398;&#12354;&#12426;&#12363; &#12391;&#12354;&#12428;&#12400; howm &#12501;&#12449;&#12452;&#12523;&#12398;&#20013;&#12408;&#20837;&#12426;&#12381;&#12398;&#20013;&#12434;&#26908;&#32034;.</span>
+)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> パラメータ</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+ChangeLog メモファイル以外でも一応出来るように, パラメータを設定出来るようにする.<br />
+主なパラメータは以下の 4 つ(1 つは toggle によって制御することにした).<br />
+</p>
+
+<ol class="org-ol">
+<li>母艦ファイル名(このファイルを Ctrl-s で検索すると, 書いてあるファイル名が存在すればそのファイルを訪れて検索を続ける)<br />
+テキストファイルであれば何でもいい.<br />
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">ChangeLog &#12501;&#12449;&#12452;&#12523;&#12434;&#26908;&#32034;&#12377;&#12427;&#38555;&#12399;, &#12381;&#12371;&#12395;&#26360;&#12356;&#12390;&#12354;&#12427;&#12501;&#12449;&#12452;&#12523;&#12398;&#20013;&#12418;&#26908;&#32034;&#12377;&#12427;</span>
+(<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-mother-fpath <span style="color: #ffa07a;">"/home/hoge/Memo/ChangeLog"</span>)
+</pre>
+</div>
+</li>
+<li>母艦ファイルに書いてあるファイル名のぱたーん<br />
+どのような文字列パターンを読み取って訪れるファイル名を抽出するか?<br />
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">".howm" &#12392;&#12356;&#12358;&#25991;&#23383;&#21015;&#12434;&#25345;&#12388;&#12501;&#12449;&#12452;&#12523;&#21517;&#12434;&#25277;&#20986;&#12375;&#12383;&#12356;&#22580;&#21512;</span>
+(<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname-patterns '(<span style="color: #ffa07a;">".howm"</span>))
+</pre>
+</div>
+<p>
+上で得られたファイル名(fname)から実在のファイル名への変換関数<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">fname &#12434;&#12381;&#12398;&#12414;&#12414;&#23455;&#22312;&#12377;&#12427;&#12501;&#12449;&#12452;&#12523;&#21517;&#12392;&#12377;&#12427;&#22580;&#21512;</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--expand-file-name</span>(fname)
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> fname (expand-file-name fname))
+  (<span style="color: #20b2aa; font-weight: bold;">if</span> (file-exists-p fname) fname nil)   <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#23384;&#22312;&#12375;&#12394;&#12369;&#12428;&#12400; nil &#12434;&#36820;&#12377;</span>
+)
+</pre>
+</div>
+</li>
+<li>ファイル検索の方法<br />
+ChangeLog の中に, 何度か同じファイル名が書いてある場合.<br />
+ファイル名があればそのファイルの中に入って検索したいとき<br />
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-visit-dived-file-p t)
+</pre>
+</div>
+<p>
+一度検索したファイルは検索しないとき.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-visit-dived-file-p nil)
+</pre>
+</div>
+</li>
+<li>そもそもこの方式で isearch の機能拡張を使うかどーか.<br />
+普通に検索したいときもあると思うので toggle 出来るようにしたい.<br />
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defvar</span> <span style="color: #9acd32;">idive-toggle</span> t)
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--toggle</span>()
+  (<span style="color: #20b2aa; font-weight: bold;">interactive</span>)
+  (<span style="color: #20b2aa; font-weight: bold;">if</span> idive-toggle (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-toggle nil)
+    (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-toggle t)
+    )
+  (message <span style="color: #ffa07a;">"idive-toggle=%s"</span> idive-toggle)
+  )
+</pre>
+</div>
+<p>
+こんな風に global 変数を気軽に使っていいんだろーかとも思うが, いい方法がわかんないのでとりあえずこれで.<br />
+</p>
+</li>
+</ol>
+
+<p>
+上記 1. のパラメータを変更すれば特別な isearch をするファイル(母艦ファイル)名を変更できる.<br />
+私の場合はここは ChangeLog ファイルを指定している.<br />
+上記 2. のパラメータを変更すれば検索するファイル名の文字列パターンを変更できます.<br />
+idive&#x2013;expand-file-name(fname) は文字列 fname から実際のファイル名への変換を行う関数です.<br />
+例:<br />
+  fname から決まった dir を追加してファイル名が完成する場合,<br />
+  fhame = '2017-09-04-111111.howm' =&gt; '/home/saito1369/howm/2017/09/2017-09-04-111111.howm'<br />
+  の対応を return する関数を書くことになる.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> isearch-mode-hook</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+iserach 開始の際にやることを hook で指定.<br />
+新しい関数をつくって add-hook とやればいいらしい.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp">(add-hook'isearch-mode-hook 'idive--init)
+
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#38283;&#12356;&#12390;&#12356;&#12427; buffer &#12364;&#27597;&#33382;&#12391;&#12354;&#12428;&#12400;&#12381;&#12398;&#24460;&#33394;&#12293;&#12420;&#12427;.</span>
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;(ChangeLog)&#12376;&#12419;&#12394;&#12369;&#12428;&#12400;&#12405;&#12388;&#12540;&#12395;&#12420;&#12427;.</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--init</span>()
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((cbuf  (current-buffer)))
+    (<span style="color: #20b2aa; font-weight: bold;">when</span> (idive--mother-buffer-p)
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">is-dive-mother-fname (&#27597;&#33382;)&#12398; buffer &#12434;&#25345;&#12387;&#12390;&#12362;&#12367;</span>
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-mother-buffer cbuf)
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26082;&#12395;&#38283;&#12356;&#12390;&#12356;&#12427; buffer &#12398; list &#12434; hash &#12391;&#12392;&#12427;.</span>
+      (idive--get-hash-already-exist-buffers)
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35370;&#21839;&#12375;&#12383; buffer &#12434;&#35352;&#37682;&#12377;&#12427;&#22580;&#25152;&#12434;&#21021;&#26399;&#21270;</span>
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-dived-files-hash (make-hash-table <span style="color: #76ee00;">:test</span> 'equal))
+      )
+    )
+  )
+
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#38283;&#12356;&#12390;&#12427;&#12398;&#12364; mother-buffer &#12363;&#12393;&#12358;&#12363;&#12434;&#30906;&#35469;&#12377;&#12427;</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--mother-buffer-p</span>()
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((fpath nil))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> buffer-file-name (<span style="color: #20b2aa; font-weight: bold;">setq</span> fpath (expand-file-name buffer-file-name)))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> fpath idive-mother-fpath (string= fpath idive-mother-fpath))
+        t
+      nil)
+    )
+  )
+</pre>
+</div>
+
+<p>
+既に開いている buffer のリストを hash でとるのは,<br />
+検索中に訪問するファイルが既に開いているのであればその buffer を開く, 開いてなければ検索終了後に buffer を削除するため.<br />
+</p>
+
+<p>
+訪問した buffer を記録するのは, 一度訪問した buffer は訪問しないようにするため.<br />
+(パラメータの項でも書いたが, 以下のように設定すれば何度も同じ buffer を訪問しないようにできる. この動作が default)<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-visit-dived-file-p nil)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> isearch-mode-end-hook</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+isearch 終了の際にやること.<br />
+使っていた global な一時変数を全部解放する.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp"><span style="color: #cd853f;">;; </span><span style="color: #cd853f;">isearch &#32066;&#20102;</span>
+(add-hook 'isearch-mode-end-hook 'idive--reset)
+
+<span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20197;&#19979;&#12398;&#12497;&#12521;&#12513;&#12540;&#12479;&#12434;&#12522;&#12475;&#12483;&#12488;&#12377;&#12427;.</span>
+(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--reset</span>()
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;(ex. ChangeLog)&#12398; buffer</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-mother-buffer nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26082;&#12395;&#35370;&#21839;&#12375;&#12383; buffers &#12398;&#12522;&#12473;&#12488;(hash)</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-dived-files-hash nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26908;&#32034;&#12434;&#34892;&#12358;&#21069;&#12363;&#12425;&#20803;&#12293;&#38283;&#12356;&#12390;&#12383; buffers</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-already-exist-hash nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35370;&#21839;&#12377;&#12427;&#12501;&#12449;&#12452;&#12523;&#12398;&#21517;&#21069;(&#19968;&#30058;&#37325;&#35201;&#12394;&#19968;&#26178;&#22793;&#25968;)</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20803;&#12398;&#26908;&#32034;&#35486;(isearch-string) &#12364;&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#19978;&#12391;&#27425;&#12393;&#12371;&#12395;&#12354;&#12427;&#12363;&#12398;&#22580;&#25152;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-next-point nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">isearch-repeat &#30452;&#21069;&#12395;&#12356;&#12383;&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#19978;&#12398;&#22580;&#25152;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-present-point nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">isearch-string(&#26908;&#32034;&#35486;)&#12398;&#36864;&#36991;&#22580;&#25152;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-isearch-string nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#12363;&#12425;&#35370;&#21839;&#12377;&#12427; file &#21517;&#12364;&#26360;&#12356;&#12390;&#12354;&#12427;&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#19978;&#12398;&#22580;&#25152;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname-point nil)
+  )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> defadvice</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+プログラムの本体部分.<br />
+isearch-repeat を行うタイミングで, howm ファイルを探す.<br />
+条件に合う howm ファイルがあればそのファイルを訪れ検索する.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defadvice</span> <span style="color: #00ff7f;">isearch-repeat</span> (around is-dive-isearch-repeat activate)
+  <span style="color: #cd5c5c;">"Dive another buffer."</span>
+  (<span style="color: #20b2aa; font-weight: bold;">if</span> (idive--mother-buffer-p) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#20869;&#12434;&#26908;&#32034;&#12375;&#12390;&#12356;&#12427;&#22580;&#21512;</span>
+      (<span style="color: #20b2aa; font-weight: bold;">if</span> idive-fname
+          (idive--dive-another-buffer)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">idive-fname &#12364;&#12354;&#12428;&#12400;&#12381;&#12398;&#12501;&#12449;&#12452;&#12523;&#12395;&#31227;&#21205; (isearch &#12399;&#23455;&#34892;&#12375;&#12394;&#12356;)</span>
+        (idive--search-idive-fname)     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">idive-fname &#12364;&#28961;&#12369;&#12428;&#12400;&#25506;&#12375;&#12390;</span>
+        ad-do-it                        <span style="color: #cd853f;">;;             </span><span style="color: #cd853f;">isearch &#12434;&#23455;&#34892;</span>
+        )
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26908;&#32034;&#12375;&#12390;&#12356;&#12427;&#12501;&#12449;&#12452;&#12523;&#12364;&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#12391;&#12394;&#12356;&#22580;&#21512;</span>
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">idive-fname &#12434;&#35370;&#21839;&#12375;&#12390;&#12356;&#12390; &#26908;&#32034;&#12364;&#32066;&#12431;&#12387;&#12383;&#22580;&#21512;&#12399;&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#12395;&#25147;&#12427;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> (idive--another-buffer-p) (not isearch-success))
+        (idive--return-mother))
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">isearch &#12434;&#23455;&#34892;</span>
+    ad-do-it
+    )
+  )
+</pre>
+</div>
+
+<p>
+idive-toggle 変数を後で追加したので結局は以下のようになる.<br />
+条件を色々考えるのが面倒なので上から被せている.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defadvice</span> <span style="color: #00ff7f;">isearch-repeat</span> (around isearch-repeat-idive-ad activate)
+  <span style="color: #cd5c5c;">"Dive another buffer."</span>
+  (<span style="color: #20b2aa; font-weight: bold;">when</span> idive-toggle
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (idive--mother-buffer-p) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">mother file &#12398;&#26908;&#32034;&#12398;&#22580;&#21512;</span>
+        (<span style="color: #20b2aa; font-weight: bold;">if</span> idive-fname
+            (idive--dive-another-buffer)  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">idive-fname &#12364;&#12354;&#12428;&#12400;&#12381;&#12398;&#12501;&#12449;&#12452;&#12523;&#12395;&#31227;&#21205; (isearch &#23455;&#34892;&#12375;&#12394;&#12356;)</span>
+          (idive--search-idive-fname)     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">idive-fname &#12364;&#28961;&#12369;&#12428;&#12400;&#25506;&#12375;&#12390;</span>
+          ad-do-it                        <span style="color: #cd853f;">;;             </span><span style="color: #cd853f;">isearch &#12434;&#23455;&#34892;</span>
+          )
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">mother file &#12391;&#12394;&#12356;&#22580;&#21512;</span>
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">idive-fname &#12434;&#35370;&#21839;&#12375;&#12390;&#12356;&#12390; &#26908;&#32034;&#12364;&#32066;&#12431;&#12387;&#12383;&#22580;&#21512;&#12399; mother &#12395;&#25147;&#12427;</span>
+      (<span style="color: #20b2aa; font-weight: bold;">if</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> (idive--another-buffer-p) (not isearch-success))
+          (idive--return-mother)
+        <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12381;&#12358;&#12391;&#12394;&#12369;&#12428;&#12400; isearch &#12434;&#23455;&#34892;(&#26222;&#36890;&#12399;&#12371;&#12371;&#12364;&#21205;&#12367;)</span>
+        ad-do-it
+        )
+      )
+    )
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12420;&#12425;&#12394;&#12356;&#12392;&#12365;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">unless</span> idive-toggle ad-do-it)
+  )
+</pre>
+</div>
+
+<p>
+idive-fname は ChangeLog ファイル(母艦ファイル)上にある howm ファイル名を示す.<br />
+ここに値が入ってなければ, あるかどうかを探す.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--search-idive-fname</span>()
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#12398;&#27597;&#33382;&#19978;&#12398;&#22580;&#25152;&#12434;&#20445;&#23384;&#12377;&#12427;.</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-present-point (point))
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26908;&#32034;&#25991;&#23383;&#21015;&#12434;&#20803;&#12293;&#12398;&#12418;&#12398;&#12395;&#25147;&#12375;&#12390;&#12362;&#12367;(isearch-string)</span>
+  (idive--return-isearch-string)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26908;&#32034;&#12375;&#12390;&#27425;&#12398;&#22580;&#25152;&#12434;&#20445;&#23384;&#12375;&#12390;&#12362;&#12367;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-next-point (idive--get-next-point isearch-string nil))
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27597;&#33382;&#19978;&#12398;&#22580;&#25152;&#12434;&#19968;&#26086;&#20803;&#12395;&#25147;&#12377;</span>
+  (idive--goto-char)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#29694;&#22312;&#12398;&#22580;&#25152;(idive-present-point) - idive-next-point &#20869;&#12395; idive-fname(howm &#12501;&#12449;&#12452;&#12523;)&#12364;&#12354;&#12427;&#12363;&#12393;&#12358;&#12363;&#12434;&#35519;&#12409;&#12427;</span>
+  (idive--get-dive-file)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12418;&#12375; idive-fname &#12364;&#12354;&#12428;&#12400;, &#19968;&#26178;&#30340;&#12395;&#26908;&#32034;&#25991;&#23383;&#21015;&#12434; idive-fname &#12395;&#22793;&#26356;&#12377;&#12427;.</span>
+  (<span style="color: #20b2aa; font-weight: bold;">when</span> idive-fname
+      (idive--change-isearch-string)
+      <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12459;&#12540;&#12477;&#12523;&#20301;&#32622;&#12398;&#35519;&#25972;</span>
+      (goto-char (<span style="color: #20b2aa; font-weight: bold;">if</span> isearch-forward (- idive-fname-point (length isearch-string))
+                   (+ idive-fname-point (length isearch-string))))
+    )
+  )
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--get-next-point</span>(str end)
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((pnt nil))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> migemo-isearch-enable-p
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> pnt (migemo-forward str end t (idive--isdir)))
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> (search-forward str end t (idive--isdir)))
+      )
+    png
+    )
+  )
+</pre>
+</div>
+
+<p>
+idive-fname があればそのファイルを訪問する.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--dive-another-buffer</span>()
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;(ex. ChangeLog &#12501;&#12449;&#12452;&#12523;)&#20869;&#12434;&#31227;&#21205;&#12377;&#12427;</span>
+  (idive--get-next-point idive-fname idive-next-point)
+  <span style="color: #cd853f;">;;</span>
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">dive into the file (idive-fname)</span>
+  <span style="color: #cd853f;">;;</span>
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#12434;&#38283;&#12367;</span>
+  (find-file (idive--expand-file-name idive-fname))
+  <span style="color: #cd853f;">; </span><span style="color: #cd853f;">&#26908;&#32034;&#25991;&#23383;&#21015;&#12434;&#20803;&#12395;&#25147;&#12377;</span>
+  (idive--return-isearch-string)
+  <span style="color: #cd853f;">; </span><span style="color: #cd853f;">isearch-forward &#12398;&#20516;&#12395;&#24540;&#12376;&#12390;&#12501;&#12449;&#12452;&#12523;&#12398;&#20808;&#38957;&#12354;&#12427;&#12356;&#12399;&#26368;&#24460;&#12395;&#31227;&#21205;&#12377;&#12427;</span>
+  (goto-char (<span style="color: #20b2aa; font-weight: bold;">if</span> isearch-forward (point-min) (point-max)))
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#19968;&#12388;&#12418;&#35211;&#12388;&#12363;&#12425;&#12394;&#12356;&#12456;&#12521;&#12540;&#12364;&#20986;&#12427;&#12398;&#12391;</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> isearch-case-fold-search t)
+  )
+</pre>
+</div>
+
+<p>
+idive-fname を訪問し終わったら母艦ファイルに戻る<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--return-mother</span>()
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20170;&#38283;&#12356;&#12390;&#12427; buffer &#12434;&#38281;&#12376;&#12427;(&#12418;&#12375;&#20803;&#12363;&#12425;&#38283;&#12356;&#12390;&#12394;&#12369;&#12428;&#12400;)</span>
+  (idive--kill-buffer-not-already-exist)
+  <span style="color: #cd853f;">; </span><span style="color: #cd853f;">&#26908;&#32034;&#25991;&#23383;&#21015; isearch-string &#12434; idive-fname &#12395;&#12375;&#12390;</span>
+  (idive--change-isearch-string)
+  <span style="color: #cd853f;">; </span><span style="color: #cd853f;">idive-fname &#12399;&#26410;&#23450;&#32681;&#12395;&#12375;&#12390;&#12362;&#12367;.</span>
+  <span style="color: #cd853f;">; </span><span style="color: #cd853f;">&#12371;&#12428;&#12391;&#12371;&#12398;&#12501;&#12449;&#12452;&#12523;&#12395;&#38306;&#12375;&#12390;&#12398;&#25506;&#32034;&#12434;&#32066;&#20102;&#12373;&#12379;&#12427;.</span>
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname nil)
+  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#27597;&#33382;&#12501;&#12449;&#12452;&#12523;&#12395;&#25147;&#12427;</span>
+  (switch-to-buffer idive-mother-buffer)
+  <span style="color: #cd853f;">; </span><span style="color: #cd853f;">&#24565;&#12398;&#12383;&#12417;</span>
+  (goto-char idive-fname-point)
+  (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname-point nil)
+  )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> idive&#x2013;get-dive-file</h3>
+<div class="outline-text-3" id="text-3-6">
+<p>
+現在の場所から次にキーワードが見つかった場所の間に idive-fname (howm ファイル名) があるかどうかを調べる.<br />
+一番めんどくさい部分.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-elisp">(<span style="color: #20b2aa; font-weight: bold;">defun</span> <span style="color: #00ff7f;">idive--get-dive-file</span>()
+  (<span style="color: #20b2aa; font-weight: bold;">let</span> ((suffs       idive-fname-patterns)
+        (sff         nil)
+        (dpoint      nil)
+        (fname       nil)
+        (fpath       nil)
+        (dive-points (list)) <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#37197;&#21015;&#12398;&#23450;&#32681;</span>
+        (fhash       (make-hash-table <span style="color: #76ee00;">:test</span> 'equal))
+        (dhash       (make-hash-table <span style="color: #76ee00;">:test</span> 'equal))
+        (dp          nil)
+        (fnames      (list))
+        (rep         nil)
+        )
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#21021;&#26399;&#21270;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname nil)
+    (<span style="color: #20b2aa; font-weight: bold;">save-excursion</span>
+      (<span style="color: #20b2aa; font-weight: bold;">while</span> suffs
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> sff (car suffs))
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> rep t)
+        (<span style="color: #20b2aa; font-weight: bold;">while</span> rep
+          (<span style="color: #20b2aa; font-weight: bold;">setq</span> dpoint (idive--get-next-point sff idive-next-point))
+          (<span style="color: #20b2aa; font-weight: bold;">setq</span> fpath nil)
+          (<span style="color: #20b2aa; font-weight: bold;">setq</span> fname nil)
+          (<span style="color: #20b2aa; font-weight: bold;">when</span> dpoint <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#35211;&#12388;&#12363;&#12387;&#12383;&#12425;</span>
+            <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">file &#21517;&#12398;&#21462;&#12426;&#20986;&#12375;</span>
+            (<span style="color: #20b2aa; font-weight: bold;">setq</span> fname (thing-at-point 'filename))
+            <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">fpath (&#12501;&#12449;&#12452;&#12523;&#12364;&#23384;&#22312;&#12375;&#12394;&#12369;&#12428;&#12400; nil &#12364;&#36820;&#12427;)</span>
+            (<span style="color: #20b2aa; font-weight: bold;">setq</span> fpath (idive--expand-file-name fname))
+            <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">file &#12364;&#23384;&#22312;&#12375;&#12390;, &#12414;&#12384;&#38283;&#12356;&#12390;&#12356;&#12394;&#12356;&#12392;&#12365;</span>
+            (<span style="color: #20b2aa; font-weight: bold;">when</span> (<span style="color: #20b2aa; font-weight: bold;">and</span> fpath (not (gethash fpath idive-dived-files-hash)))
+              <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">dpoint &#12434; push &#12377;&#12427;</span>
+              (<span style="color: #20b2aa; font-weight: bold;">push</span> dpoint dive-points)
+              <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">dpoint =&gt; fname</span>
+              (puthash dpoint fname  fhash)     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">fhash[dpoint] =fname</span>
+              (<span style="color: #20b2aa; font-weight: bold;">unless</span> (gethash fname dhash)     <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#26368;&#21021;&#12395;&#20986;&#12390;&#12365;&#12383; fname &#12398;&#22580;&#25152;&#12434;&#35352;&#37682;&#12375;&#12390;&#12362;&#12367;</span>
+                (puthash fname  dpoint dhash))  <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">dhash[fname]  =dpoint</span>
+              )
+            )
+          (<span style="color: #20b2aa; font-weight: bold;">unless</span> dpoint (<span style="color: #20b2aa; font-weight: bold;">setq</span> rep nil))
+          <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#31777;&#26131;&#29256;: &#12501;&#12449;&#12452;&#12523;&#12398;&#25506;&#32034;&#12434;&#26368;&#12418; idive--isdir &#26041;&#21521;&#12391;&#26368;&#12418;&#36817;&#12356;&#19968;&#22238;&#12391;&#32066;&#12431;&#12425;&#12379;&#12427;</span>
+          <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">(==&gt; &#12381;&#12398;&#20195;&#12431;&#12426; idive--filtered &#12434;&#12363;&#12369;&#12394;&#12356;)</span>
+          <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#20197;&#19979;&#12434;&#12467;&#12513;&#12531;&#12488;&#12450;&#12454;&#12488;&#12377;&#12428;&#12400;  idive-present-point &#12363;&#12425; idive-next-point</span>
+          <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12414;&#12391;&#12395;&#12354;&#12427;&#20840;&#12390;&#12398;&#12501;&#12449;&#12452;&#12523;&#12398;&#26908;&#32034;&#12434;&#34892;&#12358; =&gt; &#31684;&#22258;&#12364;&#24195;&#12369;&#12428;&#12400;&#32080;&#27083;&#26178;&#38291;&#12364;&#12363;&#12363;&#12427;&#12371;&#12392;&#12418;&#12354;&#12427;.</span>
+          <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(setq rep nil)</span>
+          )
+        (idive--goto-char)
+        (<span style="color: #20b2aa; font-weight: bold;">setq</span> suffs (cdr suffs))
+        )
+      )
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (= (idive--isdir)  1) (<span style="color: #20b2aa; font-weight: bold;">setq</span> dive-points (sort dive-points '&lt;)))
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> (= (idive--isdir) -1) (<span style="color: #20b2aa; font-weight: bold;">setq</span> dive-points (sort dive-points '&gt;)))
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#21517;&#12398;&#12522;&#12473;&#12488;&#12434;&#12388;&#12367;&#12427;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">while</span> dive-points
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> dp          (car dive-points))
+      (<span style="color: #20b2aa; font-weight: bold;">push</span> (gethash dp fhash) fnames)
+      (<span style="color: #20b2aa; font-weight: bold;">setq</span> dive-points (cdr dive-points))
+      )
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">filter &#12434;&#12363;&#12369;&#12427;&#22580;&#21512;(&#26908;&#32034;&#25991;&#23383;&#21015;&#12364;&#28961;&#12356;&#12501;&#12449;&#12452;&#12523;&#12399;&#38283;&#12363;&#12394;&#12356;)</span>
+    (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname (idive--filtered fnames))
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12418;&#12375; idive-fname &#12364;&#12354;&#12428;&#12400;, fname &#12398;&#22580;&#25152;&#12434;&#30906;&#20445;&#12375;&#12390;&#12362;&#12367;</span>
+    (<span style="color: #20b2aa; font-weight: bold;">if</span> idive-fname (<span style="color: #20b2aa; font-weight: bold;">setq</span> idive-fname-point (gethash idive-fname dhash)))
+    <span style="color: #cd853f;">; </span><span style="color: #cd853f;">filter &#12434;&#12363;&#12369;&#12394;&#12356;&#22580;&#21512;&#12399;&#20197;&#19979;</span>
+    <span style="color: #cd853f;">;</span><span style="color: #cd853f;">(setq idive-fname (car fnames))</span>
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">&#12371;&#12371;&#12391; dive &#12377;&#12427;&#12501;&#12449;&#12452;&#12523;&#12434;&#30331;&#37682;&#12377;&#12427;</span>
+    <span style="color: #cd853f;">;; </span><span style="color: #cd853f;">(idive-visit-dived-file-p &#12364; t &#12394;&#12425;&#12400;&#30331;&#37682;&#12375;&#12394;&#12356;)</span>
+    (<span style="color: #20b2aa; font-weight: bold;">unless</span> idive-visit-dived-file-p
+      (<span style="color: #20b2aa; font-weight: bold;">if</span> idive-fname
+          (puthash (idive--expand-file-name idive-fname) t idive-dived-files-hash)))
+    )
+  )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> プログラム全体</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+いちおう以下に置いておく.<br />
+<a href="https://github.com/saito1369/isearch-dive">https://github.com/saito1369/isearch-dive</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 反省点</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+自分で使ってる分には今のところ問題なさそうだが, エラーが出る度に勉強しながら継ぎ足しつぎたしで書いてきたので, もうなんか最初から書き直した方がいいような.<br />
+そんな気分.<br />
+限定された使い方ではうまく動いてるように見えるけど, 色々と危ういことをやってそうな雰囲気でいきなり動かなくなりそう.<br />
+isearch の仕組みがよくわかってないまま作ってるので, もう少しきちんと調べてからやればよかったかもしれない.<br />
+特に isearch-なんとか という変数の使い方とか.<br />
+  isearch-string<br />
+  isearch-success<br />
+  isearch-forward<br />
+  isearch-case-fold-search<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 参考文献</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Unix のメモ技術<br />
+<a href="http://0xcc.net/unimag/1/">http://0xcc.net/unimag/1/</a><br />
+</p>
+
+<p>
+ChangeLog メモを試してみよう<br />
+<a href="https://at-aka.blogspot.jp/p/change-log.html">https://at-aka.blogspot.jp/p/change-log.html</a><br />
+</p>
+
+<p>
+私の ChangeLog メモ活用法<br />
+<a href="http://ta2o.net/doc/zb/0016.html">http://ta2o.net/doc/zb/0016.html</a><br />
+</p>
+
+<p>
+ChangeLog メモで Howm を使う quasi-howm<br />
+<a href="https://at-aka.blogspot.jp/2005/06/changelog-howm-quasi-howm.html">https://at-aka.blogspot.jp/2005/06/changelog-howm-quasi-howm.html</a><br />
+</p>
+
+<p>
+Automatically wrapping I-search?<br />
+<a href="https://stackoverflow.com/questions/285660/automatically-wrapping-i-search">https://stackoverflow.com/questions/285660/automatically-wrapping-i-search</a><br />
+</p>
+
+<p>
+"1 of n" result for Emacs search - Stack Overflow<br />
+<a href="https://stackoverflow.com/questions/14764130/1-of-n-result-for-emacs-search">https://stackoverflow.com/questions/14764130/1-of-n-result-for-emacs-search</a><br />
+</p>
+
+<p>
+ace-isearch : isearch、ace-jump-mode、avy、helm-swoopを滑らかに統合 - Qiita<br />
+<a href="http://qiita.com/ballforest/items/7c3f2e64b59d8157bc8c">http://qiita.com/ballforest/items/7c3f2e64b59d8157bc8c</a><br />
+</p>
+
+<p>
+emacs: interactively search open buffers<br />
+<a href="https://stackoverflow.com/questions/2641211/emacs-interactively-search-open-buffers">https://stackoverflow.com/questions/2641211/emacs-interactively-search-open-buffers</a><br />
+</p>
+
+<p>
+ace-jump-modeの紹介 - syohex’s diary<br />
+<a href="http://syohex.hatenablog.com/entry/20120304/1330822993">http://syohex.hatenablog.com/entry/20120304/1330822993</a><br />
+</p>
+
+<p>
+画面内を素早くカーソル移動する方法のまとめ - Qiita<br />
+<a href="http://qiita.com/ballforest/items/834c92bf5bf262c37973">http://qiita.com/ballforest/items/834c92bf5bf262c37973</a><br />
+</p>
+
+<p>
+Emacs Lisp 関数のアドバイス<br />
+<a href="http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_17.html">http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_17.html</a><br />
+<a href="http://www.fan.gr.jp/~ring/doc/elisp_20/elisp_17.html">http://www.fan.gr.jp/~ring/doc/elisp_20/elisp_17.html</a><br />
+</p>
+
+<p>
+Emacs Lisp 基礎文法最速マスター<br />
+<a href="http://d.hatena.ne.jp/rubikitch/20100201/elispsyntax">http://d.hatena.ne.jp/rubikitch/20100201/elispsyntax</a><br />
+</p>
+
+<p>
+Emacs Lisp でスクリプト処理<br />
+<a href="http://dev.ariel-networks.com/articles/software-design-200802/elisp-scripting/">http://dev.ariel-networks.com/articles/software-design-200802/elisp-scripting/</a><br />
+</p>
+
+<p>
+正規表現の検索<br />
+<a href="http://www.math.s.chiba-u.ac.jp/~matsu/lisp/emacs-lisp-intro-jp_13.html">http://www.math.s.chiba-u.ac.jp/~matsu/lisp/emacs-lisp-intro-jp_13.html</a><br />
+</p>
+
+<p>
+バッファファイル名<br />
+<a href="http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_406.html">http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_406.html</a><br />
+</p>
+
+<p>
+リストと連想配列 - 環境設定のための Emacs Lisp 入門 | プログラマーズ雑記帳<br />
+<a href="http://yohshiy.blog.fc2.com/blog-entry-269.html">http://yohshiy.blog.fc2.com/blog-entry-269.html</a><br />
+</p>
+
+<p>
+7.1. Creating Hash Tables<br />
+<a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Hash.html#Creating-Hash">https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Hash.html#Creating-Hash</a><br />
+</p>
+
+<p>
+re-search-forward<br />
+<a href="https://www.gnu.org/software/emacs/manual/html_node/eintr/re_002dsearch_002dforward.html">https://www.gnu.org/software/emacs/manual/html_node/eintr/re_002dsearch_002dforward.html</a><br />
+<a href="http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_34.html">http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_34.html</a><br />
+<a href="http://www.math.s.chiba-u.ac.jp/~matsu/lisp/emacs-lisp-intro-jp_13.html">http://www.math.s.chiba-u.ac.jp/~matsu/lisp/emacs-lisp-intro-jp_13.html</a><br />
+<a href="http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_552.html">http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_552.html</a><br />
+</p>
+
+<p>
+2.4. ファイル<br />
+<a href="http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_25.html">http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_25.html</a><br />
+<a href="http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_406.html">http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_406.html</a><br />
+<a href="http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_27.html">http://www.bookshelf.jp/texi/elisp-manual-20-2.5-jp/elisp_27.html</a><br />
+</p>
+
+<p>
+エラー(制御構造)<br />
+<a href="http://flex.phys.tohoku.ac.jp/texi/eljman/eljman_104.html">http://flex.phys.tohoku.ac.jp/texi/eljman/eljman_104.html</a><br />
+</p>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+</feed>

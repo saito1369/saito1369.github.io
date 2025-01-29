@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>主成分分析の学習 - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2017-07-26-003653.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2017-07-26-003653.html">
+  <meta property="og:title" content="主成分分析の学習 - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-07-26T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-07-26 (Wed)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        主成分分析の学習
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 参考 URL</a></li>
+<li><a href="#sec-2">2. データ</a></li>
+<li><a href="#sec-3">3. 求めたいもの</a></li>
+<li><a href="#sec-4">4. 主成分軸の計算</a></li>
+<li><a href="#sec-5">5. 第一主成分</a></li>
+<li><a href="#sec-6">6. 寄与率(proportion)</a></li>
+<li><a href="#sec-7">7. 因子負荷量(factor loading)</a></li>
+<li><a href="#sec-8">8. まとめ</a>
+<ul>
+<li><a href="#sec-8-1">8.1. 主成分分析</a></li>
+<li><a href="#sec-8-2">8.2. 主成分得点</a></li>
+<li><a href="#sec-8-3">8.3. 寄与率</a></li>
+<li><a href="#sec-8-4">8.4. 因子負荷量</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2010-03-24 Wed 00:36&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 13:02&gt;</span></span><br  />
+</p>
+<p>
+主成分分析の学習のきろく.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 参考 URL</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">[2010-03-24 00:36]</span></span><br  />
+<a href="http://www-pse.cheme.kyoto-u.ac.jp/~kano/document/text-PCA.pdf">http://www-pse.cheme.kyoto-u.ac.jp/~kano/document/text-PCA.pdf</a><br  />
+もう見れない様子<br  />
+</p>
+
+<p>
+改めて探したらこっちに移ってた.<br  />
+<a href="http://manabukano.brilliant-future.net/document/text-PCA.pdf">http://manabukano.brilliant-future.net/document/text-PCA.pdf</a><br  />
+</p>
+
+<p>
+以下は, この pdf をよみながら勉強した記録である.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> データ</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+(自分用)<br  />
+以下のようなデータを想定する.<br  />
+サンプル(測定サンプル)の id: \(n = 1 \ldots N\) (N 個のサンプル)<br  />
+測定値(化合物) の        id: \(p = 1 \ldots P\) (P 個の化合物の量)<br  />
+</p>
+
+<p>
+サンプル 1 の測定値 \(\vec{x}_{1} = (x_{11}, x_{12}, \ldots ,x_{1P})\)<br  />
+サンプル 2 の測定値 \(\vec{x}_{2} = (x_{21}, x_{22}, \ldots ,x_{2P})\)<br  />
+&#x2026;<br  />
+サンプル N の測定値 \(\vec{x}_{N} = (x_{N1}, x_{N2}, \ldots ,x_{NP})\)<br  />
+</p>
+
+<p>
+註: それぞれの変数 \(x_{np} (n=1 \ldots N)\) に対する平均値 = 0 に規格化されているとする.<br  />
+    すなわち, \(x_{11} + x_{21} + \ldots + x_{N1}=0\) などと規格化されているものとする<br  />
+    (上の式で列の足し算を計算してこれを 0 とするように変数変換しておく).<br  />
+</p>
+
+<p>
+行列 \(X\) は以下のように定義する(\(N\) 行 \(P\) 列の行列).<br  />
+</p>
+\begin{equation*}
+  X = \left[
+    \begin{array}{rrrr}
+       x_{11} & x_{12} & \ldots & x_{1P} \\
+       x_{21} & x_{22} & \ldots & x_{2P} \\
+       \ldots & \ldots & \ldots & \ldots \\
+       x_{i1} & x_{i2} & \ldots & x_{iP} \\
+       \ldots & \ldots & \ldots & \ldots \\
+       x_{N1} & x_{N2} & \ldots & x_{NP} \\
+    \end{array}
+  \right]
+\end{equation*}
+
+<p>
+測定値の種類(化合物. \(X\) における列)に対する名前を \(x_p\) と書く.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 求めたいもの</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+情報の損失を最小限に抑えた新しい軸を作成する.<br  />
+= 新しい軸(主成分)で計測したサンプル値の分散が最大となるように, 新しい軸を定める.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 主成分軸の計算</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+測定値の種類(化合物. \(X\) における列)の名前を \(x_p\) とする.<br  />
+</p>
+
+<p>
+列名 \(x_1, x_2, \ldots, x_p, \ldots, x_P\) に対して<br  />
+主成分を以下のようにおく.<br  />
+第一主成分 \(z_1\), 第二主成分 \(z_2\), \(\ldots\), 第 \(m\) 主成分 \(z_m\), \(\ldots\), \(z_P\)<br  />
+</p>
+
+\begin{align*}
+z_1 &= w_{11} x_1 + w_{21} x_2 + \ldots + w_{P1} x_P \\
+z_2 &= w_{12} x_1 + w_{22} x_2 + \ldots + w_{P2} x_P \\
+\ldots \\
+z_m &= w_{1m} x_1 + w_{2m} x_2 + \ldots + w_{Pm} x_P \\
+\ldots \\
+z_P &= w_{1P} x_1 + w_{2P} x_2 + \ldots + w_{PP} x_P
+\end{align*}
+
+<p>
+第 \(m\) 主成分 \(z_m\) の係数 \(w_{pm} (p=1 \ldots P)\) に対する条件を以下のようにとる:<br  />
+$$
+  \sum_{p=1}^{P} w_{pm}^{2} = 1
+  $$<br  />
+(係数の自乗和 = 1 に制限することで \(w\) の値が具体的にきまる)<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 第一主成分</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+まず第一主成分を求める.<br  />
+第一主成分の結合係数 \(w_1\) を以下のように書く.<br  />
+</p>
+
+<p>
+$$
+  w_{1}^{T} = (w_{11}, w_{21}, \ldots ,w_{P1})
+  $$<br  />
+\(T\) は転置を示す(\(w_{1}\) は列ベクトル).<br  />
+</p>
+
+<p>
+上の標記を用いると,<br  />
+$$
+  \sum_{p=1}^{P} w_{pm}^{2} = 1
+  $$<br  />
+の条件は<br  />
+$$
+  w_{1}^{T} w_{1} = 1
+  $$<br  />
+と書ける.<br  />
+</p>
+
+<p>
+サンプル \(n\) の測定値<br  />
+$$
+  \vec{x}_{n} = (x_{n1},x_{n2}, \ldots, x_{nP})
+  $$<br  />
+に対する第一主成分 \(z_1\) の値 \(t_{n1}\) は<br  />
+</p>
+
+<p>
+$$
+  t_{n1} = \sum_{p=1}^{P} w_{pn} x_{np} = \vec{x}_{n} w_1
+  $$<br  />
+\(t_{n1}\) を \(\vec{x}_{n}\) に対する第一主成分得点と呼ぶ.<br  />
+</p>
+
+<p>
+\(N\) 個のサンプルに対して, 第一主成分 \(z_1\) に対する主成分得点ベクトル \(t_1\) を以下のように書く.<br  />
+</p>
+
+<p>
+$$
+  t_{1}^{T} =(t_{11}, t_{21}, \ldots, t_{N1})
+  $$<br  />
+</p>
+
+<p>
+これは, 以下のように書ける.<br  />
+$$
+  t_{1} = X w_{1}
+  $$<br  />
+</p>
+
+<p>
+第一主成分の分散 \(var_{z_1}\) は,<br  />
+\(t_{1}\) の平均値は 0 であることに注意すると<br  />
+\(var_{z_1} = \frac{t_{1}^{T} t_{1}}{N-1}\) と書け, 以下のように変形できる.<br  />
+</p>
+
+\begin{align*}
+var_{z_1} &= \frac{t_{1}^{T} t_{1}}  {N-1}  \\
+          &= \frac{(X w_1)^T (X w_1)}{N-1}  \\
+          &= w_1^T (\frac{X^T X}{N-1}) w_1  \\
+          &= w_{1}^{T} V w_1
+\end{align*}
+<p>
+但し \(V = \frac{X^T X}{N-1}\) (共分散行列. \(P\) 次元の正方行列) とした.<br  />
+</p>
+
+<p>
+第一主成分はその分散 \(var_{z_1}\) が最大値をとる.<br  />
+\(w_{1}^{T} w_{1} = 1\) の条件下で \(w_1\) を求めるためには,<br  />
+Lagrange の未定乗数法を用いるとよい.<br  />
+</p>
+
+\begin{equation*}
+J_1 = w_{1}^{T} V w_{1} - \lambda(w_{1}^{T} w_{1} -1)
+\end{equation*}
+<p>
+を考え, \(J_1\) を最大にする \(w_{1}\) を求めれば, 第一主成分 \(z_1\) を求める事ができる.<br  />
+\(J_1\) を \(w_1\) で偏微分し 0 とおく.<br  />
+</p>
+
+\begin{align*}
+\frac{\partial J_1}{\partial w_1} &= 2 V w_1 - 2 \lambda w_1 \\
+                                 &= 2(V - \lambda I) w_{1}
+\end{align*}
+<p>
+但し, \(I\) は \(P\) 次元の単位行列.<br  />
+上の式は固有値問題にほかならない. 即ち \(w_{1}\) が 0 以外の解を持つためには<br  />
+$$
+  det| V - \lambda I | = 0
+  $$<br  />
+でないといけない.<br  />
+固有値は, \(\lambda_1 > \lambda_2 > > \ldots > \lambda_P\) と \(P\) 個求められる<br  />
+(大きい順から \(\lambda_1\), \(\lambda_2\) と書くことにする).<br  />
+</p>
+
+<p>
+対応する固有ベクトルのうちのどれかが \(w_1\) となる.<br  />
+</p>
+
+
+<p>
+一方, 第一主成分で計測した値の分散 \(var_{z_1}\) は,<br  />
+</p>
+\begin{align*}
+var_{z_1} &= w_{1}^{T} V       w_{1} \\
+          &= w_{1}^{T} \lambda w_{1} \\
+          &= \lambda
+\end{align*}
+<p>
+1 行目から 2 行目への変換は, \(V-\lambda I = 0\) を用いた.<br  />
+</p>
+
+<p>
+すなわち, 主成分で計測した値の分散は固有値と等しくなる.<br  />
+</p>
+
+<p>
+第一主成分はそれで計測した値の分散が最も大きいものであるので,<br  />
+第一主成分 \(w_1\) は, 固有値 \(\lambda_1\) に対応する固有ベクトルとなる.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> 寄与率(proportion)</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+<a href="http://manabukano.brilliant-future.net/document/text-PCA.pdf">http://manabukano.brilliant-future.net/document/text-PCA.pdf</a><br  />
+</p>
+<pre class="example">
+  主成分分析とは少数の統合的指標(主成分)を用いて変数間の関係や特徴を把握するための統計的手法である.
+  従って, 各主成分が元のデータに含まれる特徴をどの程度表現しているのか,
+  あるいは何個の主成分を採用すれば元のデータに含まれる特徴を十分に表現できるのかを知ることが必要になる.
+  このための指標として, 寄与率および累積寄与率がある.
+</pre>
+
+<p>
+合計 \(P\) 個の変数の分散の和は, その共分散行列を \(V\) とすると, \(V\) の \(p\) 行 \(p\) 列目要素 \(v_{pp}\) が \(x_p\) の分散に等しくなるので,<br  />
+$$
+  \sum_{p=1}^{P} var_{x_p} = \sum_{p=1}^{P} v_{pp}  = tr(V)
+  $$<br  />
+</p>
+
+<p>
+一方, 第 \(m\) 主成分の分散 \(var_{z_m}\) は共分散行列 \(V\) の \(m\) 番目に大きな固有値 \(\lambda_m\) に等しいので,<br  />
+$$
+  \sum_{p=1}^{P} var_{z_p} = \sum_{p=1}^{P} \lambda_p = tr(V)
+  $$<br  />
+(一般に, すべての固有値の和=行列のトレース)<br  />
+</p>
+
+<p>
+従って, 元の変数で計測した値の分散の総和 = 主成分で計測した値の分散の総和 となる.<br  />
+そこで, 第 \(m\) 主成分が元のデータに含まれる特徴をどの程度表現しているかを示す指標として,<br  />
+第 \(m\) 主成分(で計測した値)の分散が分散の総和に占める割合<br  />
+</p>
+
+<p>
+$$
+  C_m = \frac{\lambda_m}{\sum_{p=1}^{P} \lambda_p} = \frac{\lambda_m}{tr(V)}
+  $$<br  />
+</p>
+
+<p>
+を利用できる. \(C_m\) は寄与率(proportion)と呼ばれ, 通常 % を用いて示される.<br  />
+</p>
+
+<p>
+第 \(m\) 主成分までの分散の和<br  />
+$$
+  P_m = \sum_{i=1}^{m} C_i
+  $$<br  />
+は累積寄与率(cumulative proportion) と呼ばれる.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 因子負荷量(factor loading)</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+<a href="http://manabukano.brilliant-future.net/document/text-PCA.pdf">http://manabukano.brilliant-future.net/document/text-PCA.pdf</a><br  />
+</p>
+<pre class="example">
+  主成分は各変数の線形結合として与えられるので, その解釈のためには, 主成分と各変数との相関を
+  把握することにより主成分に強く影響を及ぼす変数を特定することが有効である.
+</pre>
+
+<p>
+そのための指標 因子負荷量は, 主成分と変数との相関係数として定義される.<br  />
+</p>
+
+<p>
+第 \(m\) 主成分 \(z_m\) と \(p\) 番目の変数 \(x_p\) との間の因子負荷量は,<br  />
+</p>
+
+<p>
+$$
+  r_{z_m,x_p} = \frac{var_{z_m,x_p}} {sd_{z_m} sd_{x_p}}
+  $$<br  />
+</p>
+
+<p>
+ただし,<br  />
+\(sd_{z_m}\) : 主成分 \(z_m\) (で計測した値)の標準偏差 = \(\sqrt{\lambda_m}\)<br  />
+\(sd_{x_p}\) : 変数   \(x_p\) (\(N\) 個ある) の値の標準偏差<br  />
+\(var_{z_m,x_p}\) : \(z_m\), \(x_p\) の共分散<br  />
+</p>
+
+<p>
+主成分 \(z_m\) で計測した N 個のデータの値 \(t_{m}^{T} =(t_{1m}, \ldots ,t_{Nm})\) は,<br  />
+$$
+  t_{1} = X w_{1}
+  $$<br  />
+より,<br  />
+$$
+  t_{m} = X w_{m}
+  $$<br  />
+となる.<br  />
+また, \(x_p\) に関しては, \(c_{p}^{T}=(0, \ldots ,1, \ldots 0)\) (\(p\) 番目だけが 1 の \(P\) 次元ベクトル)と書くと<br  />
+$$
+  x_{p} = X c_{p}
+  $$<br  />
+</p>
+
+\begin{align*}
+var_{z_m, x_p} = \frac{(X w_m)^T X c_p}{N-1}
+\end{align*}
+<p>
+\(X w_m\) は \(t_m\) で, \(X c_p\) は \(x_p\). これらを要素毎に掛け合わせて足して, \(N-1\) (不偏分散を考えてる)で割る.<br  />
+平均は 0 で規格化されてるからこの値が共分散となる.<br  />
+</p>
+
+<p>
+これを展開していくと,<br  />
+</p>
+\begin{align*}
+var_{z_m, x_p} &= \frac{(X w_m)^T X c_p}{N-1} \\
+               &= \frac{w_{m}^{T} X^{T} X c_p}{N-1} \\
+               &= w_{m}^{T} V c_p \\
+               &= (V w_{m})^T c_p \\
+               &= (\lambda_m w_{m})^T c_p \\
+               &= \lambda_m w_{m}^T c_p \\
+               &= \lambda_m w_{pm}
+\end{align*}
+<p>
+2 行目から 3 行目は \(V = \frac{X^{T} X}{N-1}\) より<br  />
+4 行目から 5 行目は, \(2(V - \lambda_m I) w_{m}=0\) より<br  />
+6 行目から 7 行目は, \(c_p\) は \(p\) 番目の要素を取り出す役割があるので.<br  />
+</p>
+
+<p>
+従って, 主成分 \(z_m\) と変数 \(x_p\) の因子負荷量<br  />
+(主成分 \(z_m\) で計測したデータの値 (N 次元ベクトル) と変数 \(x_p\) の値(N 次元ベクトル \(X\) の縦 1 列分)との相関係数)は<br  />
+</p>
+
+\begin{align*}
+r_{z_m,x_p} &= \frac{\lambda_m w_{pm}}{(\sqrt{\lambda_m} sd_{x_p})} \\
+            &= \frac{\sqrt{\lambda_m} w_{pm}}{sd_{x_p}}
+\end{align*}
+<p>
+となる.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> まとめ</h2>
+<div class="outline-text-2" id="text-8">
+</div><div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> 主成分分析</h3>
+<div class="outline-text-3" id="text-8-1">
+<p>
+\(V\) を分散共分散行列(\(P\) x \(P\) の行列)として<br  />
+$$
+   V w = \lambda w
+   $$<br  />
+固有ベクトル \(w_{m}\) が \(m\) 番目の主成分.<br  />
+\(\lambda_m\) は 主成分 \(z_{m}\) で計測したデータの値(N 個ある)の分散の大きさ.<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> 主成分得点</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+主成分 \(z_{m}\) に対するデータ \(\vec{x}_{n}\) の主成分得点は<br  />
+$$
+   t_{nm} = \vec{x}_{n} w_{m}
+   $$<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-8-3" class="outline-3">
+<h3 id="sec-8-3"><span class="section-number-3">8.3</span> 寄与率</h3>
+<div class="outline-text-3" id="text-8-3">
+<p>
+1 つの主成分が元データの特徴をどの程度表現できてるか.<br  />
+$$
+   \frac{\lambda_m}{\sum_{p}^{P} \lambda_{p}}
+   $$<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-8-4" class="outline-3">
+<h3 id="sec-8-4"><span class="section-number-3">8.4</span> 因子負荷量</h3>
+<div class="outline-text-3" id="text-8-4">
+<p>
+主成分軸と元の軸の相関係数<br  />
+主成分 \(z_m\) で計測したデータの値と変数 \(x_p\) の値との相関<br  />
+$$
+   \frac{\sqrt{\lambda_m} w_{pm}}{sd_{x_p}}
+   $$<br  />
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-07-26T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-07-26 (Wed)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2017-07-26-003653.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2017-07-26-003653.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2017-06-20-184414.html" title="Previous Post: 統計的学習の導入ぶぶん">&laquo; 統計的学習の導入ぶぶん</a></li>
+            
+            
+            <li class="next"><a href="/blog/2017-09-04-164431.html" title="Next Post: isearch の改良">isearch の改良 &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2017-07-26-003653.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2017-07-26-003653.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

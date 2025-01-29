@@ -1,0 +1,1536 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: md | easy cure]]></title>
+  <link href="http://saito1369.github.io/blog/categories/md/atom.xml" rel="self"/>
+  <link href="http://saito1369.github.io/"/>
+  <updated>2025-01-29T16:44:35+09:00</updated>
+  <id>http://saito1369.github.io/</id>
+  <author>
+    <name><![CDATA[saito1369]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CHARMM-GUI 使い方まとめ]]></title>
+    <link href="http://saito1369.github.io/blog/2018-11-05-201433.html"/>
+    <updated>2018-11-05T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/201433</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a>
+<ul>
+<li><a href="#sec-1-1">1.1. maestro/desmond</a></li>
+<li><a href="#sec-1-2">1.2. gromacs</a></li>
+<li><a href="#sec-1-3">1.3. やりたいこと</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. この文書の目的</a></li>
+<li><a href="#sec-3">3. CHARMM-GUI の使い方</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 表紙</a></li>
+<li><a href="#sec-3-2">3.2. Input Generator</a></li>
+<li><a href="#sec-3-3">3.3. Quick MD Simulator</a></li>
+<li><a href="#sec-3-4">3.4. Model/Chain Selection</a></li>
+<li><a href="#sec-3-5">3.5. Manipulate PDB</a></li>
+<li><a href="#sec-3-6">3.6. Computed Energy</a></li>
+<li><a href="#sec-3-7">3.7. Waterbox Size Options</a></li>
+<li><a href="#sec-3-8">3.8. Add ions</a></li>
+<li><a href="#sec-3-9">3.9. System Size</a></li>
+<li><a href="#sec-3-10">3.10. Force Field Options</a></li>
+<li><a href="#sec-3-11">3.11. Input Generation Options</a></li>
+<li><a href="#sec-3-12">3.12. Equilibration Input Generation Options</a></li>
+<li><a href="#sec-3-13">3.13. Dynamics Input Generation Options</a></li>
+<li><a href="#sec-3-14">3.14. download</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. MD 計算の実行(production run)</a>
+<ul>
+<li><a href="#sec-4-1">4.1. gromacs2018</a></li>
+<li><a href="#sec-4-2">4.2. desmond</a></li>
+<li><a href="#sec-4-3">4.3. namd</a></li>
+<li><a href="#sec-4-4">4.4. amber</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-05 Mon 20:14&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-07-04 Thu 15:44&gt;</span></span><br />
+</p>
+<p>
+CHARMM-GUI を使って MD 計算用の構造をさくっと作る.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+MD (Molecular Dynamics) 計算を行うプログラムの主なもの(自分が知ってるもの).<br />
+</p>
+<ul class="org-ul">
+<li>maestro/desmond (Academic Free)<br />
+</li>
+<li>gromacs<br />
+</li>
+<li>namd<br />
+</li>
+<li>amber (free 版では CPU のみ)<br />
+</li>
+<li>cosgene<br />
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> maestro/desmond</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+今の一押しは  <a href="https://www.deshawresearch.com/resources_desmond.html">maestro/desmond</a> .<br />
+maestro は PDB データの準備から MD 計算用の構造の作成(水素付加したりとか, 周りに水入れたりとか, 足りない部分補ったりとか),<br />
+望みの MD 計算を行うまでの支援を行ってくれる GUI 部分.<br />
+desmond は MD 計算を実際に行うエンジン部分.<br />
+GUI で構造を作っていけるのでわかりやすくてよい.<br />
+手順どおりにやってけばいいので割と簡単.<br />
+手順を script に書いて自動で計算させる事もできる.<br />
+GPU を使えば計算はめちゃくちゃ速い. 速すぎてほんとに出来たのかよと思うほどである.<br />
+糖鎖とかリガンドとか色々ついてても基本自動でよしなにやってくれる.<br />
+素晴らしすぎる.<br />
+</p>
+
+<p>
+しかしこれは academic free なのである. そして free 版では使えない機能が結構あったりする.<br />
+商用版と free 版では使える力場も異なる.<br />
+マニュアルにこの機能は使えないって明示的に書いてないこともある.<br />
+やってみてエラーが出てはじめて使えないってわかったりもする.<br />
+その辺微妙に不親切な感じ.<br />
+</p>
+
+<p>
+純粋な academic 研究ならこれを使うのがいいと思う.<br />
+どれくらい五月蝿く言われるのかわからないがお金が絡むような場合は避けるのが無難か.<br />
+</p>
+
+<p>
+もしくは <a href="https://www.schrodinger.com/jp/desmond">Schrodinger 社</a> から一式を購入するか.<br />
+</p>
+
+<p>
+買い方よくわかんないけど&#x2026;<br />
+日本語の HP が表紙しかないようだ.<br />
+login するために request new password を何度か申請してみたが返事がなかった.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> gromacs</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+次のおすすめは <a href="http://www.gromacs.org/">gromacs</a> である.<br />
+</p>
+
+<p>
+gromacs は蛋白質だけの計算をするんであれば全く問題なく使える.<br />
+</p>
+
+<p>
+ligand がある場合は <a href="https://www.ccpn.ac.uk/v2-software/software/ACPYPE-folder">acpype</a> を使えばよい.<br />
+</p>
+
+<p>
+amber で amber 力場でのファイルを作成して acpype で gromacs に <a href="http://ambermd.org/tutorials/pengfei/index.htm">変換</a> でもいい.<br />
+</p>
+
+<p>
+計算速度は, desmond よりは 3 倍位遅い印象(GPU 使用時).<br />
+もうちょっと速くなってくれればなぁと思う今日このごろである.<br />
+</p>
+
+<p>
+リガンド的な化合物がある場合は acpype を使えばいいけど, 糖鎖とかがある場合(糖鎖がアミノ酸に共有結合してる)は色々と難しいようだ.<br />
+量子化学計算のプログラムが無いと出来ないっぽい. 例えば Gaussian とか. お金が無いので使ったことないけど <a href="http://blog.livedoor.jp/ag_plusplus/archives/68324049.html">何かムズかしそう</a>.<br />
+GAMESS とか Firefly とかいう freeware をインストールして使ってみたり, <a href="http://upjv.q4md-forcefieldtools.org/REDServer-Development/upload-log.php">R.E.D. Server</a> で計算させてみたり,<br />
+aspype で出来ないかなと思って頑張ってやってみたこともあったが結局よくわかんなかった.<br />
+</p>
+
+<p>
+gromacs 上で糖鎖入れた状態で MD 計算をさくっと出来ないもんかなぁ.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> やりたいこと</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+ここでやりたいことは以下である:<br />
+gromacs(及びそのほかの MD 計算プログラム)で使う構造ファイルの作成を出来るだけ簡単に行いたい.<br />
+特に糖鎖のようなアミノ酸じゃない化合物が本体の蛋白質に共有結合してるような場合でも何とか簡単に出来ないもんだろうか.<br />
+</p>
+
+<p>
+色々調べてたら<br />
+<a href="http://bit.ly/2yE89EK">How can I generate input files for MD simulations, performed in Gromacs, Namd and Charmm?</a><br />
+というサイトから<br />
+<a href="http://www.charmm-gui.org/">CHARMM-GUI</a> とかいうめちゃ便利そうなサイトを見つけた.<br />
+</p>
+
+<p>
+色々と自動でやってくれるっぽい？ 求めてるのはこれかも？<br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> この文書の目的</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>CHARMM-GUI の使い方を自分が後で思い出せるように解説しておくこと.<br />
+</li>
+<li>すぐに使えるように script を整備しておくこと.<br />
+</li>
+<li>各々の MD プログラムで, production run までの注意点/修正点等を記録しておくこと.<br />
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> CHARMM-GUI の使い方</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+基本的には書いてある通りにやればいい.<br />
+準備しておくのは, MD simulation を行いたい系の PDB ファイル(あるいは PDB ID)のみである.<br />
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 表紙</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+表紙は以下のような感じである(2018/11/15 現在)<br />
+<a href="http://www.charmm-gui.org/">http://www.charmm-gui.org/</a><br />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-01index_html.png" alt="2018-11-05-201433-01index_html.png" /><br />
+</p>
+</div>
+
+<p>
+左側の Input Generator をクリックして次へ行く.<br />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Input Generator</h3>
+<div class="outline-text-3" id="text-3-2">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-02input_generator.png" alt="2018-11-05-201433-02input_generator.png" /><br />
+</p>
+</div>
+
+<p>
+左側の Quick MD Simulator をクリックして次へ行く.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Quick MD Simulator</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">[2019-07-04 Thu]</span></span> 追記 Solvation Builder という名前に変わってる. Solvator + Quick MD Simulator =&gt; Solvation Builder?<br />
+基本的なやり方は同じようだ.<br />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-03qmd_simulator01.png" alt="2018-11-05-201433-03qmd_simulator01.png" /><br />
+</p>
+</div>
+
+<p>
+下の方に PDB ID や PDB ファイルを入れるところがある.<br />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-04qmd_simulator02.png" alt="2018-11-05-201433-04qmd_simulator02.png" /><br />
+</p>
+</div>
+
+<p>
+ここで使う PDB ファイルをアップロードする.<br />
+水素はなくても良い(default では付け直すので <span class="timestamp-wrapper"><span class="timestamp">[2019-02-13 Wed]</span></span> 追記: 水素が無いと化合物の自動同定が難しくなるのでやっぱつけといたほうがいい).<br />
+wild type でいい(mutation を設定するところがあるので).<br />
+</p>
+
+<p>
+Nest Step: Select Model/Chain をクリックして次へ行く.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Model/Chain Selection</h3>
+<div class="outline-text-3" id="text-3-4">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-05manu_pdb.png" alt="2018-11-05-201433-05manu_pdb.png" /><br />
+</p>
+</div>
+
+<p>
+PDB ファイルの解析結果が示される. どの部分構造を使うかチェックを入れる. default では全部使う.<br />
+</p>
+
+<p>
+Nest Step: Manipulate PDB をクリックして次へ.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> Manipulate PDB</h3>
+<div class="outline-text-3" id="text-3-5">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-06generate_pdb.png" alt="2018-11-05-201433-06generate_pdb.png" /><br />
+</p>
+</div>
+
+<p>
+default では元々ついてる CAP(ACE など), 水素とかは一旦外されるっぽい(？)<br />
+アップロードした PDB ファイルについてる(自分でつけておいた)水素を使いたければ Preserve hydrogen coordinates にチェックを入れるとよい.<br />
+Terminal group patching には default でチェックがついてる. 外さなくていいかと思う.<br />
+Protonation, Disulfide Bonds, Mutation 等はチェックを入れれば選択肢が出てくる.<br />
+Disulfide Bonds は指定しなくてもある程度は自動で認識してくれてるようだ.<br />
+</p>
+
+<p>
+これらの設定をした後 PDB ファイルを作成し直す.<br />
+Next Step: Generate PDB をクリック.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> Computed Energy</h3>
+<div class="outline-text-3" id="text-3-6">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-07solvate.png" alt="2018-11-05-201433-07solvate.png" /><br />
+</p>
+</div>
+
+<p>
+計算結果を確認する. たまに Energy にありえん値が入ってることがあるので注意.<br />
+結果が変であれば最初からやり直す.<br />
+</p>
+
+<p>
+遭遇した変な計算結果の例:<br />
+</p>
+<pre class="example">
+ENER ENR:  Eval#     ENERgy      Delta-E         GRMS
+ENER INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+ENER CROSS:           CMAPs        PMF1D        PMF2D        PRIMO
+ENER EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+ENER IMAGES:        IMNBvdw       IMELec       IMHBnd       RXNField    EXTElec
+ ----------       ---------    ---------    ---------    ---------    ---------
+ENER&gt;        0  0.34485E+67  0.00000E+00  0.50297E+04
+ENER INTERN&gt;    11447.85374   1251.81849    848.71042   3924.08889      7.92236
+ENER CROSS&gt;        41.52221      0.00000      0.00000      0.00000
+ENER EXTERN&gt;    0.34485E+67  0.24339E+08  0.00000E+00  0.00000E+00  0.00000E+00
+ENER IMAGES&gt;   202108.80212   -624.50570      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+</pre>
+
+<p>
+0.34485E+67 とか.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> Waterbox Size Options</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+基本 default で良いかと思う.<br />
+Rectaugular 以外にも選択肢がいくつかある.<br />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-8" class="outline-3">
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> Add ions</h3>
+<div class="outline-text-3" id="text-3-8">
+<p>
+default で問題ないと思うが自分は KCl -&gt; NaCl に変更してる.<br />
+</p>
+
+<p>
+ここまで設定が終わったら Next Step: Solvate Molecule をクリックする.<br />
+しばらく(結構)時間がかかる.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-9" class="outline-3">
+<h3 id="sec-3-9"><span class="section-number-3">3.9</span> System Size</h3>
+<div class="outline-text-3" id="text-3-9">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-08pboundary.png" alt="2018-11-05-201433-08pboundary.png" /><br />
+</p>
+</div>
+
+<p>
+そのまま次に行こう.<br />
+Next Step: Setup Periodic Boundary Condition<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-10" class="outline-3">
+<h3 id="sec-3-10"><span class="section-number-3">3.10</span> Force Field Options</h3>
+<div class="outline-text-3" id="text-3-10">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-09makeinputs.png" alt="2018-11-05-201433-09makeinputs.png" /><br />
+</p>
+</div>
+
+<p>
+CHARMM36 と CHARMM36m の２つの選択肢がある.<br />
+default の CHARMM36m でいいだろう.<br />
+</p>
+
+<p>
+注: 力場について<br />
+ default は CHARMM36m である.<br />
+ CHARMM-GUI で選択出来る力場に関する論文は以下にある.<br />
+   <a href="https://www.ncbi.nlm.nih.gov/pubmed/23832629">CHARMM36 all-atom additive protein force field: validation based on comparison to NMR data</a><br />
+   <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5199616/">CHARMM36m: An Improved Force Field for Folded and Intrinsically Disorderd Proteins</a><br />
+ ざっと見ると, C36 は左巻き helix ができやすくて NMR のデータと合ってないと書いてある.<br />
+ 改良してるんだから C36m の方でいいのかな.<br />
+</p>
+
+<p>
+cosgene の設計書に, CHARMMm 力場での相互作用計算について, Amber 力場との比較が書いてある.<br />
+どんな関数を計算してるかがめちゃわかりやすく書いてあり超参考になる.<br />
+  <a href="http://www.jbic.or.jp/activity/st_pr_pj/mypresto/files2/cosgene_design6.pdf">cosgene_design6</a><br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-11" class="outline-3">
+<h3 id="sec-3-11"><span class="section-number-3">3.11</span> Input Generation Options</h3>
+<div class="outline-text-3" id="text-3-11">
+<p>
+使いたい MD engine をチェックする.<br />
+実際自分が使うのは Gromacs, Amber, Desmond くらいか.<br />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-12" class="outline-3">
+<h3 id="sec-3-12"><span class="section-number-3">3.12</span> Equilibration Input Generation Options</h3>
+<div class="outline-text-3" id="text-3-12">
+<p>
+NVT Ensemble でよい<br />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-13" class="outline-3">
+<h3 id="sec-3-13"><span class="section-number-3">3.13</span> Dynamics Input Generation Options</h3>
+<div class="outline-text-3" id="text-3-13">
+<p>
+NPT Ensemble (default) でよい.<br />
+</p>
+
+<p>
+ここまで設定が終わったら Next Step: Generate Equilibration and Dynamics Inputs をクリックして終了である.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-14" class="outline-3">
+<h3 id="sec-3-14"><span class="section-number-3">3.14</span> download</h3>
+<div class="outline-text-3" id="text-3-14">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-10download.png" alt="2018-11-05-201433-10download.png" /><br />
+</p>
+</div>
+
+<p>
+download.tgz をクリックすれば計算結果のダウンロードが始まる.<br />
+charmm-gui.tgz という名前のファイルがダウンロードされる.<br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> MD 計算の実行(production run)</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+各々の MD engine での起動方法<br />
+charmm-gui.tgz を展開するとそれぞれの MD engine ごとに使用する構造ファイル及びパラメータファイル(の雛形)が出来ているのでそれを使えばよい.<br />
+</p>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> gromacs2018</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+step5_production.mdp 内の nsteps=500000 = (1ns) 等パラメータをいくつか変更する.<br />
+</p>
+
+<p>
+step5_production.mdp の変更例は以下:<br />
+</p>
+<pre class="example">
+dt        = 0.002     # 変えない. 2(fs) 0.002*500(step) =1(ps) 500steps = 1ps
+nsteps    = 50000000  # 例: 100(ns)
+nstlog    = 5000      # log ファイル書き出す頻度
+nstxout   = 25000     # trr ファイルに構造書き出す頻度
+nstvout   = 25000     # trr ファイル  速度
+nstfout   = 25000     # trr ファイル  力
+nstcalcenergy = 100   # ここは変えなくていい?
+nstenergy = 5000      # edr ファイルに energy を書き出す頻度 every 10(ps)
+</pre>
+
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">[2019-07-04 Thu]</span></span> 追記:<br />
+  step4.0_minimization.mdp  の nsteps=50000  (&lt;- 5000)  に変更.<br />
+  step4.1_equilibration.mdp の nsteps=250000 (&lt;- 25000) に変更.<br />
+</p>
+
+<p>
+以下の script 経由で実行できる.<br />
+shell script でいいけど自分は perl が一番わかり易いので perl で書いてみた.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">CHARMM-GUI Quick MD Simulator &#12391;&#20316;&#12425;&#12428;&#12383;&#12501;&#12449;&#12452;&#12523;&#12398;&#23455;&#34892; script</span>
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">gromacs2018 &#29256;</span>
+<span class="linenr"> 8: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">"/usr/local/gromacs2018.gpu/bin/gmx"</span>;
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$pdb</span>  =<span style="color: #ffa07a;">"step3_charmm2gmx.pdb"</span>;
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$top</span>  =<span style="color: #ffa07a;">"topol.top"</span>;
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$idx</span>  =<span style="color: #ffa07a;">"index.ndx"</span>;
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">1. &#27083;&#36896;&#26368;&#36969;&#21270;</span>
+<span class="linenr">16: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.0</span>
+<span class="linenr">17: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$mdp40</span>=<span style="color: #ffa07a;">"step4.0_minimization.mdp"</span>;
+<span class="linenr">18: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr40</span>=<span style="color: #ffa07a;">"step4.0_minimization.tpr"</span>;
+<span class="linenr">19: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd40</span>=<span style="color: #ffa07a;">"$cmd grompp -f $mdp40 -o $tpr40 -c $pdb -p $top -r $pdb"</span>;
+<span class="linenr">20: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md40</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -deffnm step4.0_minimization"</span>;
+<span class="linenr">21: </span><span style="color: #ff83fa;">print</span> $cmd40.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">22: </span><span style="color: #9370db;">system</span>($cmd40);
+<span class="linenr">23: </span><span style="color: #ff83fa;">print</span> $md40.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">24: </span><span style="color: #9370db;">system</span>($md40);
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">2. &#24179;&#34913;&#21270; MD</span>
+<span class="linenr">27: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.1</span>
+<span class="linenr">28: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$gro41</span>=<span style="color: #ffa07a;">"step4.0_minimization.gro"</span>;
+<span class="linenr">29: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$mdp41</span>=<span style="color: #ffa07a;">"step4.1_equilibration.mdp"</span>;
+<span class="linenr">30: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr41</span>=<span style="color: #ffa07a;">"step4.1_equilibration.tpr"</span>;
+<span class="linenr">31: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd41</span>=<span style="color: #ffa07a;">"$cmd grompp -f $mdp41 -o $tpr41 -c $gro41 -r $pdb -n $idx -p $top"</span>;
+<span class="linenr">32: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md41</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -deffnm step4.1_equilibration"</span>;
+<span class="linenr">33: </span><span style="color: #ff83fa;">print</span> $cmd41.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">34: </span><span style="color: #9370db;">system</span>($cmd41);
+<span class="linenr">35: </span><span style="color: #ff83fa;">print</span> $md41.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">36: </span><span style="color: #9370db;">system</span>($md41);
+<span class="linenr">37: </span>
+<span class="linenr">38: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">3. Production Run</span>
+<span class="linenr">39: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step5</span>
+<span class="linenr">40: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$gro50</span>=<span style="color: #ffa07a;">"step4.1_equilibration.gro"</span>;
+<span class="linenr">41: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$mdp50</span>=<span style="color: #ffa07a;">"step5_production.mdp"</span>;      <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26360;&#12365;&#25563;&#12360;&#12427;</span>
+<span class="linenr">42: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr50</span>=<span style="color: #ffa07a;">"step5_0.tpr"</span>;
+<span class="linenr">43: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd50</span>=<span style="color: #ffa07a;">"$cmd grompp -f $mdp50 -o $tpr50 -c $gro50 -n $idx -p $top -r $gro50"</span>;
+<span class="linenr">44: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md50</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -deffnm step5_0"</span>;
+<span class="linenr">45: </span><span style="color: #ff83fa;">print</span> $cmd50.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">46: </span><span style="color: #9370db;">system</span>($cmd50);
+<span class="linenr">47: </span><span style="color: #ff83fa;">print</span> $md50.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">48: </span><span style="color: #9370db;">system</span>($md50);
+<span class="linenr">49: </span>
+<span class="linenr">50: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">$ex(ps) &#12378;&#12388;&#36861;&#21152;&#35336;&#31639;&#12377;&#12427;&#22580;&#21512;(&#24517;&#35201;&#12394;&#12425;&#12400;)</span>
+<span class="linenr">51: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">extend 1000(ps)</span>
+<span class="linenr">52: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ex</span>=1000; <span style="color: #cd853f;"># </span><span style="color: #cd853f;">ps</span>
+<span class="linenr">53: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$max</span>=2;
+<span class="linenr">54: </span><span style="color: #20b2aa; font-weight: bold;">for</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$p</span> (0 .. $max) {
+<span class="linenr">55: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$n</span>=$p+1;
+<span class="linenr">56: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cpi</span>  =<span style="color: #ffa07a;">"step5_"</span>.$p.<span style="color: #ffa07a;">".cpt"</span>;
+<span class="linenr">57: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr5p</span>=<span style="color: #ffa07a;">"step5_"</span>.$p.<span style="color: #ffa07a;">".tpr"</span>;
+<span class="linenr">58: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr5n</span>=<span style="color: #ffa07a;">"step5_"</span>.$n.<span style="color: #ffa07a;">".tpr"</span>;
+<span class="linenr">59: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$deff</span> =<span style="color: #ffa07a;">"step5_"</span>.$n;
+<span class="linenr">60: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd5x</span>=<span style="color: #ffa07a;">"$cmd convert-tpr -s $tpr5p -o $tpr5n -extend $ex"</span>;   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">-f -e &#12399;&#24259;&#27490;</span>
+<span class="linenr">61: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md5x</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -s $tpr5n -deffnm $deff -cpi $cpi -noappend"</span>;
+<span class="linenr">62: </span>  <span style="color: #ff83fa;">print</span> $cmd5x.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">63: </span>  <span style="color: #9370db;">system</span>($cmd5x);
+<span class="linenr">64: </span>  <span style="color: #ff83fa;">print</span> $md5x.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">65: </span>  <span style="color: #9370db;">system</span>($md5x);
+<span class="linenr">66: </span>}
+</pre>
+</div>
+
+
+<p>
+手動でやるならば以下のコマンドを順に起動すればよい.<br />
+最適化計算:<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx grompp -f step4.0_minimization.mdp -o step4.0_minization.tpr -c step3_chamm2gmx.pdb -p topol.top -r step3_charmm2gmx.pdb
+gmx mdrun -v -deffnm step4.0_minimization
+</pre>
+</div>
+
+<p>
+平衡化MD:<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx grompp -f step4.1_equilibration.mdp -o step4.1_equilibration.tpr -c step4.0_minimization.gro -r step3_charmm2gmx.pdb -n index.ndx -p topol.top
+gmx mdrun -v -deffnm step4.1_equilibration
+</pre>
+</div>
+
+<p>
+MD 計算:<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx grompp -f step5_production.mdp -o step5_0.tpr -c step4.1_equilibration.gro -n index.ndx -p topol.top -r step4.1_equilibration.gro
+gmx mdrun -v -deffnm step5_0
+</pre>
+</div>
+
+<p>
+extend(必要ならば):<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx convert-tpr -s step5_0.tpr -o step5_1.tpr -extend 1000             <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20197;&#21069;&#12398;&#35336;&#31639;&#12398;&#26368;&#32066;&#12363;&#12425; 1000 (ps) &#12384;&#12369;&#35336;&#31639;&#12434;&#36914;&#12417;&#12427;</span>
+gmx mdrun -v -s step5_1.tpr -deffnm step5_1 -cpi step5_0.cpt -noappend <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26032;&#12375;&#12356;&#12501;&#12449;&#12452;&#12523;&#12395;&#26360;&#12365;&#20986;&#12375;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> desmond</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+このままでは動かなかったのでファイルを修正する.<br />
+</p>
+
+<p>
+4.0_equilibration の計算において<br />
+</p>
+<ol class="org-ol">
+<li>cfg ファイルを以下のように修正する:<br />
+1.1. list = [status &#x2026; simbox_output maeff_output &#x2026;.] の simbox_output, maeff_output を削除<br />
+1.2. trajectory { name = hogehoge_trj &#x2026;} のように名前の最後に "_trj" をつける<br />
+</li>
+<li>cms ファイルを以下のように修正する:<br />
+2.1. 残基名が 4 文字以上のものがあればうまく読み込めないので 4 文字以下に修正する.<br />
+</li>
+</ol>
+
+<p>
+step5_production.cfg ファイルの time=1000 (1ns) を修正する.<br />
+</p>
+
+<p>
+以下で desmond を起動する.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">'/opt/schrodinger2018-1/desmond'</span>;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s4</span>=<span style="color: #ffa07a;">'step4.0_minimization.cfg'</span>;
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$eq</span>=<span style="color: #ffa07a;">'step4.1_equilibration.cfg'</span>;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s5</span>=<span style="color: #ffa07a;">'step5_production.cfg'</span>;
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$min</span>=<span style="color: #ffa07a;">"$cmd -c $s4 -WAIT"</span>;
+<span class="linenr">12: </span><span style="color: #ff83fa;">print</span> $min.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">13: </span><span style="color: #9370db;">system</span>($min);
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$equ</span>=<span style="color: #ffa07a;">"$cmd -c $eq -WAIT -gpu"</span>;
+<span class="linenr">16: </span><span style="color: #ff83fa;">print</span> $equ.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">17: </span><span style="color: #9370db;">system</span>($equ);
+<span class="linenr">18: </span>
+<span class="linenr">19: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$pro</span>=<span style="color: #ffa07a;">"$cmd -c $s5 -WAIT -gpu"</span>;
+<span class="linenr">20: </span><span style="color: #ff83fa;">print</span> $pro.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">21: </span><span style="color: #9370db;">system</span>($pro);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> namd</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+step5_production.inp の run = 500000 (1ns) を書き換えてから<br />
+以下のように起動出来る<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">'/usr/local/bin/namd2'</span>;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s4</span>=<span style="color: #ffa07a;">'step4_equilibration.inp'</span>;
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$l4</span>=<span style="color: #ffa07a;">'step4.log'</span>;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s5</span>=<span style="color: #ffa07a;">'step5_production.inp'</span>;
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$l5</span>=<span style="color: #ffa07a;">'step5.log'</span>;
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md4</span>=<span style="color: #ffa07a;">"$cmd +p10 $s4 &gt; $l4"</span>;
+<span class="linenr">14: </span><span style="color: #ff83fa;">print</span> $md4.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">15: </span><span style="color: #9370db;">system</span>($md4);
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">18: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md5</span>=<span style="color: #ffa07a;">"$cmd +p10 $s5 &gt; $l5"</span>;
+<span class="linenr">19: </span><span style="color: #ff83fa;">print</span> $md5.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">20: </span><span style="color: #9370db;">system</span>($md5);
+<span class="linenr">21: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'end : '</span>.<span style="color: #ffa07a;">`date`</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> amber</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+step5_production.mdin nstlim=500000 (=1ns) を修正して<br />
+以下の script で起動する.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">charmm-gui &#12391;&#24471;&#12383;&#12497;&#12521;&#12513;&#12540;&#12479;&#12434;&#29992;&#12356;&#12383; amber(sander) MD &#35336;&#31639;</span><span style="text-decoration: underline;"> </span>
+<span class="linenr"> 7: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">"/usr/local/bin/sander"</span>;
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27083;&#36896;&#26368;&#36969;&#21270;</span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.0</span>
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s3</span>=<span style="color: #ffa07a;">'step3_charmm2amber'</span>;
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s4</span>=<span style="color: #ffa07a;">'step4.0_minimization'</span>;
+<span class="linenr">15: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd40</span>=<span style="color: #ffa07a;">"$cmd -O -i $s4.mdin -p $s3.parm7 -c $s3.rst7 -o $s4.mdout -r $s4.rst7 -inf $s4.mdinfo -ref $s3.rst7"</span>;
+<span class="linenr">16: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.0 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">17: </span><span style="color: #ff83fa;">print</span> $cmd40.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">18: </span><span style="color: #9370db;">system</span>($cmd40);
+<span class="linenr">19: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.0 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">20: </span>
+<span class="linenr">21: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24179;&#34913;&#21270;</span>
+<span class="linenr">22: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.1</span>
+<span class="linenr">23: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$eq</span>=<span style="color: #ffa07a;">'step4.1_equilibration'</span>;
+<span class="linenr">24: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd41</span>=<span style="color: #ffa07a;">"$cmd -O -i $eq.mdin -p $s3.parm7 -c $s4.rst7 -o $eq.mdout -r $eq.rst7 -inf $eq.mdinfo -ref $s3.rst7 -x $eq.nc"</span>;
+<span class="linenr">25: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.1 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">26: </span><span style="color: #ff83fa;">print</span> $cmd41.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">27: </span><span style="color: #9370db;">system</span>($cmd41);
+<span class="linenr">28: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.1 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">29: </span>
+<span class="linenr">30: </span>
+<span class="linenr">31: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">Production Run</span>
+<span class="linenr">32: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step5</span>
+<span class="linenr">33: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s5</span>=<span style="color: #ffa07a;">'step5_production'</span>;
+<span class="linenr">34: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$st</span>=<span style="color: #ffa07a;">'step5_0'</span>;
+<span class="linenr">35: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd50</span>=<span style="color: #ffa07a;">"$cmd -O -i $s5.mdin -p $s3.parm7 -c $eq.rst7 -o $st.mdout -r $st.rst7 -inf $st.mdinfo -x $st.nc"</span>;
+<span class="linenr">36: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.0 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">37: </span><span style="color: #ff83fa;">print</span> $cmd50.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">38: </span><span style="color: #9370db;">system</span>($cmd50);
+<span class="linenr">39: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.0 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">40: </span>
+<span class="linenr">41: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">Extend</span>
+<span class="linenr">42: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$max</span>=2;   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22793;&#26356;</span>
+<span class="linenr">43: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.1 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">44: </span><span style="color: #20b2aa; font-weight: bold;">for</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$p</span> (0 .. $max) {
+<span class="linenr">45: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$n</span>=$p+1;
+<span class="linenr">46: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$pt</span>=<span style="color: #ffa07a;">'step5_'</span>.$p;
+<span class="linenr">47: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$st</span>=<span style="color: #ffa07a;">'step5_'</span>.$n;
+<span class="linenr">48: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd51</span>=<span style="color: #ffa07a;">"$cmd -O -i $s5.mdin -p $s3.parm7 -c $pt.rst7 -o $st.mdout -r $st.rst7 -inf $st.mdinfo -x $st.nc"</span>;
+<span class="linenr">49: </span>  <span style="color: #ff83fa;">print</span> $cmd51.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">50: </span>  <span style="color: #9370db;">system</span>($cmd51);
+<span class="linenr">51: </span>}
+<span class="linenr">52: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.1 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[desmond/maestro による MD 計算準備の自動化]]></title>
+    <link href="http://saito1369.github.io/blog/2018-10-17-172030.html"/>
+    <updated>2018-10-17T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/172030</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. Protein Preparation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. PDB ファイルの読み込み</a></li>
+<li><a href="#sec-2-2">2.2. 水素付加</a></li>
+<li><a href="#sec-2-3">2.3. 化合物の削除</a></li>
+<li><a href="#sec-2-4">2.4. 変異体の作成</a></li>
+<li><a href="#sec-2-5">2.5. mae ファイルへの変換</a></li>
+<li><a href="#sec-2-6">2.6. 水素位置の optimize</a></li>
+<li><a href="#sec-2-7">2.7. fake X server</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. System Setup(multisim)</a></li>
+<li><a href="#sec-4">4. Molecular Dynamics</a></li>
+<li><a href="#sec-5">5. 手順まとめ</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-10-17 Wed 17:20&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-02-13 Wed 19:06&gt;</span></span><br />
+</p>
+<p>
+<!-- more --><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+maestro/desmond による MD 計算手順の典型例は以下である.<br />
+</p>
+
+<p>
+maestro を立ち上げる.<br />
+</p>
+<ol class="org-ol">
+<li>Protein Preparation ウインドウから<br />
+1.1. Import and Process タブ<br />
+1.1.1. PDB ファイルを読み込む<br />
+1.1.2. 水素付加(Preprocess)<br />
+<ul class="org-ul">
+<li>CAP termini にチェックして N端, C端の処理<br />
+</li>
+<li>Delete waters beyond 5 (default) (チェック入れたり入れなかったり)<br />
+</li>
+</ul>
+<p>
+1.2. Review and Modify タブ<br />
+     EDO 等のいらない化合物の削除<br />
+     (この時点での PDB ファイル保存しておく)  PDBID_addH_delEDO.pdb<br />
+1.3. mutant 作成(ex. E66K)<br />
+     (この時点での PDB ファイル保存しておく)  PDBID_addH_delEDO_E66K.pdb<br />
+     maestro 形式のファイルを保存する必要あり PDBID_addH_delEDO_E66K.mae<br />
+1.4. Refine タブ<br />
+     Optimize(水素位置の optimize)<br />
+     maestro 形式のファイルを読み込んで,<br />
+     maestro 形式のファイルが出力される PDBID_addH_delEDO_E66K_opt.mae<br />
+</p>
+</li>
+<li>System Setup<br />
+2.1. Solvation タブ<br />
+     Minimize Volume<br />
+2.2. Ions タブ<br />
+     Na+ (or Cl-) での neutralize<br />
+     Ad salt 0.15M<br />
+     (この時点での cms ファイル保存しておく) PDBID_addH_delEDO_E66K_opt_sol.cms<br />
+</li>
+<li>MD パラメータについて<br />
+MD 計算に必要なファイルは cms/msj/cfg ファイル.<br />
+cms は上で作成済<br />
+msj/cfg ファイルは maestro で一度作成したのを使い回すことにする.<br />
+基本的には毎回同じなので.(cfg ファイルのパラメータ seed は毎回変更する)<br />
+</li>
+</ol>
+
+<p>
+これらを自動化(script 化)したいというのがここでの目標.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Protein Preparation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> PDB ファイルの読み込み</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+まずは PDB ファイルを読み込む.<br />
+getpdb コマンドを使えば良い.<br />
+</p>
+
+<p>
+getpdb PDBID<br />
+getpdb PDBID:CHAIN_NAME<br />
+のように使えば良いらしい.<br />
+詳しくは getpdb -h とやれば詳細なパラメタが出てくる.<br />
+とりあえず以下でいいだろう.<br />
+</p>
+
+<p>
+001getpdb.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="001getpdb.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/getpdb PDBID
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">$SCHRODINGER/utilities/getpdb PDBID:A  # chain &#25351;&#23450;&#12391;&#35501;&#12415;&#36796;&#12415;&#12383;&#12356;&#22580;&#21512;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 水素付加</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+続いて水素付加を行う.<br />
+水素付加は prepwizard コマンドで出来る.<br />
+prepwizard -h で詳細がみられる.<br />
+</p>
+
+<p>
+002addH.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="002addH.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/prepwizard -c -WAIT -NOJOBID <span style="color: #ffa07a;">\</span>
+         -noepik -noimpref -noprotassign PDBID.pdb PDBID_addH.pdb
+</pre>
+</div>
+<p>
+-c option は Cap termini のチェック<br />
+Delete waters beyond 5 (default) のチェックを外すときには -keepfarwat option を追加.<br />
+-noepik -noimpref -nopropassign は, maestro Academic Only 版を使ってる場合は必須？これが無いとエラーとなる.<br />
+</p>
+
+<p>
+注: 水素付加プログラムを上記コマンドでやるときと, maestro の GUI でやるときでは, 微妙に構造が異なる場合がある. =&gt; 小数点第三位の数値が異なる場合がある.<br />
+    maestro(GUI) と全く同じ座標を使いたい場合には, 水素付加までは maestro(GUI)でやったほうがいいかも知れない(wild-type のを一回やればいいだけなんで問題ないかと思われる).<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 化合物の削除</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+これは mutation と一緒にやってもよい.<br />
+GUI の maestro を起動しないとできないが, コマンドからで立ち上げて処理が終われば終了する.<br />
+</p>
+
+<p>
+maestro -c file.com<br />
+で, file.com にある命令を実行出来るので, コマンドをファイル(file.com)内に書いておく.<br />
+</p>
+
+<p>
+具体的な命令の内容については, 以下を参照せよ.<br />
+$SCHROGINGER/docs/Documentation.htm#maestro_command_reference/Command-Language.html<br />
+</p>
+
+<p>
+011delHET.m<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="011delHET.m"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">PDB &#12501;&#12449;&#12452;&#12523;&#12398;&#35501;&#12415;&#36796;&#12415;</span>
+entryimport PDBID_addH.pdb
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">EDO &#12392;&#12356;&#12358;&#21517;&#21069;&#12398;&#27531;&#22522;&#12434;&#21066;&#38500;&#12377;&#12427;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12394;&#12380;&#12363;&#30693;&#12425;&#12435;&#12364; res. &#12398;&#24460;&#12429;&#12395;&#12473;&#12506;&#12540;&#12473;&#12364;&#28961;&#12356;&#12392;&#12456;&#12521;&#12540;&#12392;&#12394;&#12427;.</span>
+delete res. EDO
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">PDB &#12501;&#12449;&#12452;&#12523;&#12398;&#26360;&#12365;&#36796;&#12415;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">format=pdb &#12434;&#25351;&#23450;&#12375;&#12394;&#12356;&#12392;&#21029;&#12501;&#12457;&#12540;&#12510;&#12483;&#12488;&#12395;&#12394;&#12427;</span>
+entryexport <span style="color: #9acd32;">format</span>=pdb PDBID_addH_delHET.pdb
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#32066;&#20102;</span>
+quit
+</pre>
+</div>
+
+<p>
+上記ファイルを使って実行する.<br />
+</p>
+
+<p>
+012delHET.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="012delHET.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/maestro -c 011delHET.m
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 変異体の作成</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+これも maestro 本体を動かさないといけない.<br />
+</p>
+
+<p>
+maestro -c file.com で, file.com の中に変異体作成の命令を書く.<br />
+</p>
+
+<p>
+013mut.m<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="013mut.m">entryimport PDBID_addH_delHET.pdb
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21407;&#23376;&#25968;&#12364;&#22793;&#12431;&#12427;&#12398;&#12391;(&#24565;&#12398;&#28858;)&#24460;&#12429;&#12398;&#26041;&#12363;&#12425;&#22793;&#30064;&#20307;&#12434;&#20316;&#25104;&#12377;&#12427;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">chain B &#12391; residue id = 66 &#12398;&#22580;&#25152;&#12434;&#35211;&#12388;&#12369;&#12427;</span>
+find chain.name B and res.num 66
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">LYS &#12398; fragment &#12434;&#20316;&#25104;</span>
+fragment peptide LYS
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21407;&#23376;&#30058;&#21495; 6634 &#20197;&#19979;&#12398;&#27531;&#22522;( residue id =66) &#12395;&#22793;&#30064;&#12434;&#12363;&#12369;&#12427;.</span>
+mutate at.n 6634
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">chain A &#12391;&#21516;&#27096;&#12398;&#35336;&#31639;</span>
+find chain.name A and res.num 66
+fragment peptide LYS
+mutate at.n 527
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26360;&#12365;&#20986;&#12375;</span>
+entryexport <span style="color: #9acd32;">format</span>=pdb PDBID_addH_delHET_E66K.pdb
+</pre>
+</div>
+
+<p>
+上記を以下のように実行<br />
+013mut.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="013mut.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/maestro -c 0130mut.m
+</pre>
+</div>
+
+<p>
+化合物の削除と同時にやる version<br />
+普段はこっちを使えばよい<br />
+</p>
+
+<p>
+01mut.m<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="01mut.m"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">PDB &#12501;&#12449;&#12452;&#12523;&#12391;&#12418;&#12356;&#12356;&#12364;, maestro(GUI)&#12391;&#27700;&#32032;&#20184;&#21152;&#12398;&#24460;&#12395; mae &#12501;&#12449;&#12452;&#12523;&#12434;&#20445;&#23384;&#12375;&#12390;&#12362;&#12367;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">mae &#12501;&#12449;&#12452;&#12523;&#12398;&#26041;&#12364;&#24773;&#22577;&#37327;&#12364;&#22810;&#12356;&#12398;&#12391;</span>
+entryimport PDBID_addH.mae
+
+delete res. EDO
+
+
+fragment peptide LYS
+mutate chain.name B and res.num 66
+
+fragment peptide LYS
+mutate chain.name A and res.num 66
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">mae &#12501;&#12449;&#12452;&#12523;&#12391;&#20445;&#23384;&#12377;&#12427;. &#27425;&#12398;&#12467;&#12510;&#12531;&#12489;&#12408;&#12399; mae &#12501;&#12449;&#12452;&#12523;&#12375;&#12363;&#28193;&#12379;&#12394;&#12356;&#12398;&#12391;</span>
+entryexport <span style="color: #9acd32;">format</span>=maestro PDBID_addH_delHET_E66K.mae
+
+quit
+</pre>
+</div>
+
+<p>
+01mut.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="01mut.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/maestro -c 01mut.m
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> mae ファイルへの変換</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+pdb -&gt; mae ファイルへ変換(確認用)<br />
+様々な形式変換が出来る.<br />
+詳しくは pdbconvert -h で見られる.<br />
+</p>
+
+<p>
+基本は pdbconvert -i(input_format) hoge.pdb -o(output_format) fuga.mae<br />
+</p>
+
+<p>
+0140conv.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="0140conv.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/pdbconvert -ipdb PDBID_addH_delHET_E66K.pdb -omae PDBID_addH_delHET_E66K.mae
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> 水素位置の optimize</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+$SCHRODINGER/utilities/protassign を用いる.<br />
+protassign -h で詳細な情報が見られる.<br />
+とりあえず今回使うのは -propka_pH 位か？<br />
+</p>
+
+<p>
+02refine.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="02refine.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/protassign -WAIT -NOJOBID -propka_pH 7 PDBID_addH_delHET_E66K.mae PDBID_addH_delHET_E66K_opt.mae
+</pre>
+</div>
+
+
+<p>
+ついでに mae -&gt; pdb ファイルへの変換は以下のように実行する.<br />
+conv.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="conv.sh">$<span style="color: #9acd32;">SCHRODINGER</span>/utilities/pdbconvert -imae PDBID_addH_delHET_E66K_opt.mae -opdb PDBID_addH_delHET_E66K_opt.pdb
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> fake X server</h3>
+<div class="outline-text-3" id="text-2-7">
+<p>
+化合物の削除, 及び変異体の作成の際には maestro の GUI が起動してしまう.<br />
+このままではいらん GUI のせいで terminal 上のコマンドでプログラムを動かせない.<br />
+そこで xvfb を使う.<br />
+desmond/maestro が動いている linux server 上で<br />
+</p>
+
+<p>
+server@: sudo apt-get install xvfb<br />
+server@: export DISPLAY=:2     # 値は何でもいい. :1 とか.<br />
+server@: Xvfb :2 -screen 2 1280x800x24 &amp;<br />
+</p>
+
+<p>
+これで化合物の削除, 変異体の作成の script がいらん GUI が立ち上がらずに動く.<br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> System Setup(multisim)</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+System Setup の window で Run を実行せずに保存すると<br />
+desmond_setup_1/ 以下に実行 script が保存されることを見つけた.<br />
+この設定ファイルを使うことにする.<br />
+</p>
+
+<p>
+入力ファイル desmond_setup_1.mae として上の計算(水素付加関連の一連の作業)後の mae ファイルを使う.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">ln -s PDBID_addH_delHET_E66K_opt.mae desmond_setup_1.mae
+</pre>
+</div>
+<p>
+こんな感じで入力構造ファイルを確保しておく.<br />
+</p>
+
+<p>
+multisim の設定ファイル.<br />
+minimize_volume = true が無ければ手動で追加.<br />
+</p>
+
+<p>
+desmond_setup_1.msj<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_setup_1.msj">ask {
+  <span style="color: #9acd32;">task</span> = <span style="color: #ffa07a;">"desmond:auto"</span>
+}
+
+build_geometry {
+  <span style="color: #9acd32;">add_counterion</span> = {
+     <span style="color: #9acd32;">ion</span> = Cl
+     <span style="color: #9acd32;">number</span> = neutralize_system
+  }
+  <span style="color: #9acd32;">add_counterion</span> = {
+     <span style="color: #9acd32;">ion</span> = Na
+     <span style="color: #9acd32;">number</span> = neutralize_system
+  }
+  <span style="color: #9acd32;">box</span> = {
+     <span style="color: #9acd32;">shape</span> = orthorhombic
+     <span style="color: #9acd32;">size</span> = [10.0 10.0 10.0 ]
+     <span style="color: #9acd32;">size_type</span> = buffer
+  }
+  <span style="color: #9acd32;">minimize_volume</span> = true   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25163;&#21205;&#12391;&#36861;&#21152;</span>
+  <span style="color: #9acd32;">rezero_system</span> = false
+  <span style="color: #9acd32;">salt</span> = {
+     <span style="color: #9acd32;">concentration</span> = 0.15
+     <span style="color: #9acd32;">negative_ion</span> = Cl
+     <span style="color: #9acd32;">positive_ion</span> = Na
+  }
+  <span style="color: #9acd32;">solvent</span> = SPC
+}
+
+assign_forcefield {
+}
+</pre>
+</div>
+
+<p>
+shell script<br />
+desmond_setup_1.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_setup_1.sh">${<span style="color: #9acd32;">SCHRODINGER</span>}/utilities/multisim<span style="color: #ffa07a;">" -JOBNAME desmond_setup_1 -m desmond_setup_1.msj \</span>
+<span style="color: #ffa07a;">   desmond_setup_1.mae -o desmond_setup_1-out.cms -HOST localhost -TMPLAUNCHDIR -ATTACHED</span>
+</pre>
+</div>
+
+<p>
+中身は正直よくわかってないけど.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Molecular Dynamics</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+このあと水及びイオンが溶かされた系を読み込んで,<br />
+MD 計算のパラメータを書き出して MD 計算(multisim)を行っていく.<br />
+書き出しの際に得られるファイルは,<br />
+</p>
+<ul class="org-ul">
+<li>cms ファイル (上で作成)<br />
+</li>
+<li>msj ファイル<br />
+</li>
+<li>cfg ファイル<br />
+</li>
+</ul>
+
+<p>
+msj と cfg は一度 maestro で作っておけば使い回しが出来るのでそれを使うでいいかも(？)<br />
+cfg ファイルの seed (random seed) の値は変更すること.<br />
+</p>
+
+<p>
+demond_md_job_1.cfg<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.cfg"><span style="color: #9acd32;">annealing</span> = false
+<span style="color: #9acd32;">backend</span> = {
+}
+<span style="color: #9acd32;">bigger_rclone</span> = false
+<span style="color: #9acd32;">checkpt</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 240.06
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME.cpt"</span>
+   <span style="color: #9acd32;">write_last_step</span> = true
+}
+<span style="color: #9acd32;">cpu</span> = 1
+<span style="color: #9acd32;">cutoff_radius</span> = 9.0
+<span style="color: #9acd32;">elapsed_time</span> = 0.0
+<span style="color: #9acd32;">energy_group</span> = false
+<span style="color: #9acd32;">eneseq</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 1.2
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$].ene"</span>
+}
+<span style="color: #9acd32;">ensemble</span> = {
+   <span style="color: #9acd32;">barostat</span> = {
+      <span style="color: #9acd32;">tau</span> = 2.0
+   }
+   <span style="color: #9acd32;">class</span> = NPT
+   <span style="color: #9acd32;">method</span> = MTK
+   <span style="color: #9acd32;">thermostat</span> = {
+      <span style="color: #9acd32;">tau</span> = 1.0
+   }
+}
+<span style="color: #9acd32;">glue</span> = solute
+<span style="color: #9acd32;">maeff_output</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 120.0
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]-out.cms"</span>
+   <span style="color: #9acd32;">periodicfix</span> = true
+   <span style="color: #9acd32;">trjdir</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]_trj"</span>
+}
+<span style="color: #9acd32;">meta</span> = false
+<span style="color: #9acd32;">meta_file</span> = ?
+<span style="color: #9acd32;">pressure</span> = [1.01325 isotropic ]
+<span style="color: #9acd32;">randomize_velocity</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = inf
+   <span style="color: #9acd32;">seed</span> = 2007
+   <span style="color: #9acd32;">temperature</span> = <span style="color: #ffa07a;">"@*.temperature"</span>
+}
+<span style="color: #9acd32;">restrain</span> = none
+<span style="color: #9acd32;">simbox</span> = {
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">interval</span> = 1.2
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]_simbox.dat"</span>
+}
+<span style="color: #9acd32;">surface_tension</span> = 0.0
+<span style="color: #9acd32;">taper</span> = false
+<span style="color: #9acd32;">temperature</span> = [
+   [300.0 0 ]
+]
+<span style="color: #9acd32;">time</span> = 100000.0
+<span style="color: #9acd32;">timestep</span> = [0.002 0.002 0.006 ]
+<span style="color: #9acd32;">trajectory</span> = {
+   <span style="color: #9acd32;">center</span> = []
+   <span style="color: #9acd32;">first</span> = 0.0
+   <span style="color: #9acd32;">format</span> = dtr
+   <span style="color: #9acd32;">frames_per_file</span> = 250
+   <span style="color: #9acd32;">interval</span> = 10.0
+   <span style="color: #9acd32;">name</span> = <span style="color: #ffa07a;">"$JOBNAME$[_replica$REPLICA$]_trj"</span>
+   <span style="color: #9acd32;">periodicfix</span> = true
+   <span style="color: #9acd32;">write_velocity</span> = false
+}
+</pre>
+</div>
+
+<p>
+desmond_md_job_1.msj<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.msj"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">Desmond standard NPT relaxation protocol</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">All times are in the unit of ps.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">Energy is in the unit of kcal/mol.</span>
+task {
+   <span style="color: #9acd32;">task</span> = <span style="color: #ffa07a;">"desmond:auto"</span>
+   <span style="color: #9acd32;">set_family</span> = {
+      <span style="color: #9acd32;">desmond</span> = {
+         checkpt.write_last_step = no
+      }
+   }
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"Brownian Dynamics NVT, T = 10 K, small timesteps, and restraints on solute heavy atoms, 100ps"</span>
+   <span style="color: #9acd32;">annealing</span>   = off
+   <span style="color: #9acd32;">time</span>        = 100
+   <span style="color: #9acd32;">timestep</span>    = [0.001 0.001 0.003 ]
+   <span style="color: #9acd32;">temperature</span> = 10.0
+   <span style="color: #9acd32;">ensemble</span> = {
+      <span style="color: #9acd32;">class</span> = <span style="color: #ffa07a;">"NVT"</span>
+      <span style="color: #9acd32;">method</span> = <span style="color: #ffa07a;">"Brownie"</span>
+      <span style="color: #9acd32;">brownie</span> = {
+         <span style="color: #9acd32;">delta_max</span> = 0.1
+      }
+   }
+   <span style="color: #9acd32;">restrain</span> = {
+      <span style="color: #9acd32;">atom</span> = <span style="color: #ffa07a;">"solute_heavy_atom"</span>
+      <span style="color: #9acd32;">force_constant</span> = 50.0
+   }
+}
+
+simulate {
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NVT, T = 10 K, small timesteps, and restraints on solute heavy atoms, 12ps"</span>
+   <span style="color: #9acd32;">annealing</span>   = off
+   <span style="color: #9acd32;">time</span>        = 12
+   <span style="color: #9acd32;">timestep</span>    = [0.001 0.001 0.003]
+   <span style="color: #9acd32;">temperature</span> = 10.0
+   <span style="color: #9acd32;">restrain</span>    = { <span style="color: #9acd32;">atom</span> = solute_heavy_atom <span style="color: #9acd32;">force_constant</span> = 50.0 }
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NVT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NPT, T = 10 K, and restraints on solute heavy atoms, 12ps"</span>
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">annealing</span>   = off
+   <span style="color: #9acd32;">time</span>        = 12
+   <span style="color: #9acd32;">temperature</span> = 10.0
+   <span style="color: #9acd32;">restrain</span>    = retain
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NPT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 50.0
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+solvate_pocket {
+   <span style="color: #9acd32;">should_skip</span> = true
+   <span style="color: #9acd32;">ligand_file</span> = ?
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NPT and restraints on solute heavy atoms, 12ps"</span>
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"@*.*.annealing"</span>] <span style="color: #ffa07a;">'annealing = off temperature = "@*.*.temperature[0][0]"'</span>
+                  [<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">time</span>        = 12
+   <span style="color: #9acd32;">restrain</span>    = retain
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NPT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 50.0
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+simulate {
+   <span style="color: #9acd32;">title</span>       = <span style="color: #ffa07a;">"NPT and no restraints, 24ps"</span>
+   <span style="color: #9acd32;">effect_if</span>   = [[<span style="color: #ffa07a;">"@*.*.annealing"</span>] <span style="color: #ffa07a;">'annealing = off temperature = "@*.*.temperature[0][0]"'</span>
+                  [<span style="color: #ffa07a;">"=="</span> <span style="color: #ffa07a;">"-gpu"</span> <span style="color: #ffa07a;">"@*.*.jlaunch_opt[-1]"</span>] <span style="color: #ffa07a;">'ensemble.method = Langevin'</span>]
+   <span style="color: #9acd32;">time</span>        = 24
+   <span style="color: #9acd32;">ensemble</span>    = {
+      <span style="color: #9acd32;">class</span>  = NPT
+      <span style="color: #9acd32;">method</span> = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 2.0
+   }
+
+   eneseq.interval   = 0.3
+   trajectory.center = solute
+}
+
+simulate {
+   <span style="color: #9acd32;">cfg_file</span> = <span style="color: #ffa07a;">"desmond_md_job_1.cfg"</span>
+   <span style="color: #9acd32;">jobname</span>  = <span style="color: #ffa07a;">"$MASTERJOBNAME"</span>
+   <span style="color: #9acd32;">dir</span>      = <span style="color: #ffa07a;">"."</span>
+   <span style="color: #9acd32;">compress</span> = <span style="color: #ffa07a;">""</span>
+}
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">Job launching command:</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">$SCHRODINGER/utilities/multisim -VIEWNAME desmond_molecular_dynamics_gui.MDApp -JOBNAME desmond_md_job_1</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">-HOST localhost -maxjob 1 -cpu 1 -m desmond_md_job_1.msj -c desmond_md_job_1.cfg -description 'Molecular Dynamics'</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">desmond_md_job_1.cms -mode umbrella -PROJ /home/vagrant/.schrodinger/tmp/tproj36567a6821</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">-DISP append -o desmond_md_job_1-out.cms -ATTACHED</span>
+</pre>
+</div>
+
+<p>
+MD 計算の shell script もついでに載せておく.<br />
+desmond_md_job_1.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.sh"><span style="color: #ffa07a;">"${SCHRODINGER}/utilities/multisim"</span> -JOBNAME desmond_md_job_1 -HOST localhost -maxjob 1 -cpu 1 -m desmond_md_job_1.msj
+     -c desmond_md_job_1.cfg -description <span style="color: #ffa07a;">"Molecular Dynamics"</span>
+           desmond_md_job_1.cms -mode umbrella
+               -o desmond_md_job_1-out.cms -ATTACHED
+</pre>
+</div>
+
+<p>
+GPU 計算の場合<br />
+desmond_md_job_1.GPU.sh<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh" id="desmond_md_job_1.GPU.sh"><span style="color: #ffa07a;">"${SCHRODINGER}/utilities/multisim"</span> -JOBNAME desmond_md_job_1 -HOST localhost -maxjob 1 -cpu 1 -m desmond_md_job_1.msj
+      -c desmond_md_job_1.cfg -description <span style="color: #ffa07a;">"Molecular Dynamics"</span>
+            desmond_md_job_1.cms -mode umbrella  -set <span style="color: #ffa07a;">'stage[1].set_family.md.jlaunch_opt=["-gpu"]'</span>
+                -o desmond_md_job_1-out.cms -ATTACHED
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 手順まとめ</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+タンパク質の mutant を MD 計算したい場合<br />
+wild type の水素付加したものを maestro(GUI)で作成しておく. これはまぁしょうがない.<br />
+mae ファイルとして保存する.<br />
+出発点: PDBID_addH.mae<br />
+</p>
+<ol class="org-ol">
+<li>変異体作成(+いらない HET の削除): 01mut.sh (01mut.m に実行内容を書く)<br />
+必要ならば fake X server を立ち上げておくこと.<br />
+</li>
+<li>水素の refine: 02refine.sh PDBID_addH_delHET_E66K_opt.mae が出来る.<br />
+PDBID_addH_delHET_E66K_opt.mae -&gt; desmond_setup_1.mae<br />
+</li>
+<li>03setup/ system setup: desmond_setup_1.sh の実行<br />
+desmond_setup_1-out.cms -&gt; desmond_md_job_1.cms<br />
+</li>
+<li>04md/ MD run: desmond_md_job_1.GPU.sh の実行<br />
+desmond_md_job_1.cfg ファイルの seed の値を変えて疑似乱数の初期値を変更.<br />
+</li>
+</ol>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+</feed>

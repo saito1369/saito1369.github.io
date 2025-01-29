@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>dataframe のとりあつかい - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2017-02-07-DataFrames.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2017-02-07-DataFrames.html">
+  <meta property="og:title" content="dataframe のとりあつかい - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-02-07T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-02-07 (Tue)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        dataframe のとりあつかい
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. file 読み込みと書き出し</a>
+<ul>
+<li><a href="#sec-1-1">1.1. python</a></li>
+<li><a href="#sec-1-2">1.2. R</a></li>
+<li><a href="#sec-1-3">1.3. julia</a></li>
+<li><a href="#sec-1-4">1.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. head/tail</a>
+<ul>
+<li><a href="#sec-2-1">2.1. python</a></li>
+<li><a href="#sec-2-2">2.2. R</a></li>
+<li><a href="#sec-2-3">2.3. julia</a></li>
+<li><a href="#sec-2-4">2.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 行, 列の選択</a>
+<ul>
+<li><a href="#sec-3-1">3.1. python</a></li>
+<li><a href="#sec-3-2">3.2. R</a></li>
+<li><a href="#sec-3-3">3.3. julia</a></li>
+<li><a href="#sec-3-4">3.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 行, 列の追加と削除</a>
+<ul>
+<li><a href="#sec-4-1">4.1. python</a></li>
+<li><a href="#sec-4-2">4.2. R</a></li>
+<li><a href="#sec-4-3">4.3. julia</a></li>
+<li><a href="#sec-4-4">4.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 行, 列の結合</a>
+<ul>
+<li><a href="#sec-5-1">5.1. python</a></li>
+<li><a href="#sec-5-2">5.2. R</a></li>
+<li><a href="#sec-5-3">5.3. julia</a></li>
+<li><a href="#sec-5-4">5.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. 行, 列のソート</a>
+<ul>
+<li><a href="#sec-6-1">6.1. python</a></li>
+<li><a href="#sec-6-2">6.2. R</a></li>
+<li><a href="#sec-6-3">6.3. julia</a></li>
+<li><a href="#sec-6-4">6.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. 行, 列の集計</a>
+<ul>
+<li><a href="#sec-7-1">7.1. python</a></li>
+<li><a href="#sec-7-2">7.2. R</a></li>
+<li><a href="#sec-7-3">7.3. julia</a></li>
+<li><a href="#sec-7-4">7.4. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. 参考URL</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-02-07 Tue 17:46&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-02-21 Wed 19:07&gt;</span></span><br  />
+</p>
+<p>
+dataframe の取扱いについて, 各言語(python, R, julia)での違いを簡単にまとめておく.<br  />
+環境は macOS X Yosemite 10.10.5, python3.5.2(Anaconda), R3.3.2, julia0.5.0(DataFrames v0.9.0) である.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> file 読み込みと書き出し</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+ファイルからの読み込みと書出し<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> python</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'hoge.csv'</span>,sep=<span style="color: #ffa07a;">','</span>,header=0)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df)
+df.to_csv(<span style="color: #ffa07a;">'fuga.tsv'</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=<span style="color: #1e90ff;">True</span>,index=<span style="color: #1e90ff;">False</span>)
+</pre>
+</div>
+
+<pre class="example">
+   id  leng  hei
+0   1    10   20
+1   2     5    7
+2   3    15   22
+3   4     3    5
+</pre>
+
+<p>
+読み込み:<br  />
+read_csv(file名, sep="区切り文字", header=None(列名が書いてある行数. 列名が無ければ None))<br  />
+書き出し:<br  />
+to_csv(file 名, sep=",",header=True, index=False)<br  />
+  header を書き出すとき True<br  />
+  index (行番号)を書き出すとき True<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> R</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-R">dat <span style="color: #1e90ff;">&lt;-</span> read.table(<span style="color: #ffa07a;">'hoge.csv'</span>,sep=<span style="color: #ffa07a;">','</span>,header=T)
+dat
+write.table(dat,file=<span style="color: #ffa07a;">'fugaR.tsv'</span>,dat,sep=<span style="color: #ffa07a;">'\t'</span>,quote=F,row.names=F,col.names=T)
+</pre>
+</div>
+
+<pre class="example">
+  id leng hei
+1  1   10  20
+2  2    5   7
+3  3   15  22
+4  4    3   5
+x
+fugaR.tsv
+</pre>
+
+<p>
+読み込み:<br  />
+read.table(file名, sep="区切り文字", header=T)<br  />
+   header=T あるいは F: 1 行目が列名かどうか.<br  />
+書き出し<br  />
+write.table(データ, file=ファイル名, sep="区切り文字", quote=F, row.names=F,col.names=T)<br  />
+   quote=F: 書出し要素に "" をつけるかどうか.<br  />
+   row.names=F: 行名を書くかどうか<br  />
+   col.names=T: 列名を書くかどうか<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> julia</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+dat = readtable(<span style="color: #ffa07a;">"hoge.csv"</span>,separator=<span style="color: #ffa07a;">','</span>)
+print(dat)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">separator &#12399; file &#25313;&#24373;&#23376;&#12391;&#12354;&#12427;&#31243;&#24230;&#25512;&#28204;&#12375;&#12390;&#12367;&#12428;&#12427;&#12387;&#12413;&#12356;</span>
+writetable(<span style="color: #ffa07a;">"fugaJ.dat"</span>, dat, quotemark = <span style="color: #ffa07a;">' '</span>, separator = <span style="color: #ffa07a;">'\t'</span>)
+</pre>
+</div>
+
+<pre class="example">
+4×3 DataFrames.DataFrame
+│ Row │ id │ leng │ hei │
+├─────┼────┼──────┼─────┤
+│ 1   │ 1  │ 10   │ 20  │
+│ 2   │ 2  │ 5    │ 7   │
+│ 3   │ 3  │ 15   │ 22  │
+│ 4   │ 4  │ 3    │ 5   │
+</pre>
+
+<p>
+読み込み<br  />
+readtable(ファイル名, separator="区切り文字")<br  />
+書き出し:<br  />
+writetable(ファイル名, データ, quotemark=' ', separator='\t')<br  />
+  quotemark=' ': 書出し要素につける quote. quotemark='"' とすると "hoge" とかになる.<br  />
+  separator='\t': 区切り文字<br  />
+  注: quote 入れない場合, quotemark='' とやると何故かエラーとなる. Why?<br  />
+何か julia は初動が遅いような感じ.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-1-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">読み込み</th>
+<th scope="col" class="left">書き出し</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">pd.read_csv(file)</td>
+<td class="left">df.to_csv(file)</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">read.table(file)</td>
+<td class="left">write.table(df,file)</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">readtable(file)</td>
+<td class="left">writetable(file)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> head/tail</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+データをちら見する方法(head: 先頭, tail: 最後)<br  />
+</p>
+
+<p>
+python:   df.head(5)<br  />
+R, julia: head(df,5)<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> python</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">R &#12398;&#12469;&#12531;&#12503;&#12523;&#12487;&#12540;&#12479; iris &#12434; python &#12391;&#20351;&#12358;.</span>
+<span style="color: #20b2aa; font-weight: bold;">import</span> pyper
+<span style="color: #9acd32;">r</span> = pyper.R(use_pandas=<span style="color: #ffa07a;">'True'</span>)
+<span style="color: #9acd32;">df</span> = pd.DataFrame(r.get(<span style="color: #ffa07a;">'iris'</span>))
+pd.set_option(<span style="color: #ffa07a;">'display.width'</span>, 150) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19968;&#34892;&#12395;&#26360;&#12367;&#24133;&#12434;&#25351;&#23450;&#12377;&#12427;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">type</span>(df))
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df.head(5))
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df.tail(5))
+</pre>
+</div>
+
+<pre class="example">
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+    Sepal.Length    Sepal.Width    Petal.Length    Petal.Width     Species
+0             5.1            3.5             1.4            0.2  b'setosa'
+1             4.9            3.0             1.4            0.2  b'setosa'
+2             4.7            3.2             1.3            0.2  b'setosa'
+3             4.6            3.1             1.5            0.2  b'setosa'
+4             5.0            3.6             1.4            0.2  b'setosa'
+      Sepal.Length    Sepal.Width    Petal.Length    Petal.Width        Species
+145             6.7            3.0             5.2            2.3  b'virginica'
+146             6.3            2.5             5.0            1.9  b'virginica'
+147             6.5            3.0             5.2            2.0  b'virginica'
+148             6.2            3.4             5.4            2.3  b'virginica'
+149             5.9            3.0             5.1            1.8  b'virginica'
+</pre>
+
+<p>
+R のサンプルデータを python でつかう別の方法<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">from</span> sklearn <span style="color: #20b2aa; font-weight: bold;">import</span> datasets
+<span style="color: #9acd32;">iris</span> = datasets.load_iris()
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">pandas object &#12408;&#22793;&#25563;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#21517;&#12364;&#12394;&#12367;&#12394;&#12387;&#12385;&#12419;&#12358;&#12369;&#12393;.</span>
+<span style="color: #9acd32;">df</span>   = pd.DataFrame(iris.data)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> R</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #1e90ff;">options</span>(width=150) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19968;&#34892;&#12398;&#24133;&#12434;&#25351;&#23450;&#12377;&#12427;(&#20170;&#22238;&#12399;&#28961;&#12367;&#12390;&#12418;&#12356;&#12356;&#12369;&#12393;&#27604;&#36611;&#12398;&#12383;&#12417;&#26360;&#12356;&#12390;&#12362;&#12367;)</span>
+head(iris,5)
+tail(iris,5)
+</pre>
+</div>
+
+<pre class="example">
+  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+146          6.7         3.0          5.2         2.3 virginica
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> julia</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+<span style="color: #20b2aa; font-weight: bold;">using</span> RDatasets
+iris = dataset(<span style="color: #ffa07a;">"datasets"</span>,<span style="color: #ffa07a;">"iris"</span>)
+println(head(iris,5))
+println(tail(iris,5))
+</pre>
+</div>
+
+<pre class="example">
+5×5 DataFrames.DataFrame
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species  │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼──────────┤
+│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ "setosa" │
+│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ "setosa" │
+│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ "setosa" │
+│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ "setosa" │
+│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ "setosa" │
+5×5 DataFrames.DataFrame
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species     │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼─────────────┤
+│ 1   │ 6.7         │ 3.0        │ 5.2         │ 2.3        │ "virginica" │
+│ 2   │ 6.3         │ 2.5        │ 5.0         │ 1.9        │ "virginica" │
+│ 3   │ 6.5         │ 3.0        │ 5.2         │ 2.0        │ "virginica" │
+│ 4   │ 6.2         │ 3.4        │ 5.4         │ 2.3        │ "virginica" │
+│ 5   │ 5.9         │ 3.0        │ 5.1         │ 1.8        │ "virginica" │
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-2-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">head</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">df.head(5)</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">head(df,5)</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">head(df,5)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 行, 列の選択</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+領域の選択と書出し<br  />
+</p>
+</div>
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> python</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12469;&#12531;&#12503;&#12523;&#12487;&#12540;&#12479;</span>
+<span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #20b2aa; font-weight: bold;">import</span> pyper
+<span style="color: #9acd32;">r</span>=pyper.R(use_pandas=<span style="color: #ffa07a;">'True'</span>)
+<span style="color: #9acd32;">iris</span> = pd.DataFrame(r.get(<span style="color: #ffa07a;">'iris'</span>))
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12392;&#12426;&#12354;&#12360;&#12378;&#26368;&#21021;&#12398; 5 &#34892;&#12434;&#34920;&#31034;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.head(5))
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#21517;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.columns)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">(&#34892;&#25968;, &#21015;&#25968;)&#12434; tuple &#12391;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.shape)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#25968;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">len</span>(iris.index))
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#25968;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">len</span>(iris.columns))
+</pre>
+</div>
+
+<pre class="example">
+    Sepal.Length    Sepal.Width    Petal.Length    Petal.Width     Species
+0             5.1            3.5             1.4            0.2  b'setosa'
+1             4.9            3.0             1.4            0.2  b'setosa'
+2             4.7            3.2             1.3            0.2  b'setosa'
+3             4.6            3.1             1.5            0.2  b'setosa'
+4             5.0            3.6             1.4            0.2  b'setosa'
+Index([' Sepal.Length ', ' Sepal.Width ', ' Petal.Length ', ' Petal.Width ',
+       'Species'],
+      dtype='object')
+(150, 5)
+150
+5
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12469;&#12531;&#12503;&#12523;&#12487;&#12540;&#12479;</span>
+<span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #20b2aa; font-weight: bold;">import</span> pyper
+<span style="color: #9acd32;">r</span>=pyper.R(use_pandas=<span style="color: #ffa07a;">'True'</span>)
+<span style="color: #9acd32;">iris</span> = pd.DataFrame(r.get(<span style="color: #ffa07a;">'iris'</span>))
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21462;&#24471;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">iris[[0]]             # &#21015;(column)&#30058;&#21495;&#12434;&#20351;&#12387;&#12390;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">iris['Species']       # &#21015;&#12398;&#21517;&#21069;&#12434;&#20351;&#12387;&#12390;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">iris.iloc[:,0]        # &#21015;&#30058;&#21495;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">iris.loc[:,'Species'] # column index</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">iris.ix[:,0]          # 0 &#21015;&#30446;&#12398;&#12415;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"data[[column_number]]="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris[[0]].head(2))
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"\ndata['column_name']="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris[<span style="color: #ffa07a;">'Species'</span>].head(2))
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"\ndata.iloc[:,column_number]="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.iloc[:,0].head(2))
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"\ndata.loc[:,column_name]="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.loc[:,<span style="color: #ffa07a;">'Species'</span>].head(2))
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"\ndata.column_name="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.Species.head(2))
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"\ndata.ix[row_from:row_to, col_from:col_to]="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.ix[0:2,1:3])   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#21015;&#12398;&#31684;&#22258;</span>
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"\ndata[row,col]="</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris.ix[0,0])       <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20516;&#12398;&#21462;&#12426;&#20986;&#12375;</span>
+</pre>
+</div>
+
+<pre class="example">
+data[[column_number]]=
+    Sepal.Length 
+0             5.1
+1             4.9
+
+data['column_name']=
+0    b'setosa'
+1    b'setosa'
+Name: Species, dtype: object
+
+data.iloc[:,column_number]=
+0    5.1
+1    4.9
+Name:  Sepal.Length , dtype: float128
+
+data.loc[:,column_name]=
+0    b'setosa'
+1    b'setosa'
+Name: Species, dtype: object
+
+data.column_name=
+0    b'setosa'
+1    b'setosa'
+Name: Species, dtype: object
+
+data.ix[row_from:row_to, col_from:col_to]=
+    Sepal.Width    Petal.Length 
+0            3.5             1.4
+1            3.0             1.4
+2            3.2             1.3
+
+data[row,col]=
+5.1
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12469;&#12531;&#12503;&#12523;&#12487;&#12540;&#12479;</span>
+<span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #20b2aa; font-weight: bold;">import</span> pyper
+<span style="color: #9acd32;">r</span>=pyper.R(use_pandas=<span style="color: #ffa07a;">'True'</span>)
+<span style="color: #9acd32;">iris</span> = pd.DataFrame(r.get(<span style="color: #ffa07a;">'iris'</span>))
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26908;&#32034;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris[iris.ix[:,1]&gt;4.0])
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20309;&#25925;&#12363; column &#21517;&#12395;&#31354;&#30333;&#12364;&#12354;&#12356;&#12390;&#12427; 'Sepal.Width' &#12391;&#12399;&#12456;&#12521;&#12540;&#12392;&#12394;&#12387;&#12390;&#12375;&#12414;&#12358;</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(iris[iris.loc[:,<span style="color: #ffa07a;">' Sepal.Width '</span>]&gt;4.0])
+</pre>
+</div>
+
+<pre class="example">
+     Sepal.Length    Sepal.Width    Petal.Length    Petal.Width     Species
+15             5.7            4.4             1.5            0.4  b'setosa'
+32             5.2            4.1             1.5            0.1  b'setosa'
+33             5.5            4.2             1.4            0.2  b'setosa'
+     Sepal.Length    Sepal.Width    Petal.Length    Petal.Width     Species
+15             5.7            4.4             1.5            0.4  b'setosa'
+32             5.2            4.1             1.5            0.1  b'setosa'
+33             5.5            4.2             1.4            0.2  b'setosa'
+</pre>
+
+<p>
+R との違い:<br  />
+</p>
+<ol class="org-ol">
+<li>制限が無い時に ":" を使う点と<br  />
+</li>
+<li>":" による範囲指定の端<br  />
+python: iris.ix[:,1:3]   x:y =&gt; x から y-1<br  />
+R:      iris[,2:3]       x:y =&gt; x から y<br  />
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> R</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-R">names(iris)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#21517;</span>
+dim(iris)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#25968;, &#21015;&#25968;</span>
+nrow(iris)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#25968;</span>
+ncol(iris)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#25968;</span>
+
+head(iris[,1])           <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#30058;&#21495; R &#12399; 1-based &#34892;&#12434;&#36984;&#25246;&#12375;&#12394;&#12356;&#12392;&#12365;&#12399; ":" &#12434;&#26360;&#12363;&#12394;&#12356;</span>
+head(iris$Sepal.Length)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21517;&#21069;&#12434;&#20351;&#12387;&#12390;</span>
+head(iris[1:3,2:3])      <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#21015;&#12398;&#31684;&#22258;</span>
+head(iris[,c(<span style="color: #ffa07a;">"Sepal.Width"</span>,<span style="color: #ffa07a;">"Species"</span>)])  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#35079;&#25968;&#21015;&#12398;&#21462;&#24471;</span>
+iris[1,1]    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20516;&#12398;&#21462;&#12426;&#20986;&#12375;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26908;&#32034; subset(data, &#26465;&#20214;)</span>
+sel <span style="color: #1e90ff;">&lt;-</span> subset(iris,iris[<span style="color: #ffa07a;">"Sepal.Width"</span>]&gt;4.0)
+sel
+</pre>
+</div>
+
+<pre class="example">
+[1] 5.1 4.9 4.7 4.6 5.0 5.4
+[1] 5.1 4.9 4.7 4.6 5.0 5.4
+  Sepal.Width Petal.Length
+1         3.5          1.4
+2         3.0          1.4
+3         3.2          1.3
+  Sepal.Width Species
+1         3.5  setosa
+2         3.0  setosa
+3         3.2  setosa
+4         3.1  setosa
+5         3.6  setosa
+6         3.9  setosa
+[1] 150   5
+[1] 150
+[1] 5
+[1] 5.1
+   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+16          5.7         4.4          1.5         0.4  setosa
+33          5.2         4.1          1.5         0.1  setosa
+34          5.5         4.2          1.4         0.2  setosa
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> julia</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+<span style="color: #20b2aa; font-weight: bold;">using</span> RDatasets
+iris = dataset(<span style="color: #ffa07a;">"datasets"</span>,<span style="color: #ffa07a;">"iris"</span>)
+println(size(iris))     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">(&#34892;&#25968;, &#21015;&#25968;)</span>
+println(names(iris))    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#21517;</span>
+println(nrow(iris))     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#25968;</span>
+println(ncol(iris))     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#25968; length(iris) &#12391;&#12418;&#21516;&#12376;</span>
+</pre>
+</div>
+
+<pre class="example">
+(150,5)
+Symbol[:SepalLength,:SepalWidth,:PetalLength,:PetalWidth,:Species]
+150
+5
+5
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+<span style="color: #20b2aa; font-weight: bold;">using</span> RDatasets
+iris = dataset(<span style="color: #ffa07a;">"datasets"</span>,<span style="color: #ffa07a;">"iris"</span>)
+
+println(head(iris))
+println(head(iris[:,1:1]))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#21015;&#30446;&#12398;&#12415;&#21462;&#12426;&#20986;&#12377; julia &#12399; 1-based</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">println(head(iris[:,1]))  # &#12371;&#12428;&#12399;&#12480;&#12513;?</span>
+println(head(iris[:,[<span style="color: #6495ed;">:Species</span>]]))
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">println(head(iris[:,:Species]))  # &#12371;&#12428;&#12418;&#12480;&#12513;&#12415;&#12383;&#12356;</span>
+println(iris[1:3,2:3])  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#34892;-3&#34892;&#30446;&#12414;&#12391; + 2&#21015;-3&#21015;&#30446;&#12414;&#12391;(R &#12392;&#21516;&#12376;!!)</span>
+println(iris[1,1])  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20516;&#12398;&#21462;&#12426;&#20986;&#12375;</span>
+
+println(head(iris[:,[1,3,5]])) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#35079;&#25968;&#12398;&#21015;&#12434;&#21462;&#12426;&#20986;&#12377;&#12392;&#12365;&#12399;&#37197;&#21015;&#12395;&#12377;&#12427;</span>
+println(head(iris[:,2:3]))     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">2-3 &#21015;&#30446;&#12398;&#25277;&#20986;</span>
+println(head(iris[1:1,])) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12428;&#12391; 1 &#21015;&#30446;&#12434;&#21462;&#12426;&#20986;&#12379;&#12390;&#12427;&#12424;&#12358;&#12384;&#12364;&#12424;&#12367;&#12431;&#12363;&#12425;&#12394;&#12356;.</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26908;&#32034;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19981;&#31561;&#21495;&#12398;&#21069;&#12395;&#20309;&#25925;&#12363; . &#12364;&#12388;&#12356;&#12390;&#12427;&#28857;&#12395;&#27880;&#24847;&#12377;&#12427;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">element-wise &#12395;&#25805;&#20316;&#12375;&#12383;&#12356;&#22580;&#21512;&#12399; . &#12391;&#22987;&#12414;&#12427;&#28436;&#31639;&#23376;&#12434;&#20351;&#12358;</span>
+println(iris[iris[:, <span style="color: #6495ed;">:SepalWidth</span>] .&gt; 4.0,:])
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-3-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">tuple</th>
+<th scope="col" class="left">列名</th>
+<th scope="col" class="left">行数</th>
+<th scope="col" class="left">列数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">iris.shape</td>
+<td class="left">iris.columns</td>
+<td class="left">iris.index</td>
+<td class="left">isis.columns</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">dim(iris)</td>
+<td class="left">names(iris)</td>
+<td class="left">nrow(iris)</td>
+<td class="left">ncol(iris)</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">size(iris)</td>
+<td class="left">names(iris)</td>
+<td class="left">nrow(iris)</td>
+<td class="left">ncol(iris)</td>
+</tr>
+</tbody>
+</table>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">列番号</th>
+<th scope="col" class="left">列名</th>
+<th scope="col" class="left">範囲</th>
+<th scope="col" class="left">値抽出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">iris.iloc[:,0]</td>
+<td class="left">iris.loc[:,name]</td>
+<td class="left">iris.ix[0:2,1:3]</td>
+<td class="left">iris.ix[0,0]</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">iris[,1]</td>
+<td class="left">iris$name</td>
+<td class="left">iris[1:3,2:3]</td>
+<td class="left">iris[1,1]</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">iris[:,1:1]</td>
+<td class="left">iris[:[:name]]</td>
+<td class="left">iris[1:3,2:3]</td>
+<td class="left">iris[1,1]</td>
+</tr>
+</tbody>
+</table>
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">検索</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">iris.[iris.lloc[:,"name"] &gt; value]</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">subset(iris,iris["name"] &gt; value)</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">iris[iris[:,:name] .&gt; value,:]</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+python と R, julia でのデータアクセスの方法のちがい.<br  />
+</p>
+<ol class="org-ol">
+<li>python は 0-based, R, julia は 1-based<br  />
+配列の添字の始まり数が違う<br  />
+</li>
+<li>最初の列の取得<br  />
+python: iris.ix[:,0]<br  />
+R:      iris[,1]<br  />
+制限が無いときに, python 及び julia では ":" を使う. R は何も書かない.<br  />
+</li>
+<li>":" を使った範囲指定<br  />
+python: iris.ix[:,1:3]  = 1 列目(0-based) から 2(=3-1, 0-based)列目まで<br  />
+R:      iris[,2:3]      = 2 列目(1-based) から 3列目(1-based)まで<br  />
+julia:  iris[:,2:3]     = 2 列目(1-based) から 3列目(1-based)まで<br  />
+</li>
+</ol>
+
+<p>
+そのほかのちゅうい点:<br  />
+julia では column名は :column名 でアクセスするらしい.<br  />
+何かいちいちめんどくさいなぁ&#x2026;<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 行, 列の追加と削除</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> python</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #20b2aa; font-weight: bold;">import</span> numpy  <span style="color: #20b2aa; font-weight: bold;">as</span> np
+
+<span style="color: #9acd32;">df</span> = pd.DataFrame([[1,2],[3,4]],columns=<span style="color: #76ee00;">list</span>(<span style="color: #ffa07a;">'AB'</span>))
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">1. &#36861;&#21152;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#26041;&#21521;&#12395;&#36861;&#21152;</span>
+<span style="color: #9acd32;">dfa</span>= pd.DataFrame([[5,6],[7,8],[9,10],[11,12]],columns=<span style="color: #76ee00;">list</span>(<span style="color: #ffa07a;">'AB'</span>))
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfa)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">ignore_index=True &#12391;&#34892;&#30058;&#21495;&#12434;&#20184;&#12369;&#30452;&#12375;</span>
+<span style="color: #9acd32;">dfl</span>=df.append(dfa,ignore_index=<span style="color: #1e90ff;">True</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfl)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#26041;&#21521;&#12395;&#36861;&#21152;</span>
+<span style="color: #9acd32;">dfl</span>[<span style="color: #ffa07a;">'C'</span>]=np.array([1,2,3,4,5,6])
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfl)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">2. &#21066;&#38500;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#12398;&#21066;&#38500;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">drop &#12434;&#20351;&#12358;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">cud = cun.drop([3,4])  # &#35079;&#25968;&#12398;&#34892;&#12434;&#21066;&#38500;&#12377;&#12427;&#12392;&#12365;</span>
+<span style="color: #9acd32;">dfl2</span>=dfl.drop(3)
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfl2)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21066;&#38500;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">drop(&#21015;&#21517;, axis=1)   # axis=1 &#12434;&#20351;&#12358;</span>
+<span style="color: #9acd32;">dfl3</span>=dfl.drop(<span style="color: #ffa07a;">'A'</span>,axis=1)
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfl3)
+</pre>
+</div>
+
+<pre class="example">
+   A  B
+0  1  2
+1  3  4
+
+    A   B
+0   5   6
+1   7   8
+2   9  10
+3  11  12
+
+    A   B
+0   1   2
+1   3   4
+2   5   6
+3   7   8
+4   9  10
+5  11  12
+
+    A   B  C
+0   1   2  1
+1   3   4  2
+2   5   6  3
+3   7   8  4
+4   9  10  5
+5  11  12  6
+
+    A   B  C
+0   1   2  1
+1   3   4  2
+2   5   6  3
+4   9  10  5
+5  11  12  6
+
+    B  C
+0   2  1
+1   4  2
+2   6  3
+3   8  4
+4  10  5
+5  12  6
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> R</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-R">colA <span style="color: #1e90ff;">&lt;-</span> c(1,3)
+colB <span style="color: #1e90ff;">&lt;-</span> c(2,4)
+df <span style="color: #1e90ff;">&lt;-</span> data.frame(A=colA,B=colB)
+df
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">1. &#36861;&#21152;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#26041;&#21521;&#12395;&#36861;&#21152; rbind</span>
+colAadd <span style="color: #1e90ff;">&lt;-</span> c(5,7,9,11)
+colBadd <span style="color: #1e90ff;">&lt;-</span> c(6,8,10,12)
+dfa <span style="color: #1e90ff;">&lt;-</span> data.frame(A=colAadd,B=colBadd)
+print(<span style="color: #ffa07a;">"added:"</span>)
+dfa
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">rbind</span>
+dfl <span style="color: #1e90ff;">&lt;-</span> rbind(df,dfa)
+print(<span style="color: #ffa07a;">"rbind:"</span>)
+dfl
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#26041;&#21521;&#12395;&#36861;&#21152; cbind</span>
+colC <span style="color: #1e90ff;">&lt;-</span> c(12,13,14,15,16,17)
+dfc <span style="color: #1e90ff;">&lt;-</span> data.frame(C=colC)
+print(<span style="color: #ffa07a;">"added:"</span>)
+dfc
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">cbind</span>
+dfk <span style="color: #1e90ff;">&lt;-</span> cbind(dfl,dfc)
+print(<span style="color: #ffa07a;">"cbind:"</span>)
+dfk
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">2. &#21066;&#38500;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#12398;&#21066;&#38500; "-" &#12434;&#20351;&#12358;</span>
+dfl2 <span style="color: #1e90ff;">&lt;-</span> dfk[c(-1,-2),]
+print(<span style="color: #ffa07a;">"drop row:"</span>)
+dfl2
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21066;&#38500;</span>
+dfl3 <span style="color: #1e90ff;">&lt;-</span> dfl2[,-1]
+print(<span style="color: #ffa07a;">"drop col:"</span>)
+dfl3
+</pre>
+</div>
+
+<pre class="example">
+  A B
+1 1 2
+2 3 4
+[1] "added:"
+   A  B
+1  5  6
+2  7  8
+3  9 10
+4 11 12
+[1] "rbind:"
+   A  B
+1  1  2
+2  3  4
+3  5  6
+4  7  8
+5  9 10
+6 11 12
+[1] "added:"
+   C
+1 12
+2 13
+3 14
+4 15
+5 16
+6 17
+[1] "cbind:"
+   A  B  C
+1  1  2 12
+2  3  4 13
+3  5  6 14
+4  7  8 15
+5  9 10 16
+6 11 12 17
+[1] "drop row:"
+   A  B  C
+3  5  6 14
+4  7  8 15
+5  9 10 16
+6 11 12 17
+[1] "drop col:"
+   B  C
+3  6 14
+4  8 15
+5 10 16
+6 12 17
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> julia</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+df  = DataFrame(A=[1,3],B=[2,4])
+dfa = DataFrame(A=[5,7,9,11],B=[6,8,10,12])
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">1. &#36861;&#21152;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#26041;&#21521;&#12395;&#36861;&#21152; vcat</span>
+dfl = vcat(df,dfa)
+println(<span style="color: #ffa07a;">"vcat:"</span>)
+println(dfl)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#26041;&#21521;&#12395;&#36861;&#21152; hcat</span>
+dfc = DataFrame(C=[12,13,14,15,16,17])
+dfk = hcat(dfl,dfc)
+println(<span style="color: #ffa07a;">"hcat:"</span>)
+println(dfk)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">2. &#21066;&#38500;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#12398;&#21066;&#38500;</span>
+dfl2 = dfk[setdiff(collect(1:1:nrow(dfk)),[3,4]),:]
+println(collect(1:1:6))   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#12363;&#12425; 1 step &#12391; 6 &#12414;&#12391;&#12398;&#37197;&#21015;&#12434;&#20316;&#25104;</span>
+println(setdiff(collect(1:1:6),[3,4]))
+println(<span style="color: #ffa07a;">"delete row 3,4"</span>)
+println(dfl2)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21066;&#38500;</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#30772;&#22730;&#30340; method &#12391;&#21066;&#38500;&#12377;&#12427;&#22580;&#21512;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">delete!(dfk,[:C,:B])</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">setdiff(names(dfk),[:C]) =&gt; [:A,:B]</span>
+<span style="color: #cd853f;">#</span><span style="color: #cd853f;">dfl3 = dfk[setdiff(names(dfk),[:C])]</span>
+dfl3 = dfk[setdiff(names(dfk),[<span style="color: #6495ed;">:C</span>,<span style="color: #6495ed;">:B</span>])]
+println(<span style="color: #ffa07a;">"delete column C"</span>)
+println(setdiff(names(dfk),[<span style="color: #6495ed;">:C</span>]))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">Symbol[:A, :B]</span>
+println(dfl3)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfl3 = dfk[(x in [:C]) for x in names(df)] # &#20869;&#21253;&#27161;&#35352;: &#21205;&#12363;&#12394;&#12356;... Why?</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfl3 = dfk[:,1:2]   # &#12371;&#12428;&#12399;&#21205;&#12367;&#12369;&#12393;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfl3 = dfk[: [1:2]] # &#12371;&#12428;&#12399;&#21205;&#12363;&#12394;&#12356;</span>
+
+dfl3 = dfk[:,[<span style="color: #1e90ff;">true</span>,<span style="color: #1e90ff;">true</span>,<span style="color: #1e90ff;">false</span>]]   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12428;&#12399;&#21205;&#12367;</span>
+println(<span style="color: #ffa07a;">"delete column C"</span>)
+println(dfl3)
+</pre>
+</div>
+
+<pre class="example">
+vcat:
+6×2 DataFrames.DataFrame
+│ Row │ A  │ B  │
+├─────┼────┼────┤
+│ 1   │ 1  │ 2  │
+│ 2   │ 3  │ 4  │
+│ 3   │ 5  │ 6  │
+│ 4   │ 7  │ 8  │
+│ 5   │ 9  │ 10 │
+│ 6   │ 11 │ 12 │
+hcat:
+6×3 DataFrames.DataFrame
+│ Row │ A  │ B  │ C  │
+├─────┼────┼────┼────┤
+│ 1   │ 1  │ 2  │ 12 │
+│ 2   │ 3  │ 4  │ 13 │
+│ 3   │ 5  │ 6  │ 14 │
+│ 4   │ 7  │ 8  │ 15 │
+│ 5   │ 9  │ 10 │ 16 │
+│ 6   │ 11 │ 12 │ 17 │
+[1,2,3,4,5,6]
+[1,2,5,6]
+delete row 3,4
+4×3 DataFrames.DataFrame
+│ Row │ A  │ B  │ C  │
+├─────┼────┼────┼────┤
+│ 1   │ 1  │ 2  │ 12 │
+│ 2   │ 3  │ 4  │ 13 │
+│ 3   │ 9  │ 10 │ 16 │
+│ 4   │ 11 │ 12 │ 17 │
+delete column C
+Symbol[:A,:B]
+6×1 DataFrames.DataFrame
+│ Row │ A  │
+├─────┼────┤
+│ 1   │ 1  │
+│ 2   │ 3  │
+│ 3   │ 5  │
+│ 4   │ 7  │
+│ 5   │ 9  │
+│ 6   │ 11 │
+delete column C
+6×2 DataFrames.DataFrame
+│ Row │ A  │ B  │
+├─────┼────┼────┤
+│ 1   │ 1  │ 2  │
+│ 2   │ 3  │ 4  │
+│ 3   │ 5  │ 6  │
+│ 4   │ 7  │ 8  │
+│ 5   │ 9  │ 10 │
+│ 6   │ 11 │ 12 │
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-4-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">行方向追加</th>
+<th scope="col" class="left">列方向追加</th>
+<th scope="col" class="left">行削除</th>
+<th scope="col" class="left">列削除</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">df1.append(df2)</td>
+<td class="left">df1[new_col]=df2</td>
+<td class="left">df1.drop([row1,row2])</td>
+<td class="left">df1.drop([col1,col2],axis=1)</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">rbind(df1,df2)</td>
+<td class="left">cbind(df1,df2)</td>
+<td class="left">df1[c(-row1, -row2),]</td>
+<td class="left">df1[,c(-col1,-col2)]</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">vcat(df1,df2)</td>
+<td class="left">hcat(df1,dv2)</td>
+<td class="left">df1[setdiff(collect(1:1:nrow(df1)),[row1,row2]),:]</td>
+<td class="left">df1[setdiff(names(df1),[:col1,:col2])]</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+julia の削除が異様にめんどくさいが何か別の方法あるんだろーか&#x2026;<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 行, 列の結合</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> python</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #20b2aa; font-weight: bold;">import</span> numpy  <span style="color: #20b2aa; font-weight: bold;">as</span> np
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27178;&#26041;&#21521;&#12395;&#32080;&#21512;&#12377;&#12427;&#22580;&#21512;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">pd.merge(left,right, on='key', how="inner)</span>
+<span style="color: #9acd32;">cu1</span> = pd.DataFrame([[1,<span style="color: #ffa07a;">"John"</span>],[2,<span style="color: #ffa07a;">"Mark"</span>]],columns=[<span style="color: #ffa07a;">'id'</span>,<span style="color: #ffa07a;">'name'</span>])
+<span style="color: #9acd32;">cu2</span> = pd.DataFrame([[1,<span style="color: #ffa07a;">'ok'</span>,<span style="color: #ffa07a;">'mut'</span>],[2,<span style="color: #ffa07a;">'not ok'</span>,<span style="color: #ffa07a;">'wild'</span>]],columns=[<span style="color: #ffa07a;">'id'</span>,<span style="color: #ffa07a;">'OK'</span>,<span style="color: #ffa07a;">'m/w'</span>])
+<span style="color: #20b2aa; font-weight: bold;">print</span>(cu1)
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(cu2)
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">id &#12434;&#12461;&#12540;&#12395;&#12375;&#12390;&#32080;&#21512;&#12377;&#12427;.</span>
+<span style="color: #9acd32;">cum</span> = pd.merge(cu1,cu2,on=<span style="color: #ffa07a;">'id'</span>,how=<span style="color: #ffa07a;">'inner'</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(cum)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#32294;&#26041;&#21521;&#12395;&#32080;&#21512;&#12377;&#12427;&#22580;&#21512;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">pd.concat([table1, table2],ignore_index=True)</span>
+<span style="color: #9acd32;">cu3</span> = pd.DataFrame([[3,<span style="color: #ffa07a;">"hoge"</span>,<span style="color: #ffa07a;">'not ok'</span>,<span style="color: #ffa07a;">'wild'</span>],
+                    [4,<span style="color: #ffa07a;">"fuga"</span>,<span style="color: #ffa07a;">'ok'</span>,<span style="color: #ffa07a;">'wild'</span>]], columns=[<span style="color: #ffa07a;">'id'</span>,<span style="color: #ffa07a;">'name'</span>,<span style="color: #ffa07a;">'OK'</span>,<span style="color: #ffa07a;">'m/w'</span>])
+
+<span style="color: #9acd32;">cun</span>=pd.concat([cum,cu3],ignore_index=<span style="color: #1e90ff;">True</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>()
+<span style="color: #20b2aa; font-weight: bold;">print</span>(cun)
+</pre>
+</div>
+
+<pre class="example">
+   id  name
+0   1  John
+1   2  Mark
+
+   id      OK   m/w
+0   1      ok   mut
+1   2  not ok  wild
+
+   id  name      OK   m/w
+0   1  John      ok   mut
+1   2  Mark  not ok  wild
+
+   id  name      OK   m/w
+0   1  John      ok   mut
+1   2  Mark  not ok  wild
+2   3  hoge  not ok  wild
+3   4  fuga      ok  wild
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> R</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+
+<pre class="src src-R">cu1 <span style="color: #1e90ff;">&lt;-</span> data.frame(id=c(1,2),name=c(<span style="color: #ffa07a;">'John'</span>,<span style="color: #ffa07a;">'Mark'</span>))
+print(<span style="color: #ffa07a;">"cu1"</span>)
+cu1
+cu2 <span style="color: #1e90ff;">&lt;-</span> data.frame(id=c(1,2),OK=c(<span style="color: #ffa07a;">'ok'</span>,<span style="color: #ffa07a;">'not ok'</span>),mut=c(<span style="color: #ffa07a;">'mut'</span>,<span style="color: #ffa07a;">'wild'</span>))
+print(<span style="color: #ffa07a;">"cu2"</span>)
+cu2
+cum <span style="color: #1e90ff;">&lt;-</span> merge(cu1,cu2,by=<span style="color: #ffa07a;">'id'</span>,all=T)
+print(<span style="color: #ffa07a;">"merge"</span>)
+cum
+</pre>
+</div>
+
+<pre class="example">
+[1] "cu1"
+  id name
+1  1 John
+2  2 Mark
+[1] "cu2"
+  id     OK  mut
+1  1     ok  mut
+2  2 not ok wild
+[1] "merge"
+  id name     OK  mut
+1  1 John     ok  mut
+2  2 Mark not ok wild
+</pre>
+
+<p>
+cbind = column bind: 列で結合する.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R">cu1 <span style="color: #1e90ff;">&lt;-</span> data.frame(id=c(1,2),name=c(<span style="color: #ffa07a;">'John'</span>,<span style="color: #ffa07a;">'Mark'</span>))
+print(<span style="color: #ffa07a;">"cu1"</span>)
+cu1
+cu2 <span style="color: #1e90ff;">&lt;-</span> data.frame(id=c(1,2),OK=c(<span style="color: #ffa07a;">'ok'</span>,<span style="color: #ffa07a;">'not ok'</span>),mut=c(<span style="color: #ffa07a;">'mut'</span>,<span style="color: #ffa07a;">'wild'</span>))
+print(<span style="color: #ffa07a;">"cu2"</span>)
+cu2
+cum <span style="color: #1e90ff;">&lt;-</span> cbind(cu1,cu2,by=<span style="color: #ffa07a;">'id'</span>,all=T)
+print(<span style="color: #ffa07a;">"cbind"</span>)
+cum
+</pre>
+</div>
+
+<pre class="example">
+[1] "cu1"
+  id name
+1  1 John
+2  2 Mark
+[1] "cu2"
+  id     OK  mut
+1  1     ok  mut
+2  2 not ok wild
+[1] "cbind"
+  id name id     OK  mut by  all
+1  1 John  1     ok  mut id TRUE
+2  2 Mark  2 not ok wild id TRUE
+</pre>
+
+<p>
+縦方向の結合: rbind<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R">cu1 <span style="color: #1e90ff;">&lt;-</span> data.frame(id=c(1,2),name=c(<span style="color: #ffa07a;">'John'</span>,<span style="color: #ffa07a;">'Mark'</span>))
+print(<span style="color: #ffa07a;">"cu1"</span>)
+cu1
+cu2 <span style="color: #1e90ff;">&lt;-</span> data.frame(id=c(3,4),name=c(<span style="color: #ffa07a;">'hoge'</span>,<span style="color: #ffa07a;">'fuga'</span>))
+print(<span style="color: #ffa07a;">"cu2"</span>)
+cu2
+cum <span style="color: #1e90ff;">&lt;-</span> rbind(cu1,cu2)
+print(<span style="color: #ffa07a;">"rbind"</span>)
+cum
+</pre>
+</div>
+
+<pre class="example">
+[1] "cu1"
+  id name
+1  1 John
+2  2 Mark
+[1] "cu2"
+  id name
+1  3 hoge
+2  4 fuga
+[1] "rbind"
+  id name
+1  1 John
+2  2 Mark
+3  3 hoge
+4  4 fuga
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3"><span class="section-number-3">5.3</span> julia</h3>
+<div class="outline-text-3" id="text-5-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+cu1 = DataFrame(id=[1,2],name=[<span style="color: #ffa07a;">"John"</span>,<span style="color: #ffa07a;">"Mark"</span>])
+println(<span style="color: #ffa07a;">"cu1:"</span>)
+println(cu1)
+cu2 = DataFrame(id=[1,2],OK=[<span style="color: #ffa07a;">"ok"</span>,<span style="color: #ffa07a;">"not ok"</span>],mut=[<span style="color: #ffa07a;">"mut"</span>,<span style="color: #ffa07a;">"wild"</span>])
+println(<span style="color: #ffa07a;">"cu2:"</span>)
+println(cu2)
+cum = join(cu1,cu2,on=<span style="color: #6495ed;">:id</span>, kind=<span style="color: #6495ed;">:inner</span>)
+println(<span style="color: #ffa07a;">"merged:"</span>)
+println(cum)
+</pre>
+</div>
+
+<pre class="example">
+cu1:
+2×2 DataFrames.DataFrame
+│ Row │ id │ name   │
+├─────┼────┼────────┤
+│ 1   │ 1  │ "John" │
+│ 2   │ 2  │ "Mark" │
+cu2:
+2×3 DataFrames.DataFrame
+│ Row │ id │ OK       │ mut    │
+├─────┼────┼──────────┼────────┤
+│ 1   │ 1  │ "ok"     │ "mut"  │
+│ 2   │ 2  │ "not ok" │ "wild" │
+merged:
+2×4 DataFrames.DataFrame
+│ Row │ id │ name   │ OK       │ mut    │
+├─────┼────┼────────┼──────────┼────────┤
+│ 1   │ 1  │ "John" │ "ok"     │ "mut"  │
+│ 2   │ 2  │ "Mark" │ "not ok" │ "wild" │
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5-4" class="outline-3">
+<h3 id="sec-5-4"><span class="section-number-3">5.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-5-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">横方向結合</th>
+<th scope="col" class="left">縦方向結合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">pd.merge(df1,df2, on=key_col_name,how='inner')</td>
+<td class="left">pd.concat([df1,df2])</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">merge(df1,df2,by=key_col_name,all=T), cbind</td>
+<td class="left">rbind(df1,df2)</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">join(df1,df2,on=:key_col_name,kind=:innter)</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> 行, 列のソート</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> python</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12477;&#12540;&#12488;</span>
+<span style="color: #9acd32;">df2</span>= pd.DataFrame([[1,3,<span style="color: #ffa07a;">'hokkaido'</span>],[4,5,<span style="color: #ffa07a;">'tokyo'</span>],[3,5,<span style="color: #ffa07a;">'saitama'</span>],
+                   [6,9,<span style="color: #ffa07a;">'oosaka'</span>],  [1,1,<span style="color: #ffa07a;">'aomori'</span>]]);
+<span style="color: #9acd32;">df2.index</span>=[<span style="color: #ffa07a;">'suzuki'</span>,<span style="color: #ffa07a;">'tanaka'</span>,<span style="color: #ffa07a;">'kimura'</span>,<span style="color: #ffa07a;">'endo'</span>,<span style="color: #ffa07a;">'yoshida'</span>];
+<span style="color: #9acd32;">df2.columns</span>=[<span style="color: #ffa07a;">'col1'</span>,<span style="color: #ffa07a;">'col2'</span>,<span style="color: #ffa07a;">'col3'</span>]
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df2)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25968;&#20516;&#12391;&#12477;&#12540;&#12488;&#12377;&#12427;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">sort_values(by=[&#21015;],ascending=True)</span>
+<span style="color: #9acd32;">dfs1</span> = df2.sort_values(by=[<span style="color: #ffa07a;">'col1'</span>],ascending=<span style="color: #1e90ff;">True</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"sorted by col1:"</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfs1)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#21517;(index)&#12395;&#22522;&#12356;&#12390;&#12477;&#12540;&#12488;</span>
+<span style="color: #9acd32;">dfs2</span> = df2.sort_index(ascending=<span style="color: #1e90ff;">False</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"sorted by index:"</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfs2)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#21517;&#12395;&#22522;&#12356;&#12390;&#12477;&#12540;&#12488;</span>
+<span style="color: #9acd32;">dfs3</span> = df2.sort_index(axis=1, ascending=<span style="color: #1e90ff;">False</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"sorted by col names:"</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(dfs3)
+</pre>
+</div>
+
+<pre class="example">
+         col1  col2      col3
+suzuki      1     3  hokkaido
+tanaka      4     5     tokyo
+kimura      3     5   saitama
+endo        6     9    oosaka
+yoshida     1     1    aomori
+sorted by col1:
+         col1  col2      col3
+suzuki      1     3  hokkaido
+yoshida     1     1    aomori
+kimura      3     5   saitama
+tanaka      4     5     tokyo
+endo        6     9    oosaka
+sorted by index:
+         col1  col2      col3
+yoshida     1     1    aomori
+tanaka      4     5     tokyo
+suzuki      1     3  hokkaido
+kimura      3     5   saitama
+endo        6     9    oosaka
+sorted by col names:
+             col3  col2  col1
+suzuki   hokkaido     3     1
+tanaka      tokyo     5     4
+kimura    saitama     5     3
+endo       oosaka     9     6
+yoshida    aomori     1     1
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> R</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-R">df2 <span style="color: #1e90ff;">&lt;-</span> data.frame(<span style="color: #ffa07a;">'col2'</span>=c(1,4,3,6,1), <span style="color: #ffa07a;">'col1'</span>=c(3,5,5,9,1),
+                  <span style="color: #ffa07a;">'col3'</span>=c(<span style="color: #ffa07a;">'hokkaido'</span>,<span style="color: #ffa07a;">'tokyo'</span>,<span style="color: #ffa07a;">'saitama'</span>,<span style="color: #ffa07a;">'oosaka'</span>,<span style="color: #ffa07a;">'aomori'</span>),
+                  <span style="color: #ffa07a;">'name'</span>=c(<span style="color: #ffa07a;">'suzuki'</span>,<span style="color: #ffa07a;">'tanaka'</span>,<span style="color: #ffa07a;">'kimura'</span>,<span style="color: #ffa07a;">'endo'</span>,<span style="color: #ffa07a;">'yoshida'</span>))
+df2
+print(<span style="color: #ffa07a;">"col1 &#12398;&#20516;&#12391; sort"</span>)
+dfs1 <span style="color: #1e90ff;">&lt;-</span> df2[order(df2$col1),]
+dfs1
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12428;&#12391;&#12418;&#12424;&#12356;</span>
+dfs2 <span style="color: #1e90ff;">&lt;-</span> df2[sort.list(df2$col1,decreasing=<span style="color: #9370db;">TRUE</span>),]
+rownames(dfs2) <span style="color: #1e90ff;">&lt;-</span> c(1:nrow(dfs2))
+print(<span style="color: #ffa07a;">"col1 &#12398;&#20516;&#12391; sort (2)"</span>)
+dfs2
+
+print(<span style="color: #ffa07a;">"&#34892;&#21517;&#12391; sort"</span>)
+dfsr <span style="color: #1e90ff;">&lt;-</span> dfs1[order(row.names(dfs1)),]
+dfsr
+
+print(<span style="color: #ffa07a;">"&#21015;&#21517;&#12391; sort"</span>)
+dfsc <span style="color: #1e90ff;">&lt;-</span> dfs1[,order(names(dfs1))]
+dfsc
+</pre>
+</div>
+
+<pre class="example">
+  col2 col1     col3    name
+1    1    3 hokkaido  suzuki
+2    4    5    tokyo  tanaka
+3    3    5  saitama  kimura
+4    6    9   oosaka    endo
+5    1    1   aomori yoshida
+[1] "col1 の値で sort"
+  col2 col1     col3    name
+5    1    1   aomori yoshida
+1    1    3 hokkaido  suzuki
+2    4    5    tokyo  tanaka
+3    3    5  saitama  kimura
+4    6    9   oosaka    endo
+[1] "col1 の値で sort (2)"
+  col2 col1     col3    name
+1    6    9   oosaka    endo
+2    4    5    tokyo  tanaka
+3    3    5  saitama  kimura
+4    1    3 hokkaido  suzuki
+5    1    1   aomori yoshida
+[1] "行名で sort"
+  col2 col1     col3    name
+1    1    3 hokkaido  suzuki
+2    4    5    tokyo  tanaka
+3    3    5  saitama  kimura
+4    6    9   oosaka    endo
+5    1    1   aomori yoshida
+[1] "列名で sort"
+  col1 col2     col3    name
+5    1    1   aomori yoshida
+1    3    1 hokkaido  suzuki
+2    5    4    tokyo  tanaka
+3    5    3  saitama  kimura
+4    9    6   oosaka    endo
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> julia</h3>
+<div class="outline-text-3" id="text-6-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+df2 = DataFrame(col1=[1,4,3,6,1],col2=[3,5,5,9,1],
+                col3=[<span style="color: #ffa07a;">"hokkaido"</span>,<span style="color: #ffa07a;">"tokyo"</span>,<span style="color: #ffa07a;">"saitama"</span>,<span style="color: #ffa07a;">"oosaka"</span>,<span style="color: #ffa07a;">"aomori"</span>],
+                name=[<span style="color: #ffa07a;">"suzuki"</span>,<span style="color: #ffa07a;">"tanaka"</span>,<span style="color: #ffa07a;">"kimura"</span>,<span style="color: #ffa07a;">"endo"</span>,<span style="color: #ffa07a;">"yoshida"</span>])
+println(df2)
+dfs1 = sort(df2, cols=[<span style="color: #6495ed;">:col1</span>,<span style="color: #6495ed;">:col2</span>],rev=<span style="color: #1e90ff;">true</span>) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">array &#12398;&#22580;&#21512;&#12399; by= &#12384;&#12364; DataFrame &#12398;&#22580;&#21512;&#12399; cols=</span>
+println(<span style="color: #ffa07a;">"sorted:"</span>)
+println(dfs1)
+</pre>
+</div>
+
+<pre class="example">
+5×4 DataFrames.DataFrame
+│ Row │ col1 │ col2 │ col3       │ name      │
+├─────┼──────┼──────┼────────────┼───────────┤
+│ 1   │ 1    │ 3    │ "hokkaido" │ "suzuki"  │
+│ 2   │ 4    │ 5    │ "tokyo"    │ "tanaka"  │
+│ 3   │ 3    │ 5    │ "saitama"  │ "kimura"  │
+│ 4   │ 6    │ 9    │ "oosaka"   │ "endo"    │
+│ 5   │ 1    │ 1    │ "aomori"   │ "yoshida" │
+sorted:
+5×4 DataFrames.DataFrame
+│ Row │ col1 │ col2 │ col3       │ name      │
+├─────┼──────┼──────┼────────────┼───────────┤
+│ 1   │ 6    │ 9    │ "oosaka"   │ "endo"    │
+│ 2   │ 4    │ 5    │ "tokyo"    │ "tanaka"  │
+│ 3   │ 3    │ 5    │ "saitama"  │ "kimura"  │
+│ 4   │ 1    │ 3    │ "hokkaido" │ "suzuki"  │
+│ 5   │ 1    │ 1    │ "aomori"   │ "yoshida" │
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><span class="section-number-3">6.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-6-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">数値</th>
+<th scope="col" class="left">行名</th>
+<th scope="col" class="left">列名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">df.sort_values(by=[col_name])</td>
+<td class="left">df.sort_index()</td>
+<td class="left">df.sort_index(axis=1)</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">df[order(df$col_name)]</td>
+<td class="left">df[order(row.names(df)),]</td>
+<td class="left">df[,order(names(df))]</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">sort(df,cols=[:col_name])</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+julia のは調べるの力尽きたのでまたこんど.<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 行, 列の集計</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> python</h3>
+<div class="outline-text-3" id="text-7-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #20b2aa; font-weight: bold;">import</span> numpy  <span style="color: #20b2aa; font-weight: bold;">as</span> np
+<span style="color: #9acd32;">df</span> = pd.DataFrame({<span style="color: #ffa07a;">'col1'</span>:[8,9,10],
+                   <span style="color: #ffa07a;">'col2'</span>:[1,2,3],
+                   <span style="color: #ffa07a;">'col3'</span>:[4,5,6],
+                   <span style="color: #ffa07a;">'col4'</span>:[9,1,2]
+                   })
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">apply</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#27598;&#12395;&#38306;&#25968;&#12434;&#36969;&#29992;</span>
+<span style="color: #9acd32;">ca</span> = df.<span style="color: #76ee00;">apply</span>(<span style="color: #20b2aa; font-weight: bold;">lambda</span> x: np.<span style="color: #76ee00;">sum</span>(x))
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"apply each col"</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(ca)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#27598;&#12395;&#38306;&#25968;&#12434;&#36969;&#29992;</span>
+<span style="color: #9acd32;">cr</span> = df.<span style="color: #76ee00;">apply</span>(<span style="color: #20b2aa; font-weight: bold;">lambda</span> x: np.<span style="color: #76ee00;">sum</span>(x),axis=1)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"apply each row"</span>)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(cr)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12463;&#12525;&#12473;&#38598;&#35336;</span>
+<span style="color: #20b2aa; font-weight: bold;">import</span> pyper
+<span style="color: #9acd32;">r</span> = pyper.R(use_pandas=<span style="color: #ffa07a;">'True'</span>)
+<span style="color: #9acd32;">df</span> = pd.DataFrame(r.get(<span style="color: #ffa07a;">'iris'</span>))
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">df['C']=[1 if x&gt;3.0 else 0 for x in df.loc[:,' Sepal.Length ']]</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20869;&#21253;&#27161;&#35352;&#12391;&#26360;&#12356;&#12390;&#12415;&#12383;!!</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#21015;&#30446;&#12398;&#20516;&#12364; 3 &#12424;&#12426;&#22823;&#12365;&#12369;&#12428;&#12400; 1 &#12381;&#12358;&#12391;&#12394;&#12369;&#12428;&#12400; 0 &#12434; 'C' &#21015;&#12395;&#20837;&#12428;&#12427;.</span>
+<span style="color: #9acd32;">df</span>[<span style="color: #ffa07a;">'C'</span>]=[1 <span style="color: #20b2aa; font-weight: bold;">if</span> x&gt;3.0 <span style="color: #20b2aa; font-weight: bold;">else</span> 0 <span style="color: #20b2aa; font-weight: bold;">for</span> x <span style="color: #20b2aa; font-weight: bold;">in</span> df.ix[:,1]]
+<span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(df.loc[:,' Sepal.Length '].head(2))</span>
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df.head(5))
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">pd.crosstab(y&#36600;&#26041;&#21521;, x&#36600;&#26041;&#21521;)</span>
+<span style="color: #9acd32;">cross</span> = pd.crosstab(df.C,df.Species)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(cross)
+</pre>
+</div>
+
+<pre class="example">
+apply each col
+col1    27
+col2     6
+col3    15
+col4    12
+dtype: int64
+apply each row
+0    22
+1    17
+2    21
+dtype: int64
+    Sepal.Length    Sepal.Width    Petal.Length    Petal.Width     Species  C
+0             5.1            3.5             1.4            0.2  b'setosa'  1
+1             4.9            3.0             1.4            0.2  b'setosa'  0
+2             4.7            3.2             1.3            0.2  b'setosa'  1
+3             4.6            3.1             1.5            0.2  b'setosa'  1
+4             5.0            3.6             1.4            0.2  b'setosa'  1
+Species  b'setosa'  b'versicolor'  b'virginica'
+C                                              
+0                8             42            33
+1               42              8            17
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> R</h3>
+<div class="outline-text-3" id="text-7-2">
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">apply</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12395;&#23550;&#12375;&#12390;&#36969;&#29992;</span>
+means <span style="color: #1e90ff;">&lt;-</span> sapply(iris,mean)
+means
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#12384;&#12392;&#34892;&#12395;&#23550;&#12375;&#38306;&#25968;&#36969;&#29992;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">2 &#12384;&#12392;&#21015;&#12395;&#23550;&#12375;&#38306;&#25968;&#36969;&#29992;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">c(1,2) &#12384;&#12392;&#21508;&#35201;&#32032;&#12395;&#23550;&#12375;&#38306;&#25968;&#36969;&#29992;</span>
+max <span style="color: #1e90ff;">&lt;-</span> apply(iris,2,max)
+max
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12463;&#12525;&#12473;&#38598;&#35336;</span>
+head(iris)
+hoge   <span style="color: #1e90ff;">&lt;-</span> sapply(iris$Sepal.Width, <span style="color: #20b2aa; font-weight: bold;">function</span>(p) { <span style="color: #20b2aa; font-weight: bold;">if</span>(p&gt;3.0) {<span style="color: #20b2aa; font-weight: bold;">return</span>(1); }<span style="color: #20b2aa; font-weight: bold;">else</span>{ <span style="color: #20b2aa; font-weight: bold;">return</span>(0); }})
+iris$C <span style="color: #1e90ff;">&lt;-</span> hoge
+cross  <span style="color: #1e90ff;">&lt;-</span> table(iris$C, iris$Species)
+cross
+</pre>
+</div>
+
+<pre class="example">
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width      Species 
+    5.843333     3.057333     3.758000     1.199333           NA 
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width      Species 
+       "7.9"        "4.4"        "6.9"        "2.5"  "virginica" 
+  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+6          5.4         3.9          1.7         0.4  setosa
+
+    setosa versicolor virginica
+  0      8         42        33
+  1     42          8        17
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> julia</h3>
+<div class="outline-text-3" id="text-7-3">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> DataFrames
+
+<span style="color: #20b2aa; font-weight: bold;">function</span> <span style="color: #00ff7f;">ret01</span>(x,thr)
+    <span style="color: #20b2aa; font-weight: bold;">if</span>(x &gt; thr)
+        <span style="color: #20b2aa; font-weight: bold;">return</span> 1
+    <span style="color: #20b2aa; font-weight: bold;">else</span>
+        <span style="color: #20b2aa; font-weight: bold;">return</span> 0
+    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+
+df = DataFrame(col1=[8,9,10],
+               col2=[1,2,3],
+               col3=[4,5,6],
+               col4=[9,1,2])
+println(df)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">apply</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#27598;&#12395;&#38306;&#25968;&#12434;&#36969;&#29992;</span>
+co = colwise(sum,df)
+println(co)
+<span style="color: #20b2aa; font-weight: bold;">for</span> col <span style="color: #20b2aa; font-weight: bold;">in</span> eachcol(df)
+   println(mean(col[2]))
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#27598;&#12395;&#38306;&#25968;&#12434;&#36969;&#29992;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#27598;&#12391;&#12356;&#12387;&#12410;&#12435;&#12395;&#12399;&#20986;&#26469;&#12394;&#12356;&#12387;&#12413;&#12356;.</span>
+<span style="color: #20b2aa; font-weight: bold;">for</span> row <span style="color: #20b2aa; font-weight: bold;">in</span> eachrow(df)
+   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">mean(Array)</span>
+   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12356;&#12385;&#12356;&#12385;&#22793;&#25563;&#12375;&#12394;&#12356;&#12392;&#12356;&#12369;&#12394;&#12356;&#12398;&#12363;...</span>
+   println(mean(convert(<span style="color: #9370db;">Array</span>,row)))
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12463;&#12525;&#12473;&#38598;&#35336;</span>
+<span style="color: #20b2aa; font-weight: bold;">using</span> RDatasets
+df = dataset(<span style="color: #ffa07a;">"datasets"</span>,<span style="color: #ffa07a;">"iris"</span>)
+println(head(df,5))
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">println(df[Symbol("SepalLength")])</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">julia &#12399; if else &#25991;&#20837;&#12426;&#12398;&#20869;&#21253;&#34920;&#35352;&#12391;&#12365;&#12427;&#12398;&#12363;?</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">SepalWIdth 3 &#20197;&#19979;&#12434; 0, &#12381;&#12428;&#20197;&#22806;&#12399; 1 &#12434;&#20837;&#12428;&#12427;.</span>
+selct = [ ret01(x,3.0) <span style="color: #20b2aa; font-weight: bold;">for</span> x <span style="color: #20b2aa; font-weight: bold;">in</span> df[<span style="color: #9370db;">Symbol</span>(<span style="color: #ffa07a;">"SepalWidth"</span>)]]
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">println(selct)</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">C &#21015;&#12395;&#12487;&#12540;&#12479;&#12434;&#20837;&#12428;&#12427;</span>
+df[<span style="color: #6495ed;">:C</span>]=selct
+println(head(df,5))
+
+<span style="color: #20b2aa; font-weight: bold;">using</span> FreqTables
+cross = freqtable(df, <span style="color: #6495ed;">:C</span>, <span style="color: #6495ed;">:Species</span>)
+println(cross)
+</pre>
+</div>
+
+<pre class="example">
+3×4 DataFrames.DataFrame
+│ Row │ col1 │ col2 │ col3 │ col4 │
+├─────┼──────┼──────┼──────┼──────┤
+│ 1   │ 8    │ 1    │ 4    │ 9    │
+│ 2   │ 9    │ 2    │ 5    │ 1    │
+│ 3   │ 10   │ 3    │ 6    │ 2    │
+Any[[27],[6],[15],[12]]
+9.0
+2.0
+5.0
+4.0
+5.5
+4.25
+5.25
+5×5 DataFrames.DataFrame
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species  │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼──────────┤
+│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ "setosa" │
+│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ "setosa" │
+│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ "setosa" │
+│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ "setosa" │
+│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ "setosa" │
+5×6 DataFrames.DataFrame
+│ Row │ SepalLength │ SepalWidth │ PetalLength │ PetalWidth │ Species  │ C │
+├─────┼─────────────┼────────────┼─────────────┼────────────┼──────────┼───┤
+│ 1   │ 5.1         │ 3.5        │ 1.4         │ 0.2        │ "setosa" │ 1 │
+│ 2   │ 4.9         │ 3.0        │ 1.4         │ 0.2        │ "setosa" │ 0 │
+│ 3   │ 4.7         │ 3.2        │ 1.3         │ 0.2        │ "setosa" │ 1 │
+│ 4   │ 4.6         │ 3.1        │ 1.5         │ 0.2        │ "setosa" │ 1 │
+│ 5   │ 5.0         │ 3.6        │ 1.4         │ 0.2        │ "setosa" │ 1 │
+2×3 Named Array{Int64,2}
+C ╲ Species │     setosa  versicolor   virginica
+────────────┼───────────────────────────────────
+0           │          8          42          33
+1           │         42           8          17
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><span class="section-number-3">7.4</span> まとめ</h3>
+<div class="outline-text-3" id="text-7-4">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">列毎関数適用</th>
+<th scope="col" class="left">行毎関数適用</th>
+<th scope="col" class="left">クロス集計</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">python</td>
+<td class="left">df.apply(func)</td>
+<td class="left">df.apply(func,axis=1)</td>
+<td class="left">pd.crosstab(df.col1, df.col2)</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">sapply(df,func)</td>
+<td class="left">apply(df,1,func)</td>
+<td class="left">table(df$col1,df$col2)</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">apply(df,2,func)</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="left">julia</td>
+<td class="left">colwise(func,df)</td>
+<td class="left">&#xa0;</td>
+<td class="left">freqtable(df,:col1, :col2)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> 参考URL</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+主なものを以下に示す.<br  />
+</p>
+
+<p>
+Introducing Julia/DataFrames - Wikibooks, open books for an open world:<br  />
+<a href="http://bit.ly/2kRXXQC">http://bit.ly/2kRXXQC</a><br  />
+DataFrames : Apply a function by rows - Google グループ:<br  />
+<a href="https://groups.google.com/forum/#!topic/julia-users/q52Sxff5lME">https://groups.google.com/forum/#!topic/julia-users/q52Sxff5lME</a><br  />
+Learn Julia in Y Minutes:<br  />
+<a href="https://learnxinyminutes.com/docs/ja-jp/julia-jp/">https://learnxinyminutes.com/docs/ja-jp/julia-jp/</a><br  />
+データフレーム | Julia の DataFrames:<br  />
+<a href="http://stat.biopapyrus.net/julia/dataframes.html">http://stat.biopapyrus.net/julia/dataframes.html</a><br  />
+10 Minutes to DataFrames.jl - StatsFragments:<br  />
+<a href="http://sinhrks.hatenablog.com/entry/2015/12/23/003321">http://sinhrks.hatenablog.com/entry/2015/12/23/003321</a><br  />
+Vectors, Arrays and Matrices – Quantitative Economics:<br  />
+<a href="https://lectures.quantecon.org/jl/julia_arrays.html">https://lectures.quantecon.org/jl/julia_arrays.html</a><br  />
+Database-Style Joins and Indexing — dataframesjl 0.6.0 documentation<br  />
+<a href="http://dataframesjl.readthedocs.io/en/latest/joins_and_indexing.html">http://dataframesjl.readthedocs.io/en/latest/joins_and_indexing.html</a><br  />
+sort by column doesn't work · Issue #660 · JuliaStats/DataFrames.jl:<br  />
+<a href="https://github.com/JuliaStats/DataFrames.jl/issues/660">https://github.com/JuliaStats/DataFrames.jl/issues/660</a><br  />
+</p>
+
+<p>
+Python(+Pandas), R, Julia(+DataFrames) でのテキストファイルおよび SQLite からの読み込み - Qiita:<br  />
+<a href="http://qiita.com/ngr_t/items/57867de223f741f735b8">http://qiita.com/ngr_t/items/57867de223f741f735b8</a><br  />
+データ分析ライブラリPandasの使い方 - Librabuch:<br  />
+<a href="https://librabuch.jp/blog/2013/12/pandas_python_advent_calendar_2013/">https://librabuch.jp/blog/2013/12/pandas_python_advent_calendar_2013/</a><br  />
+Python pandas の算術演算 / 集約関数 / 統計関数まとめ - StatsFragments:<br  />
+<a href="http://sinhrks.hatenablog.com/entry/2014/11/27/232150">http://sinhrks.hatenablog.com/entry/2014/11/27/232150</a><br  />
+Python pandas データのイテレーションと関数適用、pipe - StatsFragments:<br  />
+<a href="http://sinhrks.hatenablog.com/entry/2015/06/18/221747">http://sinhrks.hatenablog.com/entry/2015/06/18/221747</a><br  />
+python:データ処理tips その3 クロス集計したものをヒートマップで可視化する - MATHGRAM:<br  />
+<a href="http://www.mathgram.xyz/entry/2016/02/28/141510">http://www.mathgram.xyz/entry/2016/02/28/141510</a><br  />
+</p>
+
+<p>
+apply() ファミリー:<br  />
+<a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/24.html">http://cse.naro.affrc.go.jp/takezawa/r-tips/r/24.html</a><br  />
+How can I use the row.names attribute to order the rows of my dataframe in R? - Stack Overflow<br  />
+<a href="http://stackoverflow.com/questions/20295787/how-can-i-use-the-row-names-attribute-to-order-the-rows-of-my-dataframe-in-r">http://stackoverflow.com/questions/20295787/how-can-i-use-the-row-names-attribute-to-order-the-rows-of-my-dataframe-in-r</a><br  />
+r - Sort columns of a dataframe by column name - Stack Overflow<br  />
+<a href="http://stackoverflow.com/questions/7334644/sort-columns-of-a-dataframe-by-column-name">http://stackoverflow.com/questions/7334644/sort-columns-of-a-dataframe-by-column-name</a><br  />
+</p>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-02-07T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-02-07 (Tue)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2017-02-07-DataFrames.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2017-02-07-DataFrames.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2017-01-01-first.html" title="Previous Post: はじめに">&laquo; はじめに</a></li>
+            
+            
+            <li class="next"><a href="/blog/2017-02-09-SQLite3.html" title="Next Post: SQLite3 の様々な言語での利用">SQLite3 の様々な言語での利用 &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2017-02-07-DataFrames.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2017-02-07-DataFrames.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

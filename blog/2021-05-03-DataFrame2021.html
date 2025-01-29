@@ -1,0 +1,3070 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>dataframe の取り扱い [2021 版] - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html">
+  <meta property="og:title" content="dataframe の取り扱い [2021 版] - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2021-05-03T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2021-05-03 (Mon)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        dataframe の取り扱い [2021 版]
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 環境</a></li>
+<li><a href="#sec-2">2. はじめに</a></li>
+<li><a href="#sec-3">3. データ加工</a>
+<ul>
+<li><a href="#sec-3-1">3.1. R</a></li>
+<li><a href="#sec-3-2">3.2. dataframe</a></li>
+<li><a href="#sec-3-3">3.3. tidyverse</a></li>
+<li><a href="#sec-3-4">3.4. Python</a></li>
+<li><a href="#sec-3-5">3.5. pandas</a></li>
+<li><a href="#sec-3-6">3.6. Julia</a></li>
+<li><a href="#sec-3-7">3.7. DataFrams</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. グラフ化</a>
+<ul>
+<li><a href="#sec-4-1">4.1. R</a></li>
+<li><a href="#sec-4-2">4.2. ggplot2(基礎)</a></li>
+<li><a href="#sec-4-3">4.3. ggplot2 による時系列グラフの作成</a></li>
+<li><a href="#sec-4-4">4.4. Python</a></li>
+<li><a href="#sec-4-5">4.5. matplotlib(基礎)</a></li>
+<li><a href="#sec-4-6">4.6. matplotlib による時系列グラフの作成</a></li>
+<li><a href="#sec-4-7">4.7. plotline による時系列グラフの作成</a></li>
+<li><a href="#sec-4-8">4.8. Julia</a></li>
+<li><a href="#sec-4-9">4.9. PyPlot(基礎)</a></li>
+<li><a href="#sec-4-10">4.10. PyPlotによる時系列グラフの作成</a></li>
+<li><a href="#sec-4-11">4.11. RCall(ggplot2)による時系列グラフの作成</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2021-05-03 Mon 19:03&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2021-09-21 Tue 16:52&gt;</span></span><br  />
+</p>
+<p>
+dataframe の取り扱いについて.<br  />
+以前もほとんど同じことやったけど, version が上がって変わった部分もあったりすっかり忘れてる部分もあったりするのでもう一度改めてやってみよう.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 環境</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+計算機環境を書いておこう.<br  />
+いくつかのパソコンでやったので全部書いておく.<br  />
+全部 Mac だけど.<br  />
+</p>
+
+<p>
+環境1<br  />
+  MacBook Air (M1, 2020) メモリ16GB<br  />
+  OS: MacOS Big Sur 11.2.3<br  />
+    python:  miniforge3-4.10 (Python3.9.2)<br  />
+    Julia:   version 1.6.1 (arm 用バイナリが無い)<br  />
+    R:       version 4.0.5 (arm 用バイナリが無い)<br  />
+    ruby:    3.0.1p64<br  />
+    perl:    v5.32.1<br  />
+</p>
+
+<p>
+環境2<br  />
+  iMac(2019) メモリ16GB<br  />
+  OS: MacOS Mojave 10.14.6<br  />
+    python:  anaconda3-2020.11 (Python3.8.5)<br  />
+    Julia:   version 1.5.3<br  />
+    R:       version 4.0.4<br  />
+    ruby:    3.0.1p64<br  />
+    perl:    v5.32.1<br  />
+</p>
+
+<p>
+環境3<br  />
+  MacBook Pro(2019) メモリ32GB<br  />
+  OS: MacOS Catalina 10.15.5<br  />
+    python:  anaconda3-2020.11 (Python3.8.5)<br  />
+    Julia:   version 1.6.1<br  />
+    R:       version 4.0.4<br  />
+    ruby:    3.0.1p64<br  />
+    perl:    v5.32.1<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> はじめに</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+fitbit から心拍数データをとってきた.<br  />
+こんなデータである.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=0, parse_dates=[0])
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(df.head(10))
+</pre>
+</div>
+
+<pre class="example">
+        date           cat         cal   min
+0 2021-02-01  Out_of_Range  1548.62703  1298
+1 2021-02-01      Fat_Burn   350.27367    93
+2 2021-02-01        Cardio   108.05331    15
+3 2021-02-01          Peak     0.00000     0
+4 2021-02-02  Out_of_Range  1436.70932  1209
+5 2021-02-02      Fat_Burn   437.81104    90
+6 2021-02-02        Cardio   177.95100    22
+7 2021-02-02          Peak     9.49072     1
+8 2021-02-03  Out_of_Range  1437.58534  1205
+9 2021-02-03      Fat_Burn   762.53009   162
+</pre>
+
+<p>
+プログラム 2 行目:<br  />
+  pd.read_csv でファイルを読み込む. pd.read_table とほぼ同じ.<br  />
+  区切り文字の default が read_csv のときは ",", read_table のときは "\t"<br  />
+  引数は&#x2026;<br  />
+</p>
+<ul class="org-ul">
+<li>ファイル名<br  />
+</li>
+<li>sep="\t"      # 区切り文字<br  />
+</li>
+<li>header=0      # 列名が書いてある行数(default=0) 列名が無い場合は header=None とする.<br  />
+</li>
+<li>names=('date','cat','cal','min') # のように自分で列名を指定できる<br  />
+</li>
+<li>index_col=0   # 行名がある場合. 行名が書いてある列番号を指定できる.<br  />
+</li>
+<li>usecols=[1,3] # 特定の列だけ読み込む場合(例では 2 列目と 4 列目のみ取り込み)<br  />
+</li>
+</ul>
+
+<p>
+参考:<br  />
+<a href="https://note.nkmk.me/python-pandas-read-csv-tsv/">pandasでcsv/tsvファイル読み込み（read_csv, read_table） | note.nkmk.me</a><br  />
+</p>
+
+<p>
+このデータを, 1 日 1 行にしてグラフ化したい.<br  />
+こんな感じ:<br  />
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="right" />
+
+<col  class="right" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="right">date</th>
+<th scope="col" class="right">out_of_range</th>
+<th scope="col" class="left">fat_burn</th>
+<th scope="col" class="left">cardio</th>
+<th scope="col" class="left">peak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="right">2021-02-01</td>
+<td class="right">1298</td>
+<td class="left">93</td>
+<td class="left">15</td>
+<td class="left">0</td>
+</tr>
+
+<tr>
+<td class="right">2021-02-02</td>
+<td class="right">1209</td>
+<td class="left">&#x2026;</td>
+<td class="left">&#x2026;</td>
+<td class="left">&#x2026;</td>
+</tr>
+
+<tr>
+<td class="right">&#xa0;</td>
+<td class="right">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+このデータを例にして, データをいい感じで加工しつつ簡単なグラフを描くところまでをやってみたい.<br  />
+R, python, Julia, で似たようなことをやるにはどうするかをまとめておく.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> データ加工</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> R</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+R については, 標準の dataframe を使うか tidyverse を使うか, 選択肢が複数ある.<br  />
+tidyverse の方が便利な機能が豊富っぽいが, dataframe しか使えない場合もある.<br  />
+</p>
+
+
+<p>
+参考:<br  />
+<a href="https://heavywatal.github.io/rstats/dplyr.html">dplyr: 高速data.frame処理 - Heavy Watal</a><br  />
+<a href="https://heavywatal.github.io/rstats/tidyr.html">tidyr: シンプルなデータ変形ツール - Heavy Watal</a><br  />
+<a href="http://bcl.sci.yamaguchi-u.ac.jp/~jun/notebook/r/tidyverse/">tidyverse :: Jun Nishii</a><br  />
+<a href="http://www.sudori.info/stat/stat_tidyverse_01.html">須通り_統計_Tidyverseによるデータフレーム加工（01）tidyr</a><br  />
+</p>
+
+<p>
+<a href="http://www.mishou.be/2019/09/17/r-tidyverse%E3%81%AE%E4%B8%96%E7%95%8C%E3%82%92%E4%BD%BF%E3%81%88%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%AA%E3%82%8B/">R: tidyverseをふつうに使えるようになる 1/5 – Think it aloud</a><br  />
+<a href="http://www.mishou.be/2019/09/17/r-tidyverse%E3%82%92%E4%BD%BF%E3%81%88%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%AA%E3%82%8B2-5-ver-1/">R: tidyverseをふつうに使えるようになる（tibbleとdplyr） 2/5 – Think it aloud</a><br  />
+</p>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> dataframe</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+まず普通にデータの読み込み. read.table は read.csv でもよい.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.table(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">2: </span>print(head(df0,5))
+</pre>
+</div>
+
+<pre class="example">
+        date          cat       cal  min
+1 2021-02-01 Out_of_Range 1548.6270 1298
+2 2021-02-01     Fat_Burn  350.2737   93
+3 2021-02-01       Cardio  108.0533   15
+4 2021-02-01         Peak    0.0000    0
+5 2021-02-02 Out_of_Range 1436.7093 1209
+</pre>
+
+<p>
+特定の列を抽出する. 1,2,4 列目だけ使いたい(3 列目(cal) は今回はいらないので削除したい).<br  />
+R の配列は 1 から始まる(1-based).<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">3: </span>print(head(df,5))
+</pre>
+</div>
+
+<pre class="example">
+        date          cat  min
+1 2021-02-01 Out_of_Range 1298
+2 2021-02-01     Fat_Burn   93
+3 2021-02-01       Cardio   15
+4 2021-02-01         Peak    0
+5 2021-02-02 Out_of_Range 1209
+</pre>
+
+<p>
+cat 列が "Out_of_Range" の行のみを取り出してみよう.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">3: </span>dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == <span style="color: #ffa07a;">"Out_of_Range"</span>,]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26465;&#20214;&#12434;&#28288;&#12383;&#12377;&#34892;&#12434;&#25277;&#20986;</span>
+<span class="linenr">4: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+         date          cat  min
+1  2021-02-01 Out_of_Range 1298
+5  2021-02-02 Out_of_Range 1209
+9  2021-02-03 Out_of_Range 1205
+13 2021-02-04 Out_of_Range 1255
+17 2021-02-05 Out_of_Range 1289
+</pre>
+
+<p>
+cat 列は全部同じ値なので要らないか.<br  />
+df[,c(1,3)] で 1列目と3列目がとれる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">3: </span>dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == <span style="color: #ffa07a;">"Out_of_Range"</span>,c(1,3)]
+<span class="linenr">4: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+         date  min
+1  2021-02-01 1298
+5  2021-02-02 1209
+9  2021-02-03 1205
+13 2021-02-04 1255
+17 2021-02-05 1289
+</pre>
+
+
+<p>
+min 列の名前を Out_of_Range に変えたい.<br  />
+</p>
+
+<p>
+参考:<br  />
+列名の変更: <a href="http://tips-r.blogspot.com/2018/02/r.html">Rのデータフレームで、列名指定で列名の一部を変更する方法 - Rプログラミングの小ネタ</a><br  />
+</p>
+
+<p>
+names(df) で列名がとれるのでこれを使う.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">3: </span>dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == <span style="color: #ffa07a;">"Out_of_Range"</span>,c(1,3)]
+<span class="linenr">4: </span>names(dfo)[2] <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">"Out_of_Range"</span>      <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#21517;&#12398;&#22793;&#26356;</span>
+<span class="linenr">5: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+         date Out_of_Range
+1  2021-02-01         1298
+5  2021-02-02         1209
+9  2021-02-03         1205
+13 2021-02-04         1255
+17 2021-02-05         1289
+</pre>
+
+<p>
+Out_of_Range だけでなく, Fat_Burn, Cardio, Peak の各カテゴリについても同じことをやってみる.<br  />
+for 文を使う.<br  />
+</p>
+
+<p>
+参考:  <a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/30.html">繰り返し文</a><br  />
+</p>
+
+<p>
+データフレームの配列を作るには, 以下のようにする.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>array <span style="color: #1e90ff;">&lt;-</span> list()   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">c() &#12391;&#12418;&#12424;&#12356;.</span>
+<span class="linenr">2: </span>array <span style="color: #1e90ff;">&lt;-</span> append(array, list(add_ele))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">list(add_ele) &#12395;&#12375;&#12394;&#12356;&#12392; "&#12487;&#12540;&#12479;&#12501;&#12524;&#12540;&#12512;&#12398;&#37197;&#21015;" &#12395;&#12399;&#12394;&#12425;&#12394;&#12356;&#28857;&#65281;&#65281;</span>
+</pre>
+</div>
+
+<p>
+参考:<br  />
+   <a href="https://teratail.com/questions/197546">Python - Rでデータフレーム の配列を作りたい｜teratail</a><br  />
+   <a href="https://stackoverflow.com/questions/28687806/a-better-way-to-push-and-pop-to-from-lists-in-r">A better way to push and pop to/from lists in R? - Stack Overflow</a><br  />
+   <a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/23.html">リスト</a><br  />
+   <a href="http://takenaka-akio.org/doc/r_auto/list.html">Rプログラム (TAKENAKA's Web Page)</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr"> 2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 3: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>,<span style="color: #ffa07a;">"Fat_Burn"</span>,<span style="color: #ffa07a;">"Cardio"</span>,<span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (cat <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 6: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == cat,c(1,3)]
+<span class="linenr"> 7: </span>    names(dfo)[2] <span style="color: #1e90ff;">&lt;-</span> cat
+<span class="linenr"> 8: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr"> 9: </span>}
+<span class="linenr">10: </span>print(head(adf[[2]],5))   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">adf[[1]] &#20108;&#37325;&#12395;&#12363;&#12387;&#12371;&#12434;&#20184;&#12369;&#12427;&#24517;&#35201;&#12354;&#12426;</span>
+</pre>
+</div>
+
+<pre class="example">
+         date Fat_Burn
+2  2021-02-01       93
+6  2021-02-02       90
+10 2021-02-03      162
+14 2021-02-04      134
+18 2021-02-05      114
+</pre>
+
+<p>
+ここまでで, 表が何個かできた.<br  />
+date で merge して一つの表にしたい.<br  />
+list の最初の要素を取り出すときは以下のように２ステップ必要(めんどくさい)<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>mdf <span style="color: #1e90ff;">&lt;-</span> adf[  1 ]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">shift(@adf) &#12391;&#26368;&#21021;&#12398;&#35201;&#32032;&#12434;&#21462;&#12426;&#20986;&#12377;&#37096;&#20998;</span>
+<span class="linenr">2: </span>adf <span style="color: #1e90ff;">&lt;-</span> adf[ -1 ]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">shift(@adf) &#26368;&#21021;&#12398;&#35201;&#32032;&#12434;&#21066;&#38500;&#12377;&#12427;&#37096;&#20998;</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr"> 2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 3: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>,<span style="color: #ffa07a;">"Fat_Burn"</span>,<span style="color: #ffa07a;">"Cardio"</span>,<span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (cat <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 6: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == cat,c(1,3)]
+<span class="linenr"> 7: </span>    names(dfo)[2] <span style="color: #1e90ff;">&lt;-</span> cat
+<span class="linenr"> 8: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr"> 9: </span>}
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">shift(@adf)</span>
+<span class="linenr">11: </span>mdf <span style="color: #1e90ff;">&lt;-</span> adf[1]      <span style="color: #cd853f;"># </span><span style="color: #cd853f;">Out_of_Range</span>
+<span class="linenr">12: </span>adf <span style="color: #1e90ff;">&lt;-</span> adf[-1]     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">Fat_Burn, Cardio, Peak</span>
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (ndf <span style="color: #20b2aa; font-weight: bold;">in</span> adf) {
+<span class="linenr">14: </span>    mdf <span style="color: #1e90ff;">&lt;-</span> merge(mdf, ndf, by=<span style="color: #ffa07a;">"date"</span>)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34920;&#12398; merge</span>
+<span class="linenr">15: </span>}
+<span class="linenr">16: </span>print(head(mdf,5))
+</pre>
+</div>
+
+<pre class="example">
+        date Out_of_Range Fat_Burn Cardio Peak
+1 2021-02-01         1298       93     15    0
+2 2021-02-02         1209       90     22    1
+3 2021-02-03         1205      162     14    0
+4 2021-02-04         1255      134      5    2
+5 2021-02-05         1289      114      6    0
+</pre>
+
+<p>
+これと同じことは Reduce 関数を使ってもできるようだ.<br  />
+Reduce 関数とは？<br  />
+こんな感じで動くものらしい.<br  />
+</p>
+
+<p>
+Reduce(関数(a,b), 配列) &#x2013;&gt; x = 関数(配列要素(1), 配列要素(2)) を計算 &#x2013;&gt; y = 関数(x, 配列要素(3)) &#x2013;&gt; z = 関数(y, 配列要素(4)) &#x2026;<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://qiita.com/stkdev/items/16099f6e35b98ae62389">Reduce関数活用例:福利計算シミュレーション</a><br  />
+Reduce 関数:<br  />
+  Reduce(関数, リスト)<br  />
+  関数は, ２つの引数をとる.<br  />
+</p>
+
+<p>
+例:<br  />
+  x &lt;- Reduce(function(a,b) { a+b }, c(1,2,5,7))<br  />
+</p>
+
+<p>
+プログラムの動きの解説:<br  />
+  まず a に 1, b に 2 を入れる.<br  />
+  a + b を計算. 3 になる.<br  />
+  a に 3, b に 5 を入れる.<br  />
+  a + b を計算. 8 になる.<br  />
+  a に 8, b に 7 を入れる.<br  />
+  a + b を計算. 15 になる.<br  />
+  x に 15 が入る.<br  />
+  はず.<br  />
+</p>
+
+<p>
+実際にやってみる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>data <span style="color: #1e90ff;">&lt;-</span> c(1,2,5,7)
+<span class="linenr">2: </span>x <span style="color: #1e90ff;">&lt;-</span> Reduce(<span style="color: #20b2aa; font-weight: bold;">function</span>(a,b) { a+b }, data)
+<span class="linenr">3: </span>x
+</pre>
+</div>
+
+<pre class="example">
+[1] 15
+</pre>
+
+<p>
+Reduce を使って merge してみる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr"> 2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 3: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>,<span style="color: #ffa07a;">"Fat_Burn"</span>,<span style="color: #ffa07a;">"Cardio"</span>,<span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (cat <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 6: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == cat,c(1,3)]
+<span class="linenr"> 7: </span>    names(dfo)[2] <span style="color: #1e90ff;">&lt;-</span> cat
+<span class="linenr"> 8: </span>    <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(head(dfo,5))</span>
+<span class="linenr"> 9: </span>    <span style="color: #cd853f;">#</span><span style="color: #cd853f;">adf[length(adf)+1] &lt;- dfo</span>
+<span class="linenr">10: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr">11: </span>}
+<span class="linenr">12: </span>mdf <span style="color: #1e90ff;">&lt;-</span> Reduce(<span style="color: #20b2aa; font-weight: bold;">function</span>(d1,d2) merge(d1,d2,by=<span style="color: #ffa07a;">"date"</span>), adf)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- &#12371;&#12371;</span>
+<span class="linenr">13: </span>print(head(mdf,5))
+</pre>
+</div>
+
+<pre class="example">
+        date Out_of_Range Fat_Burn Cardio Peak
+1 2021-02-01         1298       93     15    0
+2 2021-02-02         1209       90     22    1
+3 2021-02-03         1205      162     14    0
+4 2021-02-04         1255      134      5    2
+5 2021-02-05         1289      114      6    0
+</pre>
+
+<p>
+(omake)<br  />
+ついでに Reduce 系関数をいくつか調査.<br  />
+</p>
+
+<p>
+apply:<br  />
+  行ごと, 列ごとに関数を適用して結果を返す.<br  />
+  apply(行列データ, 行ごと(1)or列ごと(2), 関数(ベクトルを引数にとるもの), 関数のその他のオプション)<br  />
+  以下の参考ページが図もあってわかりやすい.<br  />
+  <a href="http://takenaka-akio.org/doc/r_auto/chapter_07_apply.html">Rプログラム (TAKENAKA's Web Page)</a><br  />
+</p>
+
+<p>
+apply 系関数の説明<br  />
+<a href="https://heavywatal.github.io/rstats/purrr.html">purrr: ループ処理やapply系関数の決定版 - Heavy Watal</a><br  />
+</p>
+
+<p>
+join の種類についてのわかりやすい説明<br  />
+<a href="https://qiita.com/matsuou1/items/b1bd9778610e3a586e71">dplyrを使いこなす！JOIN編 - Qiita</a><br  />
+<a href="http://www.sudori.info/stat/stat_tidyverse_02.html#join">須通り_統計_Tidyverseによるデータフレーム加工（02）dplyr_join による複数データフレームの結合／欠損値補完／ルックアップ</a><br  />
+<a href="https://kazutan.github.io/kazutanR/hands_on_170730/join.html">データの結合 - *_join関数</a><br  />
+</p>
+
+<p>
+最後は書き出し. write.csv() を使う.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=<span style="color: #9370db;">TRUE</span>, sep=<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr"> 2: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 3: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>,<span style="color: #ffa07a;">"Fat_Burn"</span>,<span style="color: #ffa07a;">"Cardio"</span>,<span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (cat <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 6: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> df[df$cat == cat,c(1,3)]
+<span class="linenr"> 7: </span>    names(dfo)[2] <span style="color: #1e90ff;">&lt;-</span> cat
+<span class="linenr"> 8: </span>    <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(head(dfo,5))</span>
+<span class="linenr"> 9: </span>    <span style="color: #cd853f;">#</span><span style="color: #cd853f;">adf[length(adf)+1] &lt;- dfo</span>
+<span class="linenr">10: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr">11: </span>}
+<span class="linenr">12: </span>mdf <span style="color: #1e90ff;">&lt;-</span> Reduce(<span style="color: #20b2aa; font-weight: bold;">function</span>(d1,d2) merge(d1,d2,by=<span style="color: #ffa07a;">"date"</span>), adf)
+<span class="linenr">13: </span>write.csv(mdf,<span style="color: #ffa07a;">"data/r.csv"</span>, quote=<span style="color: #9370db;">FALSE</span>, row.names=<span style="color: #9370db;">FALSE</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> tidyverse</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+データの読み込みは read_delim(file, delim, &#x2026;)<br  />
+read_tsv(file) でもよい.<br  />
+</p>
+
+<p>
+参考<br  />
+<a href="https://heavywatal.github.io/rstats/readr.html">readr - 高速で柔軟なテーブル読み込み</a><br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_delim(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">3: </span>print(head(df0,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 4
+  date       cat            cal   min
+  &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt;
+1 2021-02-01 Out_of_Range 1549.  1298
+2 2021-02-01 Fat_Burn      350.    93
+3 2021-02-01 Cardio        108.    15
+4 2021-02-01 Peak            0      0
+5 2021-02-02 Out_of_Range 1437.  1209
+</pre>
+
+<p>
+列ごとの型情報も入っているようだ.<br  />
+</p>
+
+<p>
+特定の列を抽出する<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- dataframe &#12392;&#21516;&#12376;&#12391;&#12356;&#12369;&#12427;</span>
+<span class="linenr">4: </span>print(head(df,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 3
+  date       cat            min
+  &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt;
+1 2021-02-01 Out_of_Range  1298
+2 2021-02-01 Fat_Burn        93
+3 2021-02-01 Cardio          15
+4 2021-02-01 Peak             0
+5 2021-02-02 Out_of_Range  1209
+</pre>
+
+<p>
+cat ＝＝ "Out_of_Range" の行を取り出す<br  />
+filter(df, cat＝＝"Out_of_Range") を使う.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">4: </span>dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==<span style="color: #ffa07a;">"Out_of_Range"</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- cat &#21015;&#12364; "Out_of_Range" &#12398;&#12418;&#12398;&#12398;&#12415;&#25277;&#20986;</span>
+<span class="linenr">5: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 3
+  date       cat            min
+  &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt;
+1 2021-02-01 Out_of_Range  1298
+2 2021-02-02 Out_of_Range  1209
+3 2021-02-03 Out_of_Range  1205
+4 2021-02-04 Out_of_Range  1255
+5 2021-02-05 Out_of_Range  1289
+</pre>
+
+<p>
+cat 列はいらない. 1列目, 3列目のみを取り出したい.<br  />
+tidyverse では, パイプ %&gt;% を使って以下の様にも書けるようだ.<br  />
+df %&gt;% select(date,min)  # df から date, min 列だけ取り出す場合.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">4: </span>dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==<span style="color: #ffa07a;">"Out_of_Range"</span>) <span style="color: #1e90ff;">%&gt;%</span> select(date,min) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- date, min &#21015;&#12384;&#12369;&#21462;&#12426;&#20986;&#12377;.</span>
+<span class="linenr">5: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 2
+  date         min
+  &lt;date&gt;     &lt;dbl&gt;
+1 2021-02-01  1298
+2 2021-02-02  1209
+3 2021-02-03  1205
+4 2021-02-04  1255
+5 2021-02-05  1289
+</pre>
+
+<p>
+dataframe と同じようにも書ける.<br  />
+普通に 1,3 列目だけ取り出す, という書き方もできる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">4: </span>dfo0 <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==<span style="color: #ffa07a;">"Out_of_Range"</span>)
+<span class="linenr">5: </span>dfo <span style="color: #1e90ff;">&lt;-</span> dfo0[,c(1,3)]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- 1,3 &#21015;&#30446;&#12384;&#12369;</span>
+<span class="linenr">6: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 2
+  date         min
+  &lt;date&gt;     &lt;dbl&gt;
+1 2021-02-01  1298
+2 2021-02-02  1209
+3 2021-02-03  1205
+4 2021-02-04  1255
+5 2021-02-05  1289
+</pre>
+
+<p>
+列名の変更<br  />
+tidyverse では<br  />
+new_df &lt;- rename(df, 新しい列名 = 古い列名)<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://indenkun.hatenablog.com/entry/2020/06/21/003000">Rでdplyrをつかって任意の列の列名を変更する方法 - 備忘ログ</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr">4: </span>dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==<span style="color: #ffa07a;">"Out_of_Range"</span>) <span style="color: #1e90ff;">%&gt;%</span> select(date,min) <span style="color: #1e90ff;">%&gt;%</span> rename(Out_of_Range = min)
+<span class="linenr">5: </span>print(head(dfo,5))
+</pre>
+</div>
+
+<p>
+tidyvers はパイプ %&gt;% で繋げていけるので慣れれば書きやすい. 結構楽しいかも.<br  />
+df %&gt;% 関数(x,y,z,&#x2026;)  は 関数(df, x,y,z&#x2026;) と同じ意味.<br  />
+</p>
+
+<p>
+Out_of_Range だけでなく全部のカテゴリについてやる.<br  />
+先程と同様, for 文を使おう.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://qiita.com/sasaki_K_sasaki/items/bdd3d12546e15ee31a55">【R】dplyr rename()の中で変数を使う - Qiita</a><br  />
+</p>
+
+<p>
+列名変更の rename だが&#x2026;<br  />
+rename の中で変数を使う場合は, rename(!!変数 := 前の列名)  とする必要あり. &lt;&#x2013; 注意<br  />
+うーん以外とめんどくさい.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr"> 2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr"> 3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>, <span style="color: #ffa07a;">"Fat_Burn"</span>, <span style="color: #ffa07a;">"Cardio"</span>, <span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (x <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 7: </span>    <span style="color: #cd853f;">#</span><span style="color: #cd853f;">dfo &lt;- filter(df, cat==x) %&gt;% select(date,min) %&gt;% rename(x = min) # &#12371;&#12428;&#12384;&#12392; x &#12392;&#12356;&#12358;&#25991;&#23383;&#21015;&#12364;&#20837;&#12387;&#12390;&#12375;&#12414;&#12358;.</span>
+<span class="linenr"> 8: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==x) <span style="color: #1e90ff;">%&gt;%</span> select(date,min) <span style="color: #1e90ff;">%&gt;%</span> rename(!!x := min)
+<span class="linenr"> 9: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr">10: </span>}
+<span class="linenr">11: </span>print(head(adf[[2]],5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 2
+  date       Fat_Burn
+  &lt;date&gt;        &lt;dbl&gt;
+1 2021-02-01       93
+2 2021-02-02       90
+3 2021-02-03      162
+4 2021-02-04      134
+5 2021-02-05      114
+</pre>
+
+<p>
+date で merge して一つの表にする.<br  />
+ここは dataframe と同じでいける.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr"> 2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr"> 3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>, <span style="color: #ffa07a;">"Fat_Burn"</span>, <span style="color: #ffa07a;">"Cardio"</span>, <span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (x <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 7: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==x) <span style="color: #1e90ff;">%&gt;%</span> select(date,min) <span style="color: #1e90ff;">%&gt;%</span> rename(!!x := min)
+<span class="linenr"> 8: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr"> 9: </span>}
+<span class="linenr">10: </span>mdf <span style="color: #1e90ff;">&lt;-</span> adf[[1]]
+<span class="linenr">11: </span>adf <span style="color: #1e90ff;">&lt;-</span> adf[-1]
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (ndf <span style="color: #20b2aa; font-weight: bold;">in</span> adf) {
+<span class="linenr">13: </span>    mdf <span style="color: #1e90ff;">&lt;-</span> full_join(mdf, ndf, by=<span style="color: #ffa07a;">"date"</span>)
+<span class="linenr">14: </span>}
+<span class="linenr">15: </span>print(head(mdf,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 5
+  date       Out_of_Range Fat_Burn Cardio  Peak
+  &lt;date&gt;            &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+1 2021-02-01         1298       93     15     0
+2 2021-02-02         1209       90     22     1
+3 2021-02-03         1205      162     14     0
+4 2021-02-04         1255      134      5     2
+5 2021-02-05         1289      114      6     0
+</pre>
+
+
+<p>
+色々調べてたら, データフレームのリストをまとめて join する方法をみつけた！！<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://stackoverflow.com/questions/8091303/simultaneously-merge-multiple-data-frames-in-a-list">r - Simultaneously merge multiple data.frames in a list - Stack Overflow</a><br  />
+</p>
+
+<p>
+list_of_df %&gt;% reduce(full_join, by="date") こんな感じで書くといけるらしい.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr"> 2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr"> 3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>, <span style="color: #ffa07a;">"Fat_Burn"</span>, <span style="color: #ffa07a;">"Cardio"</span>, <span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (x <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 7: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==x) <span style="color: #1e90ff;">%&gt;%</span> select(date,min) <span style="color: #1e90ff;">%&gt;%</span> rename(!!x := min)
+<span class="linenr"> 8: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr"> 9: </span>}
+<span class="linenr">10: </span>mdf <span style="color: #1e90ff;">&lt;-</span> adf <span style="color: #1e90ff;">%&gt;%</span> reduce(full_join, by=<span style="color: #ffa07a;">"date"</span>)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- &#12371;&#12371;</span>
+<span class="linenr">11: </span>print(head(mdf,5))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 5 x 5
+  date       Out_of_Range Fat_Burn Cardio  Peak
+  &lt;date&gt;            &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+1 2021-02-01         1298       93     15     0
+2 2021-02-02         1209       90     22     1
+3 2021-02-03         1205      162     14     0
+4 2021-02-04         1255      134      5     2
+5 2021-02-05         1289      114      6     0
+</pre>
+
+<p>
+write_csv を使って csv 形式に書き出す.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr"> 2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr"> 3: </span>df <span style="color: #1e90ff;">&lt;-</span> df0[,c(1,2,4)]
+<span class="linenr"> 4: </span>cats <span style="color: #1e90ff;">&lt;-</span> c(<span style="color: #ffa07a;">"Out_of_Range"</span>, <span style="color: #ffa07a;">"Fat_Burn"</span>, <span style="color: #ffa07a;">"Cardio"</span>, <span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span>adf <span style="color: #1e90ff;">&lt;-</span> list()
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (x <span style="color: #20b2aa; font-weight: bold;">in</span> cats) {
+<span class="linenr"> 7: </span>    dfo <span style="color: #1e90ff;">&lt;-</span> filter(df, cat==x) <span style="color: #1e90ff;">%&gt;%</span> select(date,min) <span style="color: #1e90ff;">%&gt;%</span> rename(!!x := min)
+<span class="linenr"> 8: </span>    adf <span style="color: #1e90ff;">&lt;-</span> append(adf,list(dfo))
+<span class="linenr"> 9: </span>}
+<span class="linenr">10: </span>mdf <span style="color: #1e90ff;">&lt;-</span> adf <span style="color: #1e90ff;">%&gt;%</span> reduce(full_join, by=<span style="color: #ffa07a;">"date"</span>)
+<span class="linenr">11: </span>write_csv(mdf,<span style="color: #ffa07a;">"data/rv.csv"</span>)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Python</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+Python では pandas を使ってみる.<br  />
+</p>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> pandas</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+まずデータを普通に読み込み.<br  />
+0 列目は日付として読み込み.<br  />
+2 列目(0-based) は使わないので削除する.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://note.nkmk.me/python-pandas-read-csv-tsv/">pandasでcsv/tsvファイル読み込み（read_csv, read_table） | note.nkmk.me</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'data/heart_beats_summary_2021-02.data'</span>,sep=<span style="color: #ffa07a;">'\t'</span>, header=0, parse_dates=[0])
+<span class="linenr">3: </span><span style="color: #9acd32;">df2</span> = df.iloc[:,[0,1,3]]
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(df2.head(5))
+</pre>
+</div>
+
+<pre class="example">
+        date           cat   min
+0 2021-02-01  Out_of_Range  1298
+1 2021-02-01      Fat_Burn    93
+2 2021-02-01        Cardio    15
+3 2021-02-01          Peak     0
+4 2021-02-02  Out_of_Range  1209
+</pre>
+
+<p>
+プログラム2 行目:<br  />
+read_csv で表敬式データを読み込み.<br  />
+tab 区切りなら read_table("foo.tsv") で良い.<br  />
+</p>
+<ul class="org-ul">
+<li>header=0 は 0 行目(最初の行)が column 名の場合.<br  />
+</li>
+<li>column 名がない場合は header=None とする.<br  />
+</li>
+<li>read_csv("foo.tsv", names=("A","B","C","D")) &#x2013;&gt; column 名を A, B, C, D として読み込む.<br  />
+</li>
+<li>parse_dates= は 0 列目が日付として扱われることを示す.<br  />
+</li>
+</ul>
+
+<p>
+プログラム 3 行目:<br  />
+位置の指定方法をここでまとめておく(多分覚えられないけど&#x2026;).<br  />
+</p>
+<ul class="org-ul">
+<li>at,  loc は, 行名,  列名   を指定して値を得る.<br  />
+</li>
+<li>iat, iloc は, 行番号,列番号 を指定して値を得る.<br  />
+</li>
+</ul>
+<p>
+取得データについて.<br  />
+</p>
+<ul class="org-ul">
+<li>at,  iat  は単独の要素の値を取得する際に使う.<br  />
+</li>
+<li>loc, iloc は複数の要素の値<br  />
+<ul class="org-ul">
+<li>複数の要素指定では, リスト [0,1,3] 及びスライス start:stop:step が使える.<br  />
+</li>
+<li>： あるいは ：： で全部という意味になる.<br  />
+</li>
+</ul>
+</li>
+</ul>
+
+<p>
+参考:<br  />
+<a href="https://note.nkmk.me/python-pandas-at-iat-loc-iloc/">pandasで任意の位置の値を取得・変更するat, iat, loc, iloc | note.nkmk.me</a><br  />
+</p>
+
+<p>
+データ取り出しをやってみる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0])
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(df.iat[0,1])    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">0 &#34892; 1 &#21015;&#30446;(0-based)&#12398;&#20516;</span>
+<span class="linenr">4: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(df.iloc[::,2])</span>
+<span class="linenr">5: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(df.iloc[: ,2].head(5))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20840;&#34892; 2&#21015;&#30446;(0-based)</span>
+</pre>
+</div>
+
+<pre class="example">
+Out_of_Range
+0    1548.62703
+1     350.27367
+2     108.05331
+3       0.00000
+4    1436.70932
+Name: cal, dtype: float64
+</pre>
+
+<p>
+usecols を使うと, 要らない行は最初から読み込まない.<br  />
+usecols=[0,1,3] で 2 列目(Python の配列番号は 0 から始まる 0-based)を読み込まない.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(df.head(5))
+</pre>
+</div>
+
+<pre class="example">
+        date           cat   min
+0 2021-02-01  Out_of_Range  1298
+1 2021-02-01      Fat_Burn    93
+2 2021-02-01        Cardio    15
+3 2021-02-01          Peak     0
+4 2021-02-02  Out_of_Range  1209
+</pre>
+
+<p>
+ここから表をバラバラにして再構成する.<br  />
+まずは cat 列 ＝＝ 'Out_of_Range' のデータを取り出す.<br  />
+df[df['cat'] ＝＝'Out_of_Range'] &lt;&#x2013; こんな感じで取り出せる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">3: </span><span style="color: #9acd32;">dfo</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Out_of_Range'</span>]
+<span class="linenr">4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfo = df[df.iloc[:,1]=='Out_of_Range']</span>
+<span class="linenr">5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfo = df[df.loc[:,'cat']=='Out_of_Range']</span>
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dfo.head(5))
+</pre>
+</div>
+
+<pre class="example">
+         date           cat   min
+0  2021-02-01  Out_of_Range  1298
+4  2021-02-02  Out_of_Range  1209
+8  2021-02-03  Out_of_Range  1205
+12 2021-02-04  Out_of_Range  1255
+16 2021-02-05  Out_of_Range  1289
+</pre>
+
+<p>
+列 cat ＝＝ 'Out_of_Range' である行を取り出す方法はいくつかあった. これ以外にもあるかもしれん.<br  />
+  df[df['cat']       ＝＝ 'Out_of_Range']  &lt;&#x2013; これが上で使ったやつ.<br  />
+  df[df.iloc[:,1]    ＝＝ 'Out_of_Range']<br  />
+  df[df.loc[:,'cat'] ＝＝ 'Out_of_Range']<br  />
+</p>
+
+<p>
+cat 列はここでは要らないなぁ. 全部同じ値だし. 消すにはどーすればいいんだろうか.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">3: </span><span style="color: #9acd32;">dfo</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Out_of_Range'</span>].iloc[:,[0,2]]
+<span class="linenr">4: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">dfo = df[df.iloc[:,1]=='Out_of_Range'].iloc[:,[0,2]]</span>
+<span class="linenr">5: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">dfo = df[df.loc[:,'cat']=='Out_of_Range'].loc[:,['date','min']]  # loc &#12391;&#12418;&#20986;&#26469;&#12427;.</span>
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dfo.head(5))
+</pre>
+</div>
+
+<pre class="example">
+         date   min
+0  2021-02-01  1298
+4  2021-02-02  1209
+8  2021-02-03  1205
+12 2021-02-04  1255
+16 2021-02-05  1289
+</pre>
+
+<p>
+プログラム 3 行目:<br  />
+ df.iloc[:,[0,2]] で df の [0,2] 列目(0-based) のみを取り出す.<br  />
+</p>
+
+<p>
+min 列の名前を Out_of_Range としたい.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">3: </span><span style="color: #9acd32;">dfo</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Out_of_Range'</span>].iloc[:,[0,2]]
+<span class="linenr">4: </span><span style="color: #9acd32;">dfo.columns</span> = [<span style="color: #ffa07a;">'date'</span>,<span style="color: #ffa07a;">'Out_of_Range'</span>]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">column &#21517;&#12434;&#25351;&#23450;&#12375;&#30452;&#12375;</span>
+<span class="linenr">5: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dfo.head(5))
+</pre>
+</div>
+
+<pre class="example">
+         date  Out_of_Range
+0  2021-02-01          1298
+4  2021-02-02          1209
+8  2021-02-03          1205
+12 2021-02-04          1255
+16 2021-02-05          1289
+</pre>
+
+<p>
+全部の cat に対して同じことをやる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr"> 3: </span><span style="color: #9acd32;">dfo</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Out_of_Range'</span>].iloc[:,[0,2]]
+<span class="linenr"> 4: </span><span style="color: #9acd32;">dff</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Fat_Burn'</span>].iloc[:,[0,2]]
+<span class="linenr"> 5: </span><span style="color: #9acd32;">dfc</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Cardio'</span>].iloc[:,[0,2]]
+<span class="linenr"> 6: </span><span style="color: #9acd32;">dfp</span> = df[df[<span style="color: #ffa07a;">'cat'</span>]==<span style="color: #ffa07a;">'Peak'</span>].iloc[:,[0,2]]
+<span class="linenr"> 7: </span><span style="color: #9acd32;">dfo.columns</span> = [<span style="color: #ffa07a;">'date'</span>,<span style="color: #ffa07a;">'Out_of_Range'</span>]
+<span class="linenr"> 8: </span><span style="color: #9acd32;">dff.columns</span> = [<span style="color: #ffa07a;">'date'</span>,<span style="color: #ffa07a;">'Fat_Burn'</span>]
+<span class="linenr"> 9: </span><span style="color: #9acd32;">dfc.columns</span> = [<span style="color: #ffa07a;">'date'</span>,<span style="color: #ffa07a;">'Cardio'</span>]
+<span class="linenr">10: </span><span style="color: #9acd32;">dfp.columns</span> = [<span style="color: #ffa07a;">'date'</span>,<span style="color: #ffa07a;">'Peak'</span>]
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dfo.head(3))
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dff.head(3))
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dfc.head(3))
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dfp.head(3))
+</pre>
+</div>
+
+<pre class="example">
+        date  Out_of_Range
+0 2021-02-01          1298
+4 2021-02-02          1209
+8 2021-02-03          1205
+        date  Fat_Burn
+1 2021-02-01        93
+5 2021-02-02        90
+9 2021-02-03       162
+         date  Cardio
+2  2021-02-01      15
+6  2021-02-02      22
+10 2021-02-03      14
+         date  Peak
+3  2021-02-01     0
+7  2021-02-02     1
+11 2021-02-03     0
+</pre>
+
+<p>
+似たような文なので for 文でまとめてしまおう.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">3: </span><span style="color: #9acd32;">adf</span> =[]
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">for</span> cat <span style="color: #20b2aa; font-weight: bold;">in</span> (<span style="color: #ffa07a;">'Out_of_Range'</span>,<span style="color: #ffa07a;">'Fat_Burn'</span>,<span style="color: #ffa07a;">'Cardio'</span>,<span style="color: #ffa07a;">'Peak'</span>):
+<span class="linenr">5: </span>    <span style="color: #9acd32;">dfx</span> = df[df[<span style="color: #ffa07a;">'cat'</span>] == cat].iloc[:,[0,2]]
+<span class="linenr">6: </span>    <span style="color: #9acd32;">dfx.columns</span> = [<span style="color: #ffa07a;">'date'</span>,cat]
+<span class="linenr">7: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(dfx.head(3))
+<span class="linenr">8: </span>    adf.append(dfx)
+</pre>
+</div>
+
+<pre class="example">
+        date  Out_of_Range
+0 2021-02-01          1298
+4 2021-02-02          1209
+8 2021-02-03          1205
+        date  Fat_Burn
+1 2021-02-01        93
+5 2021-02-02        90
+9 2021-02-03       162
+         date  Cardio
+2  2021-02-01      15
+6  2021-02-02      22
+10 2021-02-03      14
+         date  Peak
+3  2021-02-01     0
+7  2021-02-02     1
+11 2021-02-03     0
+</pre>
+
+<p>
+日付 (date) をキーにして merge して一つの表にする.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #9acd32;">df3</span> = df1.merge(df2, on=<span style="color: #ffa07a;">'date'</span>)  &lt;-- df1 &#12392; df2 &#12434; date &#21015;&#12391; merge &#12375;&#12390; df3 &#12395;&#26684;&#32013;
+</pre>
+</div>
+
+<p>
+参考:<br  />
+<a href="https://note.nkmk.me/python-pandas-merge-join/">pandas.DataFrameを結合するmerge, join（列・インデックス基準） | note.nkmk.me</a><br  />
+<a href="https://hydrocul.github.io/wiki/programming_languages_diff/list/shift.html">配列(リスト)の先頭の要素を削除するには (shift) | hydroculのメモ</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr"> 3: </span><span style="color: #9acd32;">adf</span> =[]
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">for</span> cat <span style="color: #20b2aa; font-weight: bold;">in</span> (<span style="color: #ffa07a;">'Out_of_Range'</span>,<span style="color: #ffa07a;">'Fat_Burn'</span>,<span style="color: #ffa07a;">'Cardio'</span>,<span style="color: #ffa07a;">'Peak'</span>):
+<span class="linenr"> 5: </span>    <span style="color: #9acd32;">dfx</span> = df[df[<span style="color: #ffa07a;">'cat'</span>] == cat].iloc[:,[0,2]]
+<span class="linenr"> 6: </span>    <span style="color: #9acd32;">dfx.columns</span> = [<span style="color: #ffa07a;">'date'</span>,cat]
+<span class="linenr"> 7: </span>    adf.append(dfx)
+<span class="linenr"> 8: </span><span style="color: #9acd32;">mdf</span> = adf.pop(0)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20808;&#38957;&#12398;&#35201;&#32032;&#12434;&#21462;&#12426;&#20986;&#12375;.</span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">for</span> d <span style="color: #20b2aa; font-weight: bold;">in</span> adf:
+<span class="linenr">10: </span>    <span style="color: #9acd32;">mdf</span> = mdf.merge(d,on=<span style="color: #ffa07a;">'date'</span>)
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(mdf.head(5))
+</pre>
+</div>
+
+<pre class="example">
+        date  Out_of_Range  Fat_Burn  Cardio  Peak
+0 2021-02-01          1298        93      15     0
+1 2021-02-02          1209        90      22     1
+2 2021-02-03          1205       162      14     0
+3 2021-02-04          1255       134       5     2
+4 2021-02-05          1289       114       6     0
+</pre>
+
+<p>
+できた.<br  />
+</p>
+
+<p>
+ファイルに保存しておいてさくっと取り出せるようにしとこう.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #9acd32;">df</span> = pd.read_table(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr"> 3: </span><span style="color: #9acd32;">adf</span> =[]
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">for</span> cat <span style="color: #20b2aa; font-weight: bold;">in</span> (<span style="color: #ffa07a;">'Out_of_Range'</span>,<span style="color: #ffa07a;">'Fat_Burn'</span>,<span style="color: #ffa07a;">'Cardio'</span>,<span style="color: #ffa07a;">'Peak'</span>):
+<span class="linenr"> 5: </span>    <span style="color: #9acd32;">dfx</span> = df[df[<span style="color: #ffa07a;">'cat'</span>] == cat].iloc[:,[0,2]]
+<span class="linenr"> 6: </span>    <span style="color: #9acd32;">dfx.columns</span> = [<span style="color: #ffa07a;">'date'</span>,cat]
+<span class="linenr"> 7: </span>    adf.append(dfx)
+<span class="linenr"> 8: </span><span style="color: #9acd32;">mdf</span> = adf.pop(0)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20808;&#38957;&#12398;&#35201;&#32032;&#12434;&#21462;&#12426;&#20986;&#12375;.</span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">for</span> d <span style="color: #20b2aa; font-weight: bold;">in</span> adf:
+<span class="linenr">10: </span>    <span style="color: #9acd32;">mdf</span> = mdf.merge(d,on=<span style="color: #ffa07a;">'date'</span>)
+<span class="linenr">11: </span>mdf.to_csv(<span style="color: #ffa07a;">"data/h.csv"</span>,index=<span style="color: #1e90ff;">False</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">csv &#12501;&#12449;&#12452;&#12523;&#12392;&#12375;&#12390;&#20445;&#23384;</span>
+</pre>
+</div>
+
+<p>
+参考:<br  />
+<a href="https://note.nkmk.me/python-pandas-to-csv/">pandasでcsvファイルの書き出し・追記（to_csv） | note.nkmk.me</a><br  />
+</p>
+
+<p>
+tsv(tab 区切り)で保存したい場合は,<br  />
+df.to_csv("foo.tsv",sep="\t",index=False) などとすればよい.<br  />
+index=False は行名を書かない.<br  />
+列名を書かないときは header=False<br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> Julia</h3>
+<div class="outline-text-3" id="text-3-6">
+<p>
+Julia は DataFrames というパッケージのを使うのがいいのか？<br  />
+以前とは結構変わってるような.<br  />
+</p>
+</div>
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> DataFrams</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+参考:<br  />
+<a href="https://dataframes.juliadata.org/stable/">Introduction · DataFrames.jl</a><br  />
+<a href="https://csv.juliadata.org/stable/">CSV.jl Documentation · CSV.jl</a><br  />
+</p>
+
+<p>
+色々調べて動くプログラムが書いてあるページをやっと見つけた.<br  />
+<a href="https://blog.goo.ne.jp/r-de-r/e/23c50893ed6648d798c191667a037ed9">Julia でデータフレームを操作する - 裏 RjpWiki</a><br  />
+</p>
+
+<p>
+CSV, DataFrames package を予めインストールしておくこと.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, DataFrame)
+<span class="linenr">3: </span>println(first(df,5))    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">head &#12398;&#20195;&#12431;&#12426;</span>
+<span class="linenr">4: </span>println(last(df,5))     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">tail &#12398;&#20195;&#12431;&#12426;</span>
+</pre>
+</div>
+
+<pre class="example">
+5×4 DataFrame
+ Row │ date        cat           cal       min
+     │ Date…       String        Float64   Int64
+─────┼───────────────────────────────────────────
+   1 │ 2021-02-01  Out_of_Range  1548.63    1298
+   2 │ 2021-02-01  Fat_Burn       350.274     93
+   3 │ 2021-02-01  Cardio         108.053     15
+   4 │ 2021-02-01  Peak             0.0        0
+   5 │ 2021-02-02  Out_of_Range  1436.71    1209
+5×4 DataFrame
+ Row │ date        cat           cal        min
+     │ Date…       String        Float64    Int64
+─────┼────────────────────────────────────────────
+   1 │ 2021-02-27  Peak            43.3267      4
+   2 │ 2021-02-28  Out_of_Range  1571.49     1374
+   3 │ 2021-02-28  Fat_Burn        41.3578     20
+   4 │ 2021-02-28  Cardio           0.0         0
+   5 │ 2021-02-28  Peak             0.0         0
+</pre>
+
+<p>
+head -&gt; first<br  />
+tail -&gt; last   のようだ.<br  />
+つーか何で method 名変えるかなぁ&#x2026;<br  />
+前は head, tail で行けた筈なんだけど&#x2026;<br  />
+</p>
+
+<p>
+取得列は select=[1,2,4] のようにするようだ.<br  />
+Julia は R と同じで配列添字は 1 から始まる(1-based).<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame)
+<span class="linenr">3: </span>print(first(df,5))    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">head &#12398;&#20195;&#12431;&#12426;</span>
+<span class="linenr">4: </span>print(last(df,5))     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">tail &#12398;&#20195;&#12431;&#12426;</span>
+</pre>
+</div>
+
+<pre class="example">
+5×3 DataFrame
+ Row │ date        cat           min
+     │ Date…       String        Int64
+─────┼─────────────────────────────────
+   1 │ 2021-02-01  Out_of_Range   1298
+   2 │ 2021-02-01  Fat_Burn         93
+   3 │ 2021-02-01  Cardio           15
+   4 │ 2021-02-01  Peak              0
+   5 │ 2021-02-02  Out_of_Range   12095×3 DataFrame
+ Row │ date        cat           min
+     │ Date…       String        Int64
+─────┼─────────────────────────────────
+   1 │ 2021-02-27  Peak              4
+   2 │ 2021-02-28  Out_of_Range   1374
+   3 │ 2021-02-28  Fat_Burn         20
+   4 │ 2021-02-28  Cardio            0
+   5 │ 2021-02-28  Peak              0
+</pre>
+
+<p>
+<a href="https://towardsdatascience.com/read-csv-to-data-frame-in-julia-programming-lang-77f3d0081c14">Read CSV to Data Frame in Julia. Parameters explained. Using CSV.jl… | by Vaclav Dekanovsky | Towards Data Science</a><br  />
+によると, CSV ファイルを読んで DataFrame にする方法は 3 つある.<br  />
+まず最初はこれ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = DataFrame(CSV.File(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>,select=[1,2,4]))
+<span class="linenr">3: </span>println(typeof(df))
+<span class="linenr">4: </span>println(first(df,5))
+</pre>
+</div>
+
+<pre class="example">
+DataFrame
+5×3 DataFrame
+ Row │ date        cat           min
+     │ Date…       String        Int64
+─────┼─────────────────────────────────
+   1 │ 2021-02-01  Out_of_Range   1298
+   2 │ 2021-02-01  Fat_Burn         93
+   3 │ 2021-02-01  Cardio           15
+   4 │ 2021-02-01  Peak              0
+   5 │ 2021-02-02  Out_of_Range   1209
+</pre>
+
+<p>
+次はこれ. |&gt; はパイプ演算子.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.File(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>,select=[1,2,4]) |&gt; DataFrame
+<span class="linenr">3: </span>println(typeof(df))
+<span class="linenr">4: </span>println(first(df,5))
+</pre>
+</div>
+
+<pre class="example">
+DataFrame
+5×3 DataFrame
+ Row │ date        cat           min
+     │ Date…       String        Int64
+─────┼─────────────────────────────────
+   1 │ 2021-02-01  Out_of_Range   1298
+   2 │ 2021-02-01  Fat_Burn         93
+   3 │ 2021-02-01  Cardio           15
+   4 │ 2021-02-01  Peak              0
+   5 │ 2021-02-02  Out_of_Range   1209
+</pre>
+
+<p>
+3 つめが上で使ってるやつ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>, DataFrame; delim=<span style="color: #ffa07a;">"\t"</span>,select=[1,2,4])
+<span class="linenr">3: </span>println(typeof(df))
+<span class="linenr">4: </span>println(first(df,5))
+</pre>
+</div>
+
+<pre class="example">
+DataFrame
+5×3 DataFrame
+ Row │ date        cat           min
+     │ Date…       String        Int64
+─────┼─────────────────────────────────
+   1 │ 2021-02-01  Out_of_Range   1298
+   2 │ 2021-02-01  Fat_Burn         93
+   3 │ 2021-02-01  Cardio           15
+   4 │ 2021-02-01  Peak              0
+   5 │ 2021-02-02  Out_of_Range   1209
+</pre>
+
+
+<p>
+データ取り出すとこやってみる.<br  />
+cat ＝＝ 'Out_of_Range' のデータ取り出し.<br  />
+注意点: Julia は ' (シングルクォーテーション) と " (ダブル)を区別する. " (ダブル)じゃないとダメみたいだ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame)
+<span class="linenr">3: </span>dfo = df[df.cat .== <span style="color: #ffa07a;">"Out_of_Range"</span>, :]
+<span class="linenr">4: </span>print(first(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+5×3 DataFrame
+ Row │ date        cat           min
+     │ Date…       String        Int64
+─────┼─────────────────────────────────
+   1 │ 2021-02-01  Out_of_Range   1298
+   2 │ 2021-02-02  Out_of_Range   1209
+   3 │ 2021-02-03  Out_of_Range   1205
+   4 │ 2021-02-04  Out_of_Range   1255
+   5 │ 2021-02-05  Out_of_Range   1289
+</pre>
+
+<p>
+df.列名 で列名を持つ列のデータを全て取り出す.<br  />
+ここでは, プログラム 3 行目の df.cat で cat 列のデータを全て取り出している.<br  />
+cat 列のデータが "Out_of_Range" である行を全て取り出す.<br  />
+比較演算子には .(dot) が必要<br  />
+df.cat .＝＝ "Out_of_Range"    &lt;&#x2013; こんな風に書く必要がある.<br  />
+数値であれば不等号も使えるがそれにも .(ドット)が必要である.<br  />
+df.min .&gt; 500 とか.<br  />
+抽出する列が全部であれば : を使う.<br  />
+cat 列が要らないのであれば : の代わりに ["date","min"] とかにすればいい.<br  />
+df[df.cat .=="Out_of_Range", :]  &#x2013;&gt; df[df.cat .== "Out_of_Range",["date","min"]] こんな感じ.<br  />
+</p>
+
+<p>
+index (列番号) でやるにはどうするんだろう.<br  />
+以下の 3 行目で, 1, 3 列のみ抽出してみる(Julia は R と同様, 配列等は 1-based).<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame);
+<span class="linenr">3: </span>dfo = df[df[:,2] .== <span style="color: #ffa07a;">"Out_of_Range"</span>, [1,3]];
+<span class="linenr">4: </span>print(first(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+5×2 DataFrame
+ Row │ date        min
+     │ Date…       Int64
+─────┼───────────────────
+   1 │ 2021-02-01   1298
+   2 │ 2021-02-02   1209
+   3 │ 2021-02-03   1205
+   4 │ 2021-02-04   1255
+   5 │ 2021-02-05   1289
+</pre>
+
+<p>
+できた.<br  />
+df[df[:,2] == "Out_of_Range", [1,3]]  # df の 2 列目が "Out_of_Range" の 1,3 列目だけとってくる.<br  />
+</p>
+
+<p>
+列の取得方法のいろいろ:<br  />
+  df.列名<br  />
+  df[!, :列名]          :列名  は Symbol としての列名のようだ.<br  />
+  df[!, Symbol("列名")]<br  />
+  df[:, Symbol("列名")]<br  />
+  df[!,列index(1-based)]<br  />
+  df[:,列index(1-based)]<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://qiita.com/Y0KUDA/items/3d3342ef08b28d5cda71">JuliaでCSV / DataFrameを扱う方法 - Qiita</a><br  />
+<a href="https://zenn.dev/takilog/articles/393b0d3b7dd5601c50c1">DataFrames.jl Getting Startedの要点 (2021年3月版)</a><br  />
+</p>
+
+<p>
+! と : は何が違うんだろうか.<br  />
+<a href="https://zenn.dev/takilog/articles/393b0d3b7dd5601c50c1">DataFrames.jl Getting Startedの要点 (2021年3月版)</a><br  />
+によると, コピーを作るかどうかのようだ.<br  />
+代入するときに結果が変わる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>df[:, <span style="color: #6495ed;">:A</span>][1] = 3   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20195;&#20837;</span>
+<span class="linenr">2: </span>print(df)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22793;&#12431;&#12425;&#12394;&#12356;</span>
+<span class="linenr">3: </span>
+<span class="linenr">4: </span>df[!,<span style="color: #6495ed;">:A</span>][1] = 3
+<span class="linenr">5: </span>print(df)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22793;&#12431;&#12427;</span>
+</pre>
+</div>
+
+<p>
+次は列名の変更.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://discourse.julialang.org/t/change-column-names-of-a-dataframe-previous-methods-dont-work/48026">Change Column Names of a DataFrame - Previous methods don't work - Usage / First steps - JuliaLang</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame);
+<span class="linenr">3: </span>dfo = df[df[:,2] .== <span style="color: #ffa07a;">"Out_of_Range"</span>, [1,3]];
+<span class="linenr">4: </span>rename!(dfo, <span style="color: #6495ed;">:min</span> =&gt; <span style="color: #6495ed;">:Out_of_Range</span>)
+<span class="linenr">5: </span>print(first(dfo,5))
+</pre>
+</div>
+
+<p>
+プログラム 4 行目で列名の変更を行っている. min -&gt; Out_of_Range に変更.<br  />
+! がついている関数は破壊的処理をするってどこかに書いてあったような.<br  />
+ここでは DataFrame dfo の内容が破壊的に変わる(列の名前が変更される).<br  />
+</p>
+
+<p>
+後々のことを考えて, Out_of_Range の部分を変数にしたいのだが&#x2026;<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>cat = <span style="color: #ffa07a;">"Out_of_Range"</span>
+<span class="linenr">3: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame);
+<span class="linenr">4: </span>dfo = df[df[:,2] .== cat, [1,3]];
+<span class="linenr">5: </span>rename!(dfo, <span style="color: #6495ed;">:min</span> =&gt; cat)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&lt;-- &#12371;&#12371;</span>
+<span class="linenr">6: </span>print(first(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+5×2 DataFrame
+ Row │ date        Out_of_Range
+     │ Date…       Int64
+─────┼──────────────────────────
+   1 │ 2021-02-01          1298
+   2 │ 2021-02-02          1209
+   3 │ 2021-02-03          1205
+   4 │ 2021-02-04          1255
+   5 │ 2021-02-05          1289
+</pre>
+
+<p>
+普通に rename!(dfo, :min =&gt; 変数) でよかった.<br  />
+じゃこれでもいいってことかな.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr">2: </span>cat = <span style="color: #ffa07a;">"Out_of_Range"</span>
+<span class="linenr">3: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4],DataFrame);
+<span class="linenr">4: </span>dfo = df[df[:,2] .== cat, [1,3]];
+<span class="linenr">5: </span>rename!(dfo, <span style="color: #ffa07a;">"min"</span> =&gt; cat)
+<span class="linenr">6: </span>print(first(dfo,5))
+</pre>
+</div>
+
+<pre class="example">
+5×2 DataFrame
+ Row │ date        Out_of_Range
+     │ Date…       Int64
+─────┼──────────────────────────
+   1 │ 2021-02-01          1298
+   2 │ 2021-02-02          1209
+   3 │ 2021-02-03          1205
+   4 │ 2021-02-04          1255
+   5 │ 2021-02-05          1289
+</pre>
+
+<p>
+rename!(dfo, "min" =&gt; 変数) で問題なかった.<br  />
+</p>
+
+<p>
+データの結合<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr"> 2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame);
+<span class="linenr"> 3: </span>adf =[]
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">for</span> cat <span style="color: #20b2aa; font-weight: bold;">in</span> (<span style="color: #ffa07a;">"Out_of_Range"</span>,<span style="color: #ffa07a;">"Fat_Burn"</span>,<span style="color: #ffa07a;">"Cardio"</span>,<span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span>    dfo = df[df[:,2] .== cat, [1,3]]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">df &#12398; 2 &#21015;&#30446;&#12398;&#20516;&#12364; cat &#12398;&#12384;&#12369;&#21462;&#12426;&#20986;&#12377;. [1,3] &#21015;&#30446;&#12384;&#12369;&#21462;&#12426;&#20986;&#12377;.</span>
+<span class="linenr"> 6: </span>    rename!(dfo,<span style="color: #ffa07a;">"min"</span> =&gt; cat)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfo &#12398; min &#21015;&#12398;&#21517;&#21069;&#12434; cat &#12395;&#22793;&#26356;. dfo &#12434;&#22793;&#26356;&#12377;&#12427;.</span>
+<span class="linenr"> 7: </span>    push!(adf,dfo)
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr"> 9: </span>ddf = outerjoin(adf[1], adf[2],  adf[3], adf[4], on = <span style="color: #6495ed;">:date</span>);  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">4 &#12388;&#12375;&#12363;&#28961;&#12356;&#12398;&#12391;&#12505;&#12479;&#26360;&#12365;</span>
+<span class="linenr">10: </span>println(first(ddf,5))
+</pre>
+</div>
+
+<pre class="example">
+5×5 DataFrame
+ Row │ date        Out_of_Range  Fat_Burn  Cardio  Peak
+     │ Date…       Int64?        Int64?    Int64?  Int64?
+─────┼────────────────────────────────────────────────────
+   1 │ 2021-02-01          1298        93      15       0
+   2 │ 2021-02-02          1209        90      22       1
+   3 │ 2021-02-03          1205       162      14       0
+   4 │ 2021-02-04          1255       134       5       2
+   5 │ 2021-02-05          1289       114       6       0
+</pre>
+
+<p>
+プログラム 3-8 行目<br  />
+DataFrame の配列 adf を作る. Python では append だが julia では push! (! は破壊的メソッドの意味らしい).<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://qiita.com/ttabata/items/7528863ccbb282e8260d">Julia早引きノート［14］リスト(Array型一次元配列) - Qiita</a><br  />
+</p>
+
+<p>
+プログラム 9 行目. date の値で表を merge.<br  />
+pandas では merge.<br  />
+julia では join.<br  />
+innerjoin, leftjoin 等あるけど, ここでは outerjoin を使った.<br  />
+２つだけじゃなくて何個でも行ける.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://dataframes.juliadata.org/stable/man/joins/">Joins · DataFrames.jl</a><br  />
+</p>
+
+<p>
+この DataFrame を CSV.write で保存してとりあえずこの部分は終わりとしよう.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://csv.juliadata.org/stable/#CSV.write">CSV.jl Documentation · CSV.jl</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr"> 2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, select=[1,2,4], DataFrame);
+<span class="linenr"> 3: </span>adf =[]
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">for</span> cat <span style="color: #20b2aa; font-weight: bold;">in</span> (<span style="color: #ffa07a;">"Out_of_Range"</span>,<span style="color: #ffa07a;">"Fat_Burn"</span>,<span style="color: #ffa07a;">"Cardio"</span>,<span style="color: #ffa07a;">"Peak"</span>)
+<span class="linenr"> 5: </span>    dfo = df[df[:,2] .== cat, [1,3]]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">df &#12398; 2 &#21015;&#30446;&#12398;&#20516;&#12364; cat &#12398;&#12384;&#12369;&#21462;&#12426;&#20986;&#12377;. [1,3] &#21015;&#30446;&#12384;&#12369;&#21462;&#12426;&#20986;&#12377;.</span>
+<span class="linenr"> 6: </span>    rename!(dfo,<span style="color: #ffa07a;">"min"</span> =&gt; cat)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">dfo &#12398; min &#21015;&#12398;&#21517;&#21069;&#12434; cat &#12395;&#22793;&#26356;. dfo &#12434;&#22793;&#26356;&#12377;&#12427;.</span>
+<span class="linenr"> 7: </span>    push!(adf,dfo)
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr"> 9: </span>ddf = outerjoin(adf[1], adf[2],  adf[3], adf[4], on = <span style="color: #6495ed;">:date</span>);
+<span class="linenr">10: </span>CSV.write(<span style="color: #ffa07a;">"data/j.csv"</span>,ddf, delim=<span style="color: #ffa07a;">","</span>)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> グラフ化</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> R</h3>
+<div class="outline-text-3" id="text-4-1">
+</div><div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> ggplot2(基礎)</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+ggplot2 によるグラフ作成のテンプレートはこんな感じ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #1e90ff;">library</span>(ggplot2)
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12487;&#12540;&#12479;&#12434;&#12388;&#12367;&#12427;</span>
+<span class="linenr"> 4: </span>X <span style="color: #1e90ff;">&lt;-</span> seq(-4,4, length=100)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">-4 &#12363;&#12425; 4 &#12414;&#12391;. 100 &#20998;&#21106;&#12375;&#12383;&#12505;&#12463;&#12488;&#12523;&#12434;&#20316;&#25104;</span>
+<span class="linenr"> 5: </span>Y <span style="color: #1e90ff;">&lt;-</span> dnorm(x=X, mean=0, sd=1) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">y &#12392;&#12375;&#12390;&#12460;&#12454;&#12473;&#38306;&#25968;</span>
+<span class="linenr"> 6: </span>df <span style="color: #1e90ff;">&lt;-</span> data.frame(xf=X,yf=Y)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">ggplot2 &#12399; dataframe &#12434;&#35501;&#12415;&#36796;&#12416;</span>
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>p <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=xf,y=yf))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">x,y &#12399;&#22266;&#23450;</span>
+<span class="linenr"> 9: </span>plot(p)
+<span class="linenr">10: </span>fname <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">'images/r0.png'</span>
+<span class="linenr">11: </span>ggsave(p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-r0.png" alt="DataFrame2021-r0.png" /><br  />
+</p>
+</div>
+
+<p>
+時系列データの取り扱い<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">test.data &#12395;&#12399;&#26085;&#20184;(date)&#12392;&#26178;&#21051;(time 09:03:02) &#21015;&#12364;&#12354;&#12427;&#12392;&#12377;&#12427;.</span>
+<span class="linenr">2: </span>d <span style="color: #1e90ff;">&lt;-</span> read.table(<span style="color: #ffa07a;">'test.data'</span>, sep=<span style="color: #ffa07a;">'\t'</span>, header=<span style="color: #9370db;">TRUE</span>)
+<span class="linenr">3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">datetime &#12392;&#12356;&#12358;&#26032;&#12375;&#12356;&#21015;&#12434;&#12388;&#12367;&#12427;&#12392;&#12365;.</span>
+<span class="linenr">4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">datetime &#21015;&#12399; "date time" &#12392;&#12377;&#12427;</span>
+<span class="linenr">5: </span>d$datetime <span style="color: #1e90ff;">&lt;-</span> paste(d$date, d$time, sep=<span style="color: #ffa07a;">' '</span>)
+<span class="linenr">6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">POSIX &#24418;&#24335;&#12395;&#22793;&#25563;</span>
+<span class="linenr">7: </span>d$datetime <span style="color: #1e90ff;">&lt;-</span> as.POSIXct(d$datetime)
+<span class="linenr">8: </span>p <span style="color: #1e90ff;">&lt;-</span> ggplot(data=d) + geom_lines(mapping=aes(x=datetime, y=Y))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> ggplot2 による時系列グラフの作成</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+tidyverse を使うと, 日付っぽい部分が勝手に日付オブジェクトとなるので自動でいい感じのグラフが描ける.<br  />
+Out_of_Range 列のデータのみのグラフを描いてみる<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> read_csv(<span style="color: #ffa07a;">"data/rv.csv"</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20316;&#25104;&#12375;&#12383;&#12418;&#12398;</span>
+<span class="linenr">3: </span>p <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Out_of_Range))
+<span class="linenr">4: </span>plot(p)
+<span class="linenr">5: </span>fname = <span style="color: #ffa07a;">'images/r01.png'</span>
+<span class="linenr">6: </span>ggsave(p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-r01.png" alt="DataFrame2021-r01.png" /><br  />
+</p>
+</div>
+
+<p>
+プレーンな dataframe を使う場合は, 日付部分を POSIXct クラスに変更する.<br  />
+3 行目でやってる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(ggplot2)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data/r.csv'</span>,header=<span style="color: #9370db;">TRUE</span>)
+<span class="linenr">3: </span>df$date <span style="color: #1e90ff;">&lt;-</span> as.POSIXct(df$date)
+<span class="linenr">4: </span>p <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Out_of_Range))
+<span class="linenr">5: </span>plot(p)
+<span class="linenr">6: </span>fname = <span style="color: #ffa07a;">'images/r03.png'</span>
+<span class="linenr">7: </span>ggsave(p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-r03.png" alt="DataFrame2021-r03.png" /><br  />
+</p>
+</div>
+
+<p>
+同じ図が描けた.<br  />
+</p>
+
+<p>
+一枚のグラフに複数のデータを載せる場合.<br  />
+Out_of_Range 列と Fat_Burn 列を描く.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df <span style="color: #1e90ff;">&lt;-</span> read_csv(<span style="color: #ffa07a;">"data/rv.csv"</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20316;&#25104;&#12375;&#12383;&#12418;&#12398;</span>
+<span class="linenr">3: </span>p <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Out_of_Range), color=<span style="color: #ffa07a;">"blue"</span>)
+<span class="linenr">4: </span>p <span style="color: #1e90ff;">&lt;-</span> p + geom_line(mapping=aes(x=date,y=Fat_Burn),color=<span style="color: #ffa07a;">"orange"</span>) + ylab(<span style="color: #ffa07a;">"min"</span>)
+<span class="linenr">5: </span>plot(p)
+<span class="linenr">6: </span>fname = <span style="color: #ffa07a;">'images/r04.png'</span>
+<span class="linenr">7: </span>ggsave(p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-r04.png" alt="DataFrame2021-r04.png" /><br  />
+</p>
+</div>
+
+<p>
+R の場合は色々処理する前のデータでそのまま描ける.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>head(df0)
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 6 x 4
+  date       cat            cal   min
+  &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt;
+1 2021-02-01 Out_of_Range 1549.  1298
+2 2021-02-01 Fat_Burn      350.    93
+3 2021-02-01 Cardio        108.    15
+4 2021-02-01 Peak            0      0
+5 2021-02-02 Out_of_Range 1437.  1209
+6 2021-02-02 Fat_Burn      438.    90
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr">2: </span>df0 <span style="color: #1e90ff;">&lt;-</span> read_tsv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>)
+<span class="linenr">3: </span>p <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df0) + geom_line(mapping=aes(x=date,y=min,color=cat))
+<span class="linenr">4: </span>plot(p)
+<span class="linenr">5: </span>fname = <span style="color: #ffa07a;">'images/r05.png'</span>
+<span class="linenr">6: </span>ggsave(p,file=fname, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-r05.png" alt="DataFrame2021-r05.png" /><br  />
+</p>
+</div>
+
+<p>
+複数のグラフを描く場合<br  />
+gridExtra を使おう.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #1e90ff;">library</span>(tidyverse)
+<span class="linenr"> 2: </span><span style="color: #1e90ff;">library</span>(gridExtra)
+<span class="linenr"> 3: </span>df <span style="color: #1e90ff;">&lt;-</span> read_csv(<span style="color: #ffa07a;">"data/rv.csv"</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20316;&#25104;&#12375;&#12383;&#12418;&#12398;</span>
+<span class="linenr"> 4: </span>p1 <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Out_of_Range), color=<span style="color: #ffa07a;">"blue"</span>) + xlab(<span style="color: #ffa07a;">""</span>)
+<span class="linenr"> 5: </span>p2 <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Fat_Burn),     color=<span style="color: #ffa07a;">"orange"</span>) + xlab(<span style="color: #ffa07a;">""</span>)
+<span class="linenr"> 6: </span>p3 <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Cardio),       color=<span style="color: #ffa07a;">"magenta"</span>) + xlab(<span style="color: #ffa07a;">""</span>)
+<span class="linenr"> 7: </span>p4 <span style="color: #1e90ff;">&lt;-</span> ggplot(data=df) + geom_line(mapping=aes(x=date,y=Peak),         color=<span style="color: #ffa07a;">"cyan"</span>)
+<span class="linenr"> 8: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">grid.arrange(p1,p2,p3,p4,nrow=4)  # 4 &#12388;&#32294;&#12395;&#20006;&#12409;&#12427;</span>
+<span class="linenr"> 9: </span>h <span style="color: #1e90ff;">&lt;-</span> arrangeGrob(p1,p2,p3,p4,nrow=4)
+<span class="linenr">10: </span>fname = <span style="color: #ffa07a;">'images/r06.png'</span>
+<span class="linenr">11: </span>ggsave(h,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-r06.png" alt="DataFrame2021-r06.png" /><br  />
+</p>
+</div>
+
+<p>
+プログラム 4 - 6 行目 xlab("") で x 軸のタイトル "date" を書かない.<br  />
+プログラム 9 行目 arrangeGrob(p1, p2, p3, p4, nrow=4) nrow=4 で 4 つ縦に並べる.<br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> Python</h3>
+<div class="outline-text-3" id="text-4-4">
+</div><div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> matplotlib(基礎)</h3>
+<div class="outline-text-3" id="text-4-5">
+<p>
+matplotlib によるグラフ作成のテンプレートはこんな感じ.<br  />
+常にオブジェクト指向的に書くのがわかりやすいのでは.<br  />
+  plt class -&gt; figure object を作成 (figure) -&gt; axes object を作成 (add_subplot)-&gt; axes object が一つのグラフを作成<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> numpy <span style="color: #20b2aa; font-weight: bold;">as</span> np
+<span class="linenr"> 3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12487;&#12540;&#12479;&#20316;&#25104;&#20363;</span>
+<span class="linenr"> 4: </span><span style="color: #9acd32;">x</span> = np.linspace(-4,4, 100)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">-4 &#12363;&#12425; 4 &#12414;&#12391; 100 &#20998;&#21106;</span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12460;&#12454;&#12473;&#38306;&#25968; &#12356;&#12385;&#12356;&#12385;&#23450;&#32681;&#12377;&#12427;&#24517;&#35201;&#12354;&#12427;&#12398;&#12363;... &#38754;&#20498;&#12384;&#12394;&#12353;.</span>
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">def</span> <span style="color: #00ff7f;">gauss</span>(x,mu,sig):
+<span class="linenr"> 7: </span>   <span style="color: #20b2aa; font-weight: bold;">return</span> np.exp(-np.power(x -mu, 2.0)/ (2*np.power(sig,2)))
+<span class="linenr"> 8: </span><span style="color: #9acd32;">y</span> = gauss(x,0,1)
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12487;&#12540;&#12479;&#20316;&#25104;&#20363;&#12371;&#12371;&#12414;&#12391;</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12371;&#12363;&#12425;&#12464;&#12521;&#12501;&#20316;&#25104;</span>
+<span class="linenr">11: </span><span style="color: #9acd32;">fig</span> = plt.figure()            <span style="color: #cd853f;"># </span><span style="color: #cd853f;">plt &#12463;&#12521;&#12473;&#12363;&#12425; figure object</span>
+<span class="linenr">12: </span><span style="color: #9acd32;">ax</span> = fig.add_subplot(1,1,1)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">figure &#12363;&#12425; axes object (1 &#34892; 1 &#21015;&#12398; 1 &#30058;&#30446;&#12398;&#12464;&#12521;&#12501; = 1 &#26522;&#12398;&#12464;&#12521;&#12501;&#12434;&#20840;&#20307;&#12395;&#25551;&#12367;)</span>
+<span class="linenr">13: </span>ax.plot(x,y)                  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">axes object &#12364;&#19968;&#12388;&#12398;&#12464;&#12521;&#12501;&#12434;&#25551;&#30011;&#12377;&#12427;</span>
+<span class="linenr">14: </span>fig.show()
+<span class="linenr">15: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12464;&#12521;&#12501;&#12398;&#20445;&#23384;</span>
+<span class="linenr">16: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p00.png'</span>
+<span class="linenr">17: </span>fig.savefig(fname, <span style="color: #76ee00;">format</span>=<span style="color: #ffa07a;">'png'</span>, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p00.png" alt="DataFrame2021-p00.png" /><br  />
+</p>
+</div>
+
+<p>
+時系列グラフでは x 軸が日付・時間であることが多いだろう.<br  />
+軸目盛の設定(locator, formatter)を軸に対して行う.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://bunsekikobako.com/setting_ticks_by_matplotlib_dates/">matplotlib.datesで時系列データのグラフの軸目盛の設定をする | 分析小箱</a><br  />
+<a href="https://qiita.com/yoinhu/items/e0039309a47c75dade05">時系列データの可視化：datetime型のx軸操作 - Qiita</a><br  />
+<a href="https://www.delftstack.com/ja/howto/matplotlib/how-to-rotate-x-axis-tick-label-text-in-matplotlib/">Matplotlib で X 軸の目盛りラベルテキストを回転させる方法 | Delft スタック</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 2: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#30446;&#30427;&#12398;&#25351;&#23450;</span>
+<span class="linenr"> 3: </span><span style="color: #9acd32;">xloc</span> = mdates.HourLocator(byhour=<span style="color: #76ee00;">range</span>(0,24,4))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">0-24&#26178;&#38291; &#12414;&#12391;, 4 &#26178;&#38291;&#12362;&#12365;&#12395;&#30446;&#30427;</span>
+<span class="linenr"> 4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">ax &#12399;&#20316;&#25104;&#12373;&#12428;&#12383; axes object</span>
+<span class="linenr"> 5: </span>ax.xaxis.set_major_locator(xloc)                 <span style="color: #cd853f;"># </span><span style="color: #cd853f;">minor_locator &#12418;&#12354;&#12427;(&#35036;&#21161;&#30446;&#30427;)</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x &#36600;&#12398;&#25991;&#23383;&#21015; format &#12398;&#25351;&#23450;</span>
+<span class="linenr"> 7: </span><span style="color: #9acd32;">xfmt</span> = mdates.DateFormatter(<span style="color: #ffa07a;">"%H:%M"</span>) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#30446;&#30427;&#12398;&#26360;&#12363;&#12379;&#26041;. &#12371;&#12371;&#12391;&#12399; 00:00 &#24418;&#24335;&#12391;</span>
+<span class="linenr"> 8: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x &#36600;&#12398;&#25991;&#23383;&#21015;&#12434;&#26012;&#12417;&#12395;&#26360;&#12367;&#12392;&#12365;</span>
+<span class="linenr">10: </span><span style="color: #9acd32;">labels</span> = ax.get_xticklabels()
+<span class="linenr">11: </span>plt.setp(labels, rotation=45, fontsize=10)
+</pre>
+</div>
+
+<p>
+その他の設定事項<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> calendar
+<span class="linenr"> 2: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">ax &#12399;&#20316;&#25104;&#12373;&#12428;&#12383; axes object</span>
+<span class="linenr"> 3: </span>ax.set_title(<span style="color: #ffa07a;">'heart beats summary'</span>)
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span>ax.set_xlabel(<span style="color: #ffa07a;">'Date'</span>)
+<span class="linenr"> 6: </span>ax.set_ylabel(<span style="color: #ffa07a;">'heart_beat'</span>)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span style="color: #9acd32;">dlst</span> = calendar.monthrange(2021,4)[1]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26376;&#26411;&#26085;</span>
+<span class="linenr"> 9: </span>ax.set_xlim(dt.datetime(2021,4,1), dt.datetime(2021,4,dlst))
+<span class="linenr">10: </span><span style="color: #9acd32;">ylim</span> = (50,200)
+<span class="linenr">11: </span>ax.set_ylim(*ylim)
+</pre>
+</div>
+
+<p>
+グラフ作成<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#31309;&#12415;&#19978;&#12370;&#26834;&#12464;&#12521;&#12501;&#12394;&#12425;</span>
+<span class="linenr">2: </span>ax.bar(df.date, df.Out_of_Range)
+<span class="linenr">3: </span>ax.bar(df.date, df.Fat_Burn, bottom=df.Out_of_Range,color=<span style="color: #ffa07a;">'green'</span>)
+<span class="linenr">4: </span>ax.bar(df.date, df.Cardio, bottom=df.Out_of_Range+df.Fat_Burn,color=<span style="color: #ffa07a;">'orange'</span>)
+<span class="linenr">5: </span>ax.bar(df.date, df.Peak, bottom=df.Out_of_Range+df.Fat_Burn+df.Cardio,color=<span style="color: #ffa07a;">'red'</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25551;&#30011;</span>
+<span class="linenr">2: </span>fig.show()
+<span class="linenr">3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20445;&#23384;</span>
+<span class="linenr">4: </span>fig.save(<span style="color: #ffa07a;">"output.png"</span>, <span style="color: #76ee00;">format</span>=<span style="color: #ffa07a;">"png"</span>, dpi=70)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-6" class="outline-3">
+<h3 id="sec-4-6"><span class="section-number-3">4.6</span> matplotlib による時系列グラフの作成</h3>
+<div class="outline-text-3" id="text-4-6">
+<p>
+pandas でデータを dataframe に格納し, plt -&gt; fig -&gt; ax object を使って図を描画する.<br  />
+典型的な一連の流れ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'data/h.csv'</span>,parse_dates=[0])
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #9acd32;">fig</span> = plt.figure(dpi=100, figsize=(4,3))
+<span class="linenr"> 8: </span><span style="color: #9acd32;">ax</span> = fig.add_subplot(1,1,1)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">figure &#12363;&#12425; axes object (1 &#34892; 1 &#21015;&#12398; 1 &#30058;&#30446;)</span>
+<span class="linenr"> 9: </span>ax.plot(df.date, df.Out_of_Range)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p01.png'</span>
+<span class="linenr">12: </span>fig.show()
+<span class="linenr">13: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p01.png" alt="DataFrame2021-p01.png" /><br  />
+</p>
+</div>
+
+<p>
+横軸の文字が重なってよくわからん状態になっている. 何とかしないと.<br  />
+locator, formatter を修正する.<br  />
+DayLocator, DateFormatter を使う.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://bunsekikobako.com/setting_ticks_by_matplotlib_dates/">matplotlib.datesで時系列データのグラフの軸目盛の設定をする | 分析小箱</a><br  />
+<a href="https://qiita.com/jeta_taka/items/9e6b8c7c0fe1a86e2ae9">時系列プロットはじめました〜python編〜 - Qiita</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'data/h.csv'</span>,parse_dates=[0])
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #9acd32;">fig</span> = plt.figure(dpi=100, figsize=(5,3))
+<span class="linenr"> 8: </span><span style="color: #9acd32;">ax</span> = fig.add_subplot(1,1,1)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">figure &#12363;&#12425; axes object (1 &#34892; 1 &#21015;&#12398; 1 &#30058;&#30446;)</span>
+<span class="linenr"> 9: </span>ax.plot(df.date, df.Out_of_Range)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27178;&#36600;&#12399;&#26178;&#31995;&#21015;</span>
+<span class="linenr">12: </span><span style="color: #9acd32;">xloc</span> = mdates.DayLocator(bymonthday=<span style="color: #1e90ff;">None</span>, interval=7)
+<span class="linenr">13: </span><span style="color: #9acd32;">xfmt</span> = mdates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">14: </span>ax.xaxis.set_major_locator(xloc)
+<span class="linenr">15: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr">16: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26012;&#12417;&#12395;&#26360;&#12367;&#22580;&#21512;</span>
+<span class="linenr">17: </span><span style="color: #9acd32;">labels</span> = ax.get_xticklabels()
+<span class="linenr">18: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">19: </span>
+<span class="linenr">20: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p02.png'</span>
+<span class="linenr">21: </span>fig.show()
+<span class="linenr">22: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p02.png" alt="DataFrame2021-p02.png" /><br  />
+</p>
+</div>
+
+<p>
+横軸文字列はみ出してるんだけど.<br  />
+plt.tight_layout() とすると自動で調整してくれるようだ. これは便利.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://qiita.com/Tatejimaru137/items/4ee6a73114d07d85bfd7">matplotlibでグラフの文字サイズを大きくする - Qiita</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'data/h.csv'</span>,parse_dates=[0])
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #9acd32;">fig</span> = plt.figure(dpi=100, figsize=(5,3))
+<span class="linenr"> 8: </span><span style="color: #9acd32;">ax</span> = fig.add_subplot(1,1,1)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">figure &#12363;&#12425; axes object (1 &#34892; 1 &#21015;&#12398; 1 &#30058;&#30446;)</span>
+<span class="linenr"> 9: </span>ax.plot(df.date, df.Out_of_Range)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27178;&#36600;&#12399;&#26178;&#31995;&#21015;</span>
+<span class="linenr">12: </span><span style="color: #9acd32;">xloc</span> = mdates.DayLocator(bymonthday=<span style="color: #1e90ff;">None</span>, interval=7)
+<span class="linenr">13: </span><span style="color: #9acd32;">xfmt</span> = mdates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">14: </span>ax.xaxis.set_major_locator(xloc)
+<span class="linenr">15: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr">16: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26012;&#12417;&#12395;&#26360;&#12367;&#22580;&#21512;</span>
+<span class="linenr">17: </span><span style="color: #9acd32;">labels</span> = ax.get_xticklabels()
+<span class="linenr">18: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">19: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#32622;&#12434;&#12356;&#12356;&#24863;&#12376;&#12395;&#12377;&#12427;</span>
+<span class="linenr">20: </span>plt.tight_layout()
+<span class="linenr">21: </span>
+<span class="linenr">22: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p03.png'</span>
+<span class="linenr">23: </span>fig.show()
+<span class="linenr">24: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p03.png" alt="DataFrame2021-p03.png" /><br  />
+</p>
+</div>
+
+<p>
+一つのグラフに複数のグラフを描く場合<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://qiita.com/Tatejimaru137/items/4ee6a73114d07d85bfd7">matplotlibでグラフの文字サイズを大きくする - Qiita</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'data/h.csv'</span>,parse_dates=[0])
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #9acd32;">fig</span> = plt.figure(dpi=100, figsize=(5,3))
+<span class="linenr"> 8: </span><span style="color: #9acd32;">ax</span> = fig.add_subplot(1,1,1)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">figure &#12363;&#12425; axes object (1 &#34892; 1 &#21015;&#12398; 1 &#30058;&#30446;)</span>
+<span class="linenr"> 9: </span>ax.plot(df.date, df.Out_of_Range, label=<span style="color: #ffa07a;">'out_of_range'</span>)
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12381;&#12398;&#12414;&#12414;&#26360;&#12356;&#12390;&#12369;&#12400;&#12356;&#12356;</span>
+<span class="linenr">11: </span>ax.plot(df.date, df.Fat_Burn, label=<span style="color: #ffa07a;">'fat_burn'</span>)
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20961;&#20363;&#12364;&#24517;&#35201;&#12363;&#65311;</span>
+<span class="linenr">13: </span>ax.legend(fontsize=10)
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27178;&#36600;&#12399;&#26178;&#31995;&#21015;</span>
+<span class="linenr">16: </span><span style="color: #9acd32;">xloc</span> = mdates.DayLocator(bymonthday=<span style="color: #1e90ff;">None</span>, interval=7)
+<span class="linenr">17: </span><span style="color: #9acd32;">xfmt</span> = mdates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">18: </span>ax.xaxis.set_major_locator(xloc)
+<span class="linenr">19: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr">20: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26012;&#12417;&#12395;&#26360;&#12367;&#22580;&#21512;</span>
+<span class="linenr">21: </span><span style="color: #9acd32;">labels</span> = ax.get_xticklabels()
+<span class="linenr">22: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">23: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#32622;&#12434;&#12356;&#12356;&#24863;&#12376;&#12395;&#12377;&#12427;</span>
+<span class="linenr">24: </span>plt.tight_layout()
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p04.png'</span>
+<span class="linenr">27: </span>fig.show()
+<span class="linenr">28: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p04.png" alt="DataFrame2021-p04.png" /><br  />
+</p>
+</div>
+
+<p>
+複数のグラフを揃えて描く場合<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">'data/h.csv'</span>,parse_dates=[0])
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #9acd32;">fig</span> = plt.figure(dpi=100, figsize=(3,5))
+<span class="linenr"> 8: </span><span style="color: #9acd32;">ax1</span> = fig.add_subplot(2,1,1)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">figure &#12363;&#12425; axes object (2 &#34892; 1 &#21015;&#12398; 1 &#30058;&#30446;)</span>
+<span class="linenr"> 9: </span>ax1.plot(df.date, df.Out_of_Range)
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20108;&#12388;&#30446;&#12398;&#12464;&#12521;&#12501;</span>
+<span class="linenr">11: </span><span style="color: #9acd32;">ax2</span> = fig.add_subplot(2,1,2, sharex=ax1) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">2 &#34892; 1 &#21015;&#12398; 2 &#30058;&#30446;, ax1 &#12398; x &#36600;&#12434;&#20849;&#26377;&#12377;&#12427;</span>
+<span class="linenr">12: </span>ax2.plot(df.date, df.Fat_Burn, color=<span style="color: #ffa07a;">"green"</span>, marker=<span style="color: #ffa07a;">'.'</span>) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12487;&#12540;&#12479;&#12395; . &#12388;&#12365;&#12398;&#12464;&#12521;&#12501;&#12395;&#12375;&#12390;&#12415;&#12427;</span>
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19968;&#12388;&#30446;&#12398;&#12464;&#12521;&#12501;&#12398; x &#36600;&#12521;&#12505;&#12523;&#12399;&#35201;&#12425;&#12394;&#12356;</span>
+<span class="linenr">15: </span>ax1.tick_params(labelbottom=<span style="color: #1e90ff;">False</span>)
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27178;&#36600;&#12399;&#26178;&#31995;&#21015;</span>
+<span class="linenr">18: </span><span style="color: #9acd32;">xloc</span> = mdates.DayLocator(bymonthday=<span style="color: #1e90ff;">None</span>, interval=7)
+<span class="linenr">19: </span><span style="color: #9acd32;">xfmt</span> = mdates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">20: </span>ax2.xaxis.set_major_locator(xloc)
+<span class="linenr">21: </span>ax2.xaxis.set_major_formatter(xfmt)
+<span class="linenr">22: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26012;&#12417;&#12395;&#26360;&#12367;&#22580;&#21512;</span>
+<span class="linenr">23: </span><span style="color: #9acd32;">labels</span> = ax2.get_xticklabels()
+<span class="linenr">24: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">title</span>
+<span class="linenr">27: </span>ax1.set_title(<span style="color: #ffa07a;">'out_of_range'</span>,fontsize=10)
+<span class="linenr">28: </span>ax2.set_title(<span style="color: #ffa07a;">'fat_burn'</span>, fontsize=10)
+<span class="linenr">29: </span>
+<span class="linenr">30: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#32622;&#12434;&#12356;&#12356;&#24863;&#12376;&#12395;&#12377;&#12427;</span>
+<span class="linenr">31: </span>plt.tight_layout()
+<span class="linenr">32: </span>
+<span class="linenr">33: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p05.png'</span>
+<span class="linenr">34: </span>fig.show()
+<span class="linenr">35: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p05.png" alt="DataFrame2021-p05.png" /><br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-7" class="outline-3">
+<h3 id="sec-4-7"><span class="section-number-3">4.7</span> plotline による時系列グラフの作成</h3>
+<div class="outline-text-3" id="text-4-7">
+<p>
+Python での描画と言えば matplotlib だが,<br  />
+ggplot2 のように, データ加工前の元々のデータでグラフを描けないんかなぁ. と思ったりもする.<br  />
+元々のデータ構造はこんな感じなんだけど.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(df.head(5))
+</pre>
+</div>
+
+<pre class="example">
+        date           cat   min
+0 2021-02-01  Out_of_Range  1298
+1 2021-02-01      Fat_Burn    93
+2 2021-02-01        Cardio    15
+3 2021-02-01          Peak     0
+4 2021-02-02  Out_of_Range  1209
+</pre>
+
+<p>
+このデータを読み込んで cat ごとに色を変えてグラフを描きたい.<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://stackoverflow.com/questions/41494942/pandas-dataframe-groupby-plot">https://stackoverflow.com/questions/41494942/pandas-dataframe-groupby-plot</a><br  />
+<a href="https://scentellegher.github.io/programming/2017/07/15/pandas-groupby-multiple-columns-plot.html">https://scentellegher.github.io/programming/2017/07/15/pandas-groupby-multiple-columns-plot.html</a><br  />
+</p>
+
+<p>
+上の URL を見てみたが, うーん何かめんどくさそう.<br  />
+更に調べてたら ggplot2 とほぼ同様の書き方でいける plotline というパッケージがあるのを見つけた.<br  />
+これを使ったほうがいいかな？<br  />
+</p>
+
+<p>
+<a href="https://anaconda.org/conda-forge/plotnine">Plotnine :: Anaconda.org</a><br  />
+</p>
+
+<p>
+入ってなかったのでインストールする.<br  />
+こんな風にインストールできるようだ:<br  />
+  shell@: conda install -c conda_forge plotnine<br  />
+</p>
+
+<p>
+早速これでグラフを作ってみる.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">from</span> plotnine <span style="color: #20b2aa; font-weight: bold;">import</span> ggplot, geom_line, aes, ggsave
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> plotnine
+<span class="linenr">4: </span>
+<span class="linenr">5: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">6: </span><span style="color: #9acd32;">p</span> = ggplot() + geom_line(data=df, mapping=aes(x=<span style="color: #ffa07a;">'date'</span>, y=<span style="color: #ffa07a;">'min'</span>, color=<span style="color: #ffa07a;">'cat'</span>))
+<span class="linenr">7: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/p06.png'</span>
+<span class="linenr">8: </span>ggsave(p,filename=fname, <span style="color: #76ee00;">format</span>=<span style="color: #ffa07a;">'png'</span>,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-p06.png" alt="DataFrame2021-p06.png" /><br  />
+</p>
+</div>
+
+<p>
+ggplot2 と同じじゃん&#x2026;<br  />
+ggplot2 に慣れてるなら結構いいかも？<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://ichi.pro/python-no-de-ta-shikakuka-pakke-ji-no-daitai-toshite-no-plotnine-no-shokai-76970624743422">Pythonのデータ視覚化パッケージの代替としてのPlotnineの紹介</a><br  />
+<a href="https://plotnine.readthedocs.io/en/stable/index.html">A Grammar of Graphics for Python — plotnine 0.8.0 documentation</a><br  />
+</p>
+
+<p>
+date の label を 45°回転<br  />
+<a href="https://stackoverflow.com/questions/47714540/plotnine-rotating-labels">python - Plotnine rotating labels - Stack Overflow</a><br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">from</span> plotnine <span style="color: #20b2aa; font-weight: bold;">import</span> ggplot, geom_line, aes, ggsave, theme, element_text
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> plotnine
+<span class="linenr">4: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">5: </span><span style="color: #9acd32;">p</span> = ggplot() + geom_line(data=df, mapping=aes(x=<span style="color: #ffa07a;">'date'</span>, y=<span style="color: #ffa07a;">'min'</span>, color=<span style="color: #ffa07a;">'cat'</span>))
+<span class="linenr">6: </span><span style="color: #9acd32;">p</span> = p + theme(axis_text_x = element_text(rotation=45, hjust=1))
+<span class="linenr">7: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/py07.png'</span>
+<span class="linenr">8: </span>ggsave(p,filename=fname, <span style="color: #76ee00;">format</span>=<span style="color: #ffa07a;">'png'</span>,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-py07.png" alt="DataFrame2021-py07.png" /><br  />
+</p>
+</div>
+
+<p>
+独立に図を描く<br  />
+facet_wrap('~cat', nrow=4) # 'cat' ごとに 4 行のグラフを描く.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">from</span> plotnine <span style="color: #20b2aa; font-weight: bold;">import</span> ggplot, geom_line, aes, ggsave, theme, element_text, facet_wrap
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> plotnine
+<span class="linenr">4: </span><span style="color: #9acd32;">df</span> = pd.read_csv(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,sep=<span style="color: #ffa07a;">"\t"</span>,header=0, parse_dates=[0], usecols=[0,1,3])
+<span class="linenr">5: </span><span style="color: #9acd32;">p</span> = ggplot(data=df, mapping=aes(x=<span style="color: #ffa07a;">'date'</span>,y=<span style="color: #ffa07a;">'min'</span>,color=<span style="color: #ffa07a;">'cat'</span>)) + geom_line()
+<span class="linenr">6: </span><span style="color: #9acd32;">p</span> = p + theme(axis_text_x = element_text(rotation=45, hjust=1)) + facet_wrap(<span style="color: #ffa07a;">'~cat'</span>,nrow=4)
+<span class="linenr">7: </span><span style="color: #9acd32;">fname</span> = <span style="color: #ffa07a;">'images/py08.png'</span>
+<span class="linenr">8: </span>ggsave(p,filename=fname, <span style="color: #76ee00;">format</span>=<span style="color: #ffa07a;">'png'</span>,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-py08.png" alt="DataFrame2021-py08.png" /><br  />
+</p>
+</div>
+
+<p>
+割と素晴らしいかも.<br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-8" class="outline-3">
+<h3 id="sec-4-8"><span class="section-number-3">4.8</span> Julia</h3>
+<div class="outline-text-3" id="text-4-8">
+</div><div id="outline-container-sec-4-9" class="outline-3">
+<h3 id="sec-4-9"><span class="section-number-3">4.9</span> PyPlot(基礎)</h3>
+<div class="outline-text-3" id="text-4-9">
+<p>
+PyPlot は, Matplotlib と同様の書き方が出来る. 標準の Plots よりも良いらしい？<br  />
+</p>
+
+<p>
+参考:<br  />
+<a href="https://www.eureka-moments-blog.com/entry/2020/09/06/102455">JuliaとMatplotlibでグラフを作る際のハマりポイントとサンプルプログラム集 - EurekaMoments</a><br  />
+<a href="https://qiita.com/ttabata/items/96a0e172addfac690cca">Julia早引きノート［23］JuliaでのMatplotlibによるグラフ描画 - Qiita</a>  &#x2013;&gt; matplotlib でも使えるよく使うパラメータ<br  />
+</p>
+
+<p>
+テンプレートはこんな感じか<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> PyPlot
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12480;&#12511;&#12540;&#12487;&#12540;&#12479;</span>
+<span class="linenr"> 4: </span>x = range(0,2&#960;, step=0.1)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">0 &#12363;&#12425; 2&#960; &#12414;&#12391; 0.1&#21051;&#12415;&#12391;&#12505;&#12463;&#12488;&#12523;&#12487;&#12540;&#12479;&#12434;&#20316;&#25104;</span>
+<span class="linenr"> 5: </span>y = []
+<span class="linenr"> 6: </span>z = []
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">sin &#12392; cos &#12395;&#12377;&#12427;.</span>
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> x
+<span class="linenr"> 9: </span>    push!(y,sin(i))
+<span class="linenr">10: </span>    push!(z,cos(i))
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">matplotlib &#12392;&#21516;&#27096;&#12395;&#26360;&#12369;&#12427;&#65281;&#65281;</span>
+<span class="linenr">14: </span>fig = figure()
+<span class="linenr">15: </span>ax1 = fig.add_subplot(2,1,1)
+<span class="linenr">16: </span>ax1.plot(x,y)
+<span class="linenr">17: </span>
+<span class="linenr">18: </span>ax2 = fig.add_subplot(2,1,2)
+<span class="linenr">19: </span>ax2.plot(x,z)
+<span class="linenr">20: </span>
+<span class="linenr">21: </span>fig.tight_layout()
+<span class="linenr">22: </span>fname = <span style="color: #ffa07a;">"images/j00.png"</span>
+<span class="linenr">23: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j00.png" alt="DataFrame2021-j00.png" /><br  />
+</p>
+</div>
+
+<p>
+PyPlot だとほぼ matplotlib と同じ要領でグラフを描けるようだ.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25240;&#12428;&#32218;&#12398;&#22580;&#21512;</span>
+<span class="linenr"> 2: </span>plot(x,y, color=<span style="color: #ffa07a;">"m"</span>, marker=<span style="color: #ffa07a;">"o"</span>, markerfacecolor=<span style="color: #ffa07a;">"r"</span>, linestyle=<span style="color: #ffa07a;">"-"</span>, label=raw<span style="color: #ffa07a;">"$\sin(x)$"</span>)
+<span class="linenr"> 3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#33394;: b=blue, g=green, r=red, c=cyan, m=magenta, y=yellow, k=black,w=white</span>
+<span class="linenr"> 4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12510;&#12540;&#12459;&#12398;&#31278;&#39006;: o=&#20870;, s=square, p=pentagon, *=star, +=&#12503;&#12521;&#12473;&#35352;&#21495;, D=&#12480;&#12452;&#12450;&#12514;&#12531;&#12489;</span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">markerfacecolor=&#12510;&#12540;&#12459;&#12398;&#33394;</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">linestyle=&#32218;&#12398;&#31278;&#39006;: -=&#23455;&#25126; --=&#30772;&#32218;, -.=&#30772;&#32218;(&#28857;&#20837;&#12426;) :=&#28857;&#32218;</span>
+<span class="linenr"> 7: </span>legend()  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">label &#12398;&#25991;&#23383;&#12434;&#20961;&#20363;&#12392;&#12375;&#12390;&#20351;&#12358;.</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26834;&#12464;&#12521;&#12501;</span>
+<span class="linenr">10: </span>bar(x,y)
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12498;&#12473;&#12488;&#12464;&#12521;&#12512;</span>
+<span class="linenr">13: </span>hist(data)
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25955;&#24067;&#22259;</span>
+<span class="linenr">16: </span>scatter(x,y)
+<span class="linenr">17: </span>
+<span class="linenr">18: </span>title(<span style="color: #ffa07a;">"hoo"</span>)
+<span class="linenr">19: </span>xlabel(<span style="color: #ffa07a;">"x label"</span>)
+<span class="linenr">20: </span>ylabel(<span style="color: #ffa07a;">"y label"</span>)
+<span class="linenr">21: </span>
+<span class="linenr">22: </span>grid(<span style="color: #1e90ff;">true</span>)
+<span class="linenr">23: </span>
+<span class="linenr">24: </span>savefig(<span style="color: #ffa07a;">"hoge.png"</span>)
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">x &#30446;&#30427;&#12426;</span>
+<span class="linenr">27: </span>x_ticks_name([1,2,3], [<span style="color: #ffa07a;">"first"</span>,<span style="color: #ffa07a;">"second"</span>,<span style="color: #ffa07a;">"third"</span>]) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1,2,3 &#12398;&#12392;&#12371;&#12395; first, second, third</span>
+<span class="linenr">28: </span>
+<span class="linenr">29: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#31684;&#22258;</span>
+<span class="linenr">30: </span>xlim(0, &#960;)
+<span class="linenr">31: </span>ylim(0, <span style="color: #1e90ff;">nothing</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19978;&#38480;&#12364;&#28961;&#12356;&#12400;&#12354;&#12356;. nothing &#12434;&#20351;&#12358;.</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-10" class="outline-3">
+<h3 id="sec-4-10"><span class="section-number-3">4.10</span> PyPlotによる時系列グラフの作成</h3>
+<div class="outline-text-3" id="text-4-10">
+<p>
+Out_of_Range 列の時系列グラフの作成<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames, PyPlot
+<span class="linenr"> 2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/j.csv"</span>,DataFrame)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>fig = figure(dpi=100, figsize=(4,3))
+<span class="linenr"> 5: </span>ax  = fig.add_subplot(1,1,1)
+<span class="linenr"> 6: </span>ax.plot(df.date, df.Out_of_Range)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>fig.tight_layout()
+<span class="linenr"> 9: </span>fname=<span style="color: #ffa07a;">"images/j01.png"</span>
+<span class="linenr">10: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j01.png" alt="DataFrame2021-j01.png" /><br  />
+</p>
+</div>
+
+<p>
+matplotlib と同じようにいけた&#x2026;<br  />
+</p>
+
+<p>
+横軸についても同じように行けるんだろうか.<br  />
+Python の横軸に関する部分のソースコードは以下だけど.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #20b2aa; font-weight: bold;">as</span> plt
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> matplotlib.dates <span style="color: #20b2aa; font-weight: bold;">as</span> mdates
+<span class="linenr"> 3: </span>...
+<span class="linenr"> 4: </span><span style="color: #9acd32;">xloc</span> = mdates.DayLocator(bymonthday=<span style="color: #1e90ff;">None</span>, interval=7)
+<span class="linenr"> 5: </span><span style="color: #9acd32;">xfmt</span> = mdates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr"> 6: </span>ax.xaxis.set_major_locator(xloc)
+<span class="linenr"> 7: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr"> 8: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26012;&#12417;&#12395;&#26360;&#12367;&#22580;&#21512;</span>
+<span class="linenr"> 9: </span><span style="color: #9acd32;">labels</span> = ax.get_xticklabels()
+<span class="linenr">10: </span>plt.setp(labels, rotation=45, fontsize=10)
+</pre>
+</div>
+
+<p>
+matplotlib.dates で行けるのかも？<br  />
+<a href="https://gist.github.com/gizmaa/7214002">Various Julia plotting examples using PyPlot · GitHub</a><br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames, PyPlot
+<span class="linenr"> 2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/j.csv"</span>,DataFrame)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>fig = figure(dpi=100, figsize=(4,3))
+<span class="linenr"> 5: </span>ax  = fig.add_subplot(1,1,1)
+<span class="linenr"> 6: </span>ax.plot(df.date, df.Out_of_Range)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>xloc = matplotlib.dates.DayLocator(interval=7)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">bymonthly=None &lt;-- None &#12394;&#12435;&#12390;&#30693;&#12425;&#12435;&#12392;&#12356;&#12358;&#12456;&#12521;&#12540;&#12395;&#12394;&#12387;&#12390;&#12375;&#12414;&#12387;&#12383;&#12398;&#12391;&#12371;&#12371;&#12399;&#22793;&#26356;</span>
+<span class="linenr"> 9: </span>xfmt = matplotlib.dates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">10: </span>ax.xaxis.set_major_locator(xloc)
+<span class="linenr">11: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>labels = ax.get_xticklabels()
+<span class="linenr">14: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">15: </span>
+<span class="linenr">16: </span>fig.tight_layout()
+<span class="linenr">17: </span>fname=<span style="color: #ffa07a;">"images/j02.png"</span>
+<span class="linenr">18: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j02.png" alt="DataFrame2021-j02.png" /><br  />
+</p>
+</div>
+
+<p>
+行けたようだ.<br  />
+同様に, 一つのグラフに複数のグラフを描く場合<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames, PyPlot
+<span class="linenr"> 2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/j.csv"</span>,DataFrame)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>fig = figure(dpi=100, figsize=(5,3))
+<span class="linenr"> 5: </span>ax  = fig.add_subplot(1,1,1)
+<span class="linenr"> 6: </span>ax.plot(df.date, df.Out_of_Range, label=<span style="color: #ffa07a;">"out_of_range"</span>)
+<span class="linenr"> 7: </span>ax.plot(df.date, df.Fat_Burn,     label=<span style="color: #ffa07a;">"fat_burn"</span>)
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span>ax.legend(fontsize=10)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span>xloc = matplotlib.dates.DayLocator(interval=7)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">bymonthly=None &lt;-- None &#12394;&#12435;&#12390;&#30693;&#12425;&#12435;&#12392;&#12356;&#12358;&#12456;&#12521;&#12540;</span>
+<span class="linenr">12: </span>xfmt = matplotlib.dates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">13: </span>ax.xaxis.set_major_locator(xloc)
+<span class="linenr">14: </span>ax.xaxis.set_major_formatter(xfmt)
+<span class="linenr">15: </span>
+<span class="linenr">16: </span>labels = ax.get_xticklabels()
+<span class="linenr">17: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">18: </span>
+<span class="linenr">19: </span>fig.tight_layout()
+<span class="linenr">20: </span>fname=<span style="color: #ffa07a;">"images/j04.png"</span>
+<span class="linenr">21: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j04.png" alt="DataFrame2021-j04.png" /><br  />
+</p>
+</div>
+
+
+<p>
+複数のグラフを揃えて描く場合<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames, PyPlot
+<span class="linenr"> 2: </span>df = CSV.read(<span style="color: #ffa07a;">"data/j.csv"</span>,DataFrame)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>fig = figure(dpi=100, figsize=(3,5))
+<span class="linenr"> 5: </span>ax1  = fig.add_subplot(2,1,1)
+<span class="linenr"> 6: </span>ax1.plot(df.date, df.Out_of_Range, label=<span style="color: #ffa07a;">"out_of_range"</span>)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>ax2  = fig.add_subplot(2,1,2, sharex=ax1)
+<span class="linenr"> 9: </span>ax2.plot(df.date, df.Fat_Burn,     label=<span style="color: #ffa07a;">"fat_burn"</span>, color=<span style="color: #ffa07a;">"green"</span>, marker=<span style="color: #ffa07a;">"."</span>)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19978;&#12398;&#12464;&#12521;&#12501;&#12398; x &#36600;&#12521;&#12505;&#12523;&#12399;&#35201;&#12425;&#12394;&#12356;</span>
+<span class="linenr">12: </span>ax1.tick_params(labelbottom=<span style="color: #1e90ff;">false</span>)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">ax2 &#12398; x &#36600;&#12521;&#12505;&#12523;</span>
+<span class="linenr">15: </span>xloc = matplotlib.dates.DayLocator(interval=7)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">bymonthly=None &lt;-- None &#12394;&#12435;&#12390;&#30693;&#12425;&#12435;&#12392;&#12356;&#12358;&#12456;&#12521;&#12540;</span>
+<span class="linenr">16: </span>xfmt = matplotlib.dates.DateFormatter(<span style="color: #ffa07a;">"%Y-%m-%d"</span>)
+<span class="linenr">17: </span>ax2.xaxis.set_major_locator(xloc)
+<span class="linenr">18: </span>ax2.xaxis.set_major_formatter(xfmt)
+<span class="linenr">19: </span>labels = ax2.get_xticklabels()
+<span class="linenr">20: </span>plt.setp(labels, rotation=45, fontsize=10)
+<span class="linenr">21: </span>
+<span class="linenr">22: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">title</span>
+<span class="linenr">23: </span>ax1.set_title(<span style="color: #ffa07a;">"out_of_range"</span>, fontsize=10)
+<span class="linenr">24: </span>ax2.set_title(<span style="color: #ffa07a;">"fat_burn"</span>,     fontsize=10)
+<span class="linenr">25: </span>
+<span class="linenr">26: </span>fig.tight_layout()
+<span class="linenr">27: </span>fname=<span style="color: #ffa07a;">"images/j05.png"</span>
+<span class="linenr">28: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j05.png" alt="DataFrame2021-j05.png" /><br  />
+</p>
+</div>
+
+<p>
+同じ図ができた.<br  />
+同じライブラリ使ってるから当然か.<br  />
+</p>
+
+<p>
+PyPlot のたくさんの例<br  />
+<a href="https://gist.github.com/gizmaa/7214002">Various Julia plotting examples using PyPlot · GitHub</a><br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-11" class="outline-3">
+<h3 id="sec-4-11"><span class="section-number-3">4.11</span> RCall(ggplot2)による時系列グラフの作成</h3>
+<div class="outline-text-3" id="text-4-11">
+<p>
+RCall というのを使うと, R のコードが使えるらしい.<br  />
+Julia 経由で ggplot2 を使ってグラフを描いてみる.<br  />
+</p>
+
+<p>
+<a href="https://gist.github.com/genkuroki/e1def6d087fea3753b8dcd2cc2896d44">RCall.jl examples · GitHub</a><br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, DataFrame);
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">using</span> RCall
+<span class="linenr"> 6: </span>R<span style="color: #ffa07a;">"""Sys.setenv(LANG="en")"""</span>
+<span class="linenr"> 7: </span><span style="color: #6495ed;">@rimport</span> base as R
+<span class="linenr"> 8: </span><span style="color: #6495ed;">@rlibrary</span> ggplot2
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>p = ggplot(data=df) + geom_line(mapping=aes(x=<span style="color: #6495ed;">:date</span>, y=<span style="color: #6495ed;">:min</span>, color=<span style="color: #6495ed;">:cat</span>))
+<span class="linenr">11: </span>fname = <span style="color: #ffa07a;">"images/j06.png"</span>
+<span class="linenr">12: </span>ggsave(p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j06.png" alt="DataFrame2021-j06.png" /><br  />
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">using</span> CSV, DataFrames
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span>df = CSV.read(<span style="color: #ffa07a;">"data/heart_beats_summary_2021-02.data"</span>,delim=<span style="color: #ffa07a;">"\t"</span>, DataFrame);
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">using</span> RCall
+<span class="linenr"> 6: </span>R<span style="color: #ffa07a;">"""Sys.setenv(LANG="en")"""</span>
+<span class="linenr"> 7: </span><span style="color: #6495ed;">@rimport</span> base as R              <span style="color: #cd853f;"># </span><span style="color: #cd853f;">org-babel &#12391;&#12371;&#12371;&#12364;&#12456;&#12521;&#12540;&#65311;</span>
+<span class="linenr"> 8: </span><span style="color: #6495ed;">@rlibrary</span> ggplot2               <span style="color: #cd853f;"># </span><span style="color: #cd853f;">org-babel &#12391;&#12371;&#12371;&#12364;&#12456;&#12521;&#12540;&#65311;</span>
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>p = ggplot(data=df) + geom_line(mapping=aes(x=<span style="color: #6495ed;">:date</span>, y=<span style="color: #6495ed;">:min</span>, color=<span style="color: #6495ed;">:cat</span>))
+<span class="linenr">11: </span>p = p + facet_wrap(<span style="color: #ffa07a;">"~cat"</span>,nrow=4)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">rotation=45 &#12399;&#20351;&#12360;&#12394;&#12356;&#12424;&#12358;&#12384;.</span>
+<span class="linenr">12: </span>fname = <span style="color: #ffa07a;">"images/j07.png"</span>
+<span class="linenr">13: </span>ggsave(p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/DataFrame2021-j07.png" alt="DataFrame2021-j07.png" /><br  />
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2021-05-03T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2021-05-03 (Mon)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2019-04-08-161532.html" title="Previous Post: diary-float による org-mode の日付作成 (3)">&laquo; diary-float による org-mode の日付作成 (3)</a></li>
+            
+            
+            <li class="next"><a href="/blog/2022-03-18-Stan04.html" title="Next Post: Stan と R でベイズ統計モデリング 第四章">Stan と R でベイズ統計モデリング 第四章 &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item active" href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: misc | easy cure]]></title>
+  <link href="http://saito1369.github.io/blog/categories/misc/atom.xml" rel="self"/>
+  <link href="http://saito1369.github.io/"/>
+  <updated>2025-01-29T16:44:35+09:00</updated>
+  <id>http://saito1369.github.io/</id>
+  <author>
+    <name><![CDATA[saito1369]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[はじめに]]></title>
+    <link href="http://saito1369.github.io/blog/2017-01-01-first.html"/>
+    <updated>2017-01-01T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/first</id>
+    <content type="html"><![CDATA[<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-01-01 Sun 12:50&gt;</span></span><br />
+#+Last Updated: &lt;2021-09-21 Tue 12:59&gt;<span class="timestamp">&lt;2018-02-21 Wed 18:56&gt;</span><br />
+</p>
+<p>
+以前から自分が困った時用に応急処置的につくっていた学習記録などを,<br />
+まとめてここに置いておく.<br />
+学習をきろくした日が File Created の日時で,<br />
+まとめ用に色々修正した最終日が Last Updated の日時になっている.<br />
+</p>
+]]></content>
+  </entry>
+  
+</feed>

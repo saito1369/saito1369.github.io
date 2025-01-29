@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>統計的学習の導入ぶぶん - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2017-06-20-184414.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2017-06-20-184414.html">
+  <meta property="og:title" content="統計的学習の導入ぶぶん - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-06-20T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-06-20 (Tue)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        統計的学習の導入ぶぶん
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 準備</a>
+<ul>
+<li><a href="#sec-1-1">1.1. \(P(x)\) の数式について</a></li>
+<li><a href="#sec-1-2">1.2. 離散と連続</a></li>
+<li><a href="#sec-1-3">1.3. 変数名と具体的な値の区別など</a></li>
+<li><a href="#sec-1-4">1.4. 回帰分析</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 考える事</a>
+<ul>
+<li><a href="#sec-2-1">2.1. #01: \(y\) の(\(x\) を固定したときの)分布の形</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. 分布の形の想定</a></li>
+<li><a href="#sec-2-1-2">2.1.2. (参考) \(y\) の値の制限と想定される分布との関係</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. #02: \(y\) のパラメータと \(x\) との関係</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. \(y\) の分布のパラメータ \(m\) と \(x\) との関係を考える</a></li>
+<li><a href="#sec-2-2-2">2.2.2. (参考) 分布のパラメータ値の制限と \(x\) との関係を形作る関数(リンク関数)</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. #03: 同時確率(密度) = 尤度計算</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. データが得られる確率(密度)の計算</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 尤度の計算</a></li>
+<li><a href="#sec-2-3-3">2.3.3. 同時確率(密度)の計算</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-3">3. パラメータの推定</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 最尤推定</a></li>
+<li><a href="#sec-3-2">3.2. ベイズ推定</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. パラメータの「分布」の推定</a></li>
+<li><a href="#sec-3-2-2">3.2.2. (参考) 正則化と事前分布</a></li>
+<li><a href="#sec-3-2-3">3.2.3. (参考) 階層ベイズ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 例</a>
+<ul>
+<li><a href="#sec-4-1">4.1. 線形回帰</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. #01 \(y\) の分布の形</a></li>
+<li><a href="#sec-4-1-2">4.1.2. #02 \(y\) のパラメータと \(x\) との関係</a></li>
+<li><a href="#sec-4-1-3">4.1.3. #03 同時確率</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-2">4.2. ロジスティック回帰</a>
+<ul>
+<li><a href="#sec-4-2-1">4.2.1. #01 \(y\) の分布の形</a></li>
+<li><a href="#sec-4-2-2">4.2.2. #02 \(y\) のパラメータと \(x\) との関係</a></li>
+<li><a href="#sec-4-2-3">4.2.3. #03 同時確率</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-3">4.3. 多クラス分類</a>
+<ul>
+<li><a href="#sec-4-3-1">4.3.1. #01 \(y\) の分布の形</a></li>
+<li><a href="#sec-4-3-2">4.3.2. #02 \(y\) のパラメータと \(x\) との関係</a></li>
+<li><a href="#sec-4-3-3">4.3.3. #03 同時確率</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-5">5. ニューラルネット</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 線形回帰</a>
+<ul>
+<li><a href="#sec-5-1-1">5.1.1. #02 \(y\) のパラメータと \(x\) との関係</a></li>
+</ul>
+</li>
+<li><a href="#sec-5-2">5.2. ロジスティック回帰</a>
+<ul>
+<li><a href="#sec-5-2-1">5.2.1. #02 \(y\) のパラメータと \(x\) との関係</a></li>
+</ul>
+</li>
+<li><a href="#sec-5-3">5.3. 多クラス分類</a>
+<ul>
+<li><a href="#sec-5-3-1">5.3.1. #02 \(y\) のパラメータと \(x\) との関係</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-06-20 Tue 18:44&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 13:04&gt;</span></span><br  />
+</p>
+<p>
+遅ればせながら統計学とか機械学習とかを改めて勉強しようと思い, 初心者向けの色々な本を読み始めている.<br  />
+導入部分を自分なりにまとめる.<br  />
+色々と勘違いなどあるかと思いますがきろくとして残しておく.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 準備</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+数式と変数の書き方など<br  />
+</p>
+</div>
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> \(P(x)\) の数式について</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+確率を示す \(p(x)\) とか \(P(x)\) とか, 普通(?)の数学とは何か意味が違うんだろうか?<br  />
+何かいつも途中でわけがわかんなくなるなぁ, と思ってたのだが&#x2026;<br  />
+計算統計II マルコフ連鎖モンテカルロ法とその周辺 という本のめちゃ最初の方にに以下の記述があった.<br  />
+</p>
+
+<pre class="example">
+   さまざまな条件付き確率(密度)があらわれるとき, それらをすべて P あるいは p で表現し,
+   独立変数によって区別するという記法がよく用いられるが, この解説でもそれに従った.
+</pre>
+
+<p>
+あーっ. なんと, そういうことだったのか&#x2026;<br  />
+\(P(x)\) と \(P(y)\) は, 違う関数を表してたんだ&#x2026; 知らなかったよ.<br  />
+何か最初はいいけど途中から色々と変だなと思ってたんだよなぁ.<br  />
+こういうことを明示的に書いてくれる本を今まで読んだことがなかった(見落としてたのかな?)ので, この本を読んで知れてよかった.<br  />
+つーか言われなきゃずっとわかんなかったかも&#x2026;<br  />
+これって当たり前なんだろーか.<br  />
+まぁ読んでたら普通気づくんだろうなぁ.<br  />
+\(f(x)=2x+1\) と書くんであれば \(f(y)=2y+1\) だし, 別の関数を表現するんなら名前を変える,<br  />
+例えば \(g(x)=x^2\) と書くのがふつーかと思ってたけどそーじゃない.<br  />
+\(P(x)=2x+1\) で \(P(y)\) は \(2y+1\) じゃなくて全然違う関数,<br  />
+例えば \(P(y)=y^2\) を示しているかも, という点にちゅうい.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 離散と連続</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+統計学の教科書では変数 \(x\) が離散変数か連続変数かが重要っぽい.<br  />
+そんなに心してかかることなのだろーか?<br  />
+連続変数を粗視化してったら離散になるんだから, 連続だけ考えとけばいいんじゃないの?<br  />
+と思いましたがそうでもないっぽい.<br  />
+この辺色々な教科書を読んみても何かいまいちしっくりこないなーと思いつつ, 違いと対応関係についてまとめておく.<br  />
+</p>
+
+<p>
+離散変数 \(x\) をとる確率を \(P(x)\) とかく.<br  />
+確率なのでとり得る \(x={ x_{(1)}, x_{(2)}, ... x_{(M)} }\) の \(P(x)\) を全部たすと 1 になる.<br  />
+</p>
+
+<p>
+$$
+   \sum_{i=1}^{M} P(x_{(i)}) = 1
+   $$<br  />
+</p>
+
+<p>
+連続変数の場合, \(x\) の具体的な値 \(x=X\) をとる確率は 0.<br  />
+確率は微小値 \(\delta X\) を使って \(P(X) = \int_{X}^{X+\delta X} p(x) dx \sim p(X) \delta X\) となる.<br  />
+</p>
+
+<p>
+\(p(x)\) は積分すると確率になる確率密度関数<br  />
+</p>
+
+<p>
+$$
+   \int_{x_{min}}^{x_{max}} p(x) dx = 1
+   $$<br  />
+</p>
+
+<p>
+\(x_{min}\), \(x_{max}\) はそれぞれ \(x\) がとれる値の最小値, 最大値.<br  />
+</p>
+
+<p>
+上の 2 つは確率のめちゃ基本的な式.<br  />
+離散 &lt;-&gt; 連続での対応関係は以下:<br  />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">離散</th>
+<th scope="col" class="left">連続</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">関数</td>
+<td class="left">\(P(x)\)</td>
+<td class="left">\(p(x)\)</td>
+</tr>
+
+<tr>
+<td class="left">規格化</td>
+<td class="left">和 \(\sum_{i=1}^{M}\)</td>
+<td class="left">積分 \(\int_{x_{min}}^{x_{max}} dx\)</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+離散変数のときは \(P(x)\) を使って, 連続変数のときは \(p(x)\) を使う.<br  />
+離散のときは和, 連続のときは積分を使う.<br  />
+\(P(x)\) と \(p(x)\) は単位が違うような感じがするけどいいんだろうか&#x2026;<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> 変数名と具体的な値の区別など</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+変数名の添字の意味が色々あってややこしく, 読んでてすぐ挫折しそうになるので, どんなのがあるのかをまとめておく.<br  />
+</p>
+
+<ul class="org-ul">
+<li>(確率)変数の名前 = 属性(schema)の名前 = (表における)列の名前 = 箱の名前 =&gt; ここでは, 小文字アルファベットで<br  />
+例:<br  />
+気温 \(x\)<br  />
+年齢 \(x\)<br  />
+性別 \(x\)<br  />
+</li>
+
+<li>データ = 具体的な数値 = (表における)セルに入ってる値  = 箱の中に入ってる値 (の名前) =&gt; 大文字アルファベット<br  />
+例:<br  />
+気温 \(X (= 25)\) 度<br  />
+年齢 \(X (= 20)\) 歳<br  />
+性別 \(X (= M)\)<br  />
+</li>
+
+<li>各々のサンプルにおける具体的な値(の名前) =&gt; 上付き文字(かっこ入り)<br  />
+例:<br  />
+気温データ \(X^{(1)}, X^{(2)}, ... X^{(j)}, ... X^{(N)}\)<br  />
+   気温の具体的な値が \(N\) 個あってそれぞれ \(X^{(1)}\) &#x2026;<br  />
+</li>
+
+<li>ベクトルの要素 =&gt; 下付き文字<br  />
+例:<br  />
+\(\vec{x} = (x_1,x_2, ... x_k, ... x_K)\)<br  />
+\(x\) は基本的にはベクトル. ベクトルと明示したいときに \(\vec{x}\) を使うことにする.<br  />
+</li>
+
+<li>離散変数 \(x\) の具体的な値(の名前) =&gt; 下付き文字(かっこ入り)<br  />
+離散変数 \(x\) は \(M\) 種類あってその値は \(x_{(i)}\)<br  />
+\(x = { x_{(1)}, x_{(2)}, ... x_{(i)}, ... x_{(M)} }\)<br  />
+</li>
+
+<li>累乗 =&gt; 上付き文字<br  />
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> 回帰分析</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+大抵のばあい, データ \((X,Y)\) から知りたいのは変数 \(x\) と \(y\) との関係性で, \(x\) と \(y\) の関係性は \(y=f(x)\) と書ける(回帰分析).<br  />
+実際は, \(y\) は確率変数として取り扱うので左辺は \(y\) そのものというよりは,<br  />
+例えば \(y_{mean}\) のような \(y\) の分布の代表値を使って \(y_{mean} = f(x)\) のようになるかと思う.<br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 考える事</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+分析を行う際に考えることは以下の 3 つ.<br  />
+</p>
+
+<ol class="org-ol">
+<li>\(y\) の(\(x\) を固定したときの)分布の形<br  />
+</li>
+<li>\(y\) の分布のパラメータと \(x\) との関係<br  />
+</li>
+<li>同時確率<br  />
+</li>
+</ol>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> #01: \(y\) の(\(x\) を固定したときの)分布の形</h3>
+<div class="outline-text-3" id="text-2-1">
+</div><div id="outline-container-sec-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> 分布の形の想定</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+\(y\) は決定的な値ではなく, 偶然によってふらつく値であると考える.<br  />
+全く同じ条件で観測しても, あるときは 5 と観測され, あるときは 7 と観測されたりする.<br  />
+一つひとつの \(y\) の実現値はそんな値.<br  />
+すなわち, (\(x\) を固定して)全く同じ条件で何回も観測すれば, \(y\) のばらつき具合(分布)を見ることが出来る筈である.<br  />
+実際は, 全く同じ条件で何度も観測できてる状態はまれなので, \(x\) を固定しない \(y\) のデータ全体から, \(x\) を固定した状態での \(y\) の分布を想定することになる(?).<br  />
+</p>
+
+<p>
+例えば, 大体いつも出てくる典型的な想定は \(y\) は正規分布をする, というもの.<br  />
+観測値 \(y\) のばらつきがいろんな細かい条件の積み重ねに由来するものであれば, \(y\) は正規分布すると考えて問題無いことが多かったりする(中心極限定理. だったっけ？).<br  />
+</p>
+
+<p>
+例: \(y\) は正規分布してる, と考えた場合, \(y\) の確率密度 \(p(y)\) は以下のようにかける.<br  />
+$$
+    p(y) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{(y-m)^2}{2\sigma^2})
+    $$<br  />
+</p>
+
+<p>
+正規分布の場合, 分布の具体的な形を決めるためのパラメータは 2 つあって, 一つは期待値 \(m\), もう一つは標準偏差 \(\sigma\) である.<br  />
+</p>
+
+<p>
+想定した分布のパラメータ(と \(y\) の代表値との関係)を把握したあと次に進む.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> (参考) \(y\) の値の制限と想定される分布との関係</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+想定される分布は, \(y\) がどのような値をとりえるかによってある程度制限される.<br  />
+\(y\) の真の分布はわからないので(うまくデータと合うようにできれば実際はなんでもよい？(注)),<br  />
+\(y\) の値の特性によって用いる分布に必要条件的に制限がかけられている, というイメージでかんがえるとよい.<br  />
+</p>
+
+<p>
+(注)<br  />
+Stan と R でベイズ統計モデリング p80 より<br  />
+</p>
+<pre class="example">
+    ほとんどの場合, 現実のデータがある確率分布に従っていると考えるというのは単なる仮定にすぎない.
+</pre>
+
+<p>
+以下によく見る分布をしめす. 各々の分布についての詳細は省略する.<br  />
+</p>
+
+<p>
+\(y\) が連続値をとる場合:<br  />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">\(y\) の範囲</th>
+<th scope="col" class="left">分布</th>
+<th scope="col" class="left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">\((-\infty,\infty)\)</td>
+<td class="left">正規分布</td>
+<td class="left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="left">\((0,\infty)\)</td>
+<td class="left">ガンマ分布</td>
+<td class="left">待ち時間とか</td>
+</tr>
+
+<tr>
+<td class="left">\((0,\infty)\)</td>
+<td class="left">対数正規分布</td>
+<td class="left">体重とか</td>
+</tr>
+
+<tr>
+<td class="left">\((0,1)\)</td>
+<td class="left">ベータ分布</td>
+<td class="left">比率</td>
+</tr>
+
+<tr>
+<td class="left">\([0,\infty)\)</td>
+<td class="left">指数分布</td>
+<td class="left">イベントが起こるまでの時間</td>
+</tr>
+</tbody>
+</table>
+<BR>
+
+<p>
+\(y\) が \(K\) 次元のベクトルの場合:<br  />
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">\(y_{k}\) の範囲</th>
+<th scope="col" class="left">\(\vec{y}\) の条件</th>
+<th scope="col" class="left">分布</th>
+<th scope="col" class="left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">\((-\infty,\infty)\)</td>
+<td class="left">&#xa0;</td>
+<td class="left">多変量正規分布</td>
+<td class="left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="left">\((0,1)\)</td>
+<td class="left">\(\sum y_k = 1\)</td>
+<td class="left">ディリクレ分布</td>
+<td class="left">ベータ分布の多次元版</td>
+</tr>
+</tbody>
+</table>
+
+<BR><BR>
+<p>
+\(y\) が離散値をとる場合:<br  />
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">y の範囲</th>
+<th scope="col" class="left">分布</th>
+<th scope="col" class="left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">\([0,1]\)</td>
+<td class="left">ベルヌーイ分布</td>
+<td class="left">コイン投げ</td>
+</tr>
+
+<tr>
+<td class="left">\([0,N]\)</td>
+<td class="left">二項分布</td>
+<td class="left">複数のコイン投げで表の出た数</td>
+</tr>
+
+<tr>
+<td class="left">\([0,\infty)\)</td>
+<td class="left">ポアソン分布</td>
+<td class="left">イベント回数/単位時間</td>
+</tr>
+
+<tr>
+<td class="left">\([1,K]\)</td>
+<td class="left">カテゴリカル分布</td>
+<td class="left">サイコロ投げで出た目</td>
+</tr>
+</tbody>
+</table>
+<BR>
+
+<p>
+\(y\) が \(K\) 次元のベクトルの場合:<br  />
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">\(y_{k}\) の範囲</th>
+<th scope="col" class="left">\(\vec{y}\) の条件</th>
+<th scope="col" class="left">分布</th>
+<th scope="col" class="left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">\([0,N]\)</td>
+<td class="left">\(\sum y_{k}=N\)</td>
+<td class="left">多項分布</td>
+<td class="left">複数のサイコロ投げで \(k(k=1,..K)\) が出た数の分布</td>
+</tr>
+</tbody>
+</table>
+<BR><BR>
+
+<p>
+(注):<br  />
+ベルヌーイ分布(0,1)の多次元版(1..K)がカテゴリカル分布<br  />
+二項分布(0,1 をN 回)の多次元版(1..K をN 回)が多項分布<br  />
+ベルヌーイ分布(0,1)を多数回やったのが二項分布(0,1 を N 回)<br  />
+カテゴリカル分布(1..K)を多数回やったのが多項分布(1..K をN回)<br  />
+参照:<br  />
+<a href="http://machine-learning.hatenablog.com/entry/2016/03/26/211106">ややこしい離散分布に関するまとめ - 作って遊ぶ機械学習。</a><br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> #02: \(y\) のパラメータと \(x\) との関係</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> \(y\) の分布のパラメータ \(m\) と \(x\) との関係を考える</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+\(y\) の確率分布 \(p(y)\) は, パラメータ \(m\), \(\sigma\) (正規分布の場合) の具体的な値が決まれば決るので, この具体的な値を求めることが目標になる.<br  />
+\(y\) の分布を正規分布と想定することで, 求めるべきものは \(y\) そのものではなくパラメータ \(m\), \(\sigma\) になった.<br  />
+</p>
+
+<p>
+ところで, 変数 \(y\) は 変数 \(x\) と関係している筈だからそれらの関係性を知りたい, というのが元の問いである.<br  />
+上で, 考えるのは \(y\) そのものではなく分布のパラメータ \(m\), \(\sigma\) に移行しているので, \(m\), \(\sigma\) と \(x\) との関係性について考えることになる.<br  />
+</p>
+
+<p>
+\(m\) は \(y\) の期待値という代表値の一つを表しており, これが \(x\) の値と関係するのでは, と考えるのはまぁ自然なことかなーと思うけどどうだろうか？<br  />
+例えばこんな感じ.<br  />
+</p>
+
+<p>
+例: \(y\) の代表値(期待値) \(m\) が \(x\) が大きくなるにつれて大きくなる(あるいは小さくなる)と考えた場合:<br  />
+$$
+      m = \alpha x + \beta
+    $$<br  />
+</p>
+
+<p>
+この場合, パラメータ \(m\) は データ(\(x\)) 毎に異なった値と仮定されて, そのパラメータは \(\alpha\), \(\beta\) となっている.<br  />
+</p>
+
+<p>
+この段階で, 求めるべき変数は \(m\), \(\sigma\) から \(\alpha\), \(\beta\), \(\sigma\) の 3 つになった(増えちゃった..).<br  />
+上の例のように, 普通は, \(y\) の代表値を示すようなパラメータと \(x\) との関係を考えることが多いようである.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> (参考) 分布のパラメータ値の制限と \(x\) との関係を形作る関数(リンク関数)</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+上の例では正規分布の平均値を表すパラメータ \(m\) と \(x\) が線形の関係であると仮定して,<br  />
+$$
+    m = \alpha x + \beta
+    $$<br  />
+とした.<br  />
+\(m\) の値の範囲は \((-\infty,\infty)\) なので, 右辺をどんなふうに仮定しもとりあえず矛盾することはないかと思われる.<br  />
+</p>
+
+<p>
+しかし, 正規分布以外の場合には, 推定するパラメータの値の制限によって, \(x\) との関係性(右辺)はある程度制限されることがある.<br  />
+</p>
+
+<p>
+以下によく見る分布とパラメータの制限, 代表的な \(x\) との関係を表す関数についてまとめておく.<br  />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">分布</th>
+<th scope="col" class="left">パラメータの制限</th>
+<th scope="col" class="left">\(x\) との関係を表す関数</th>
+<th scope="col" class="left">備考(glm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">正規分布</td>
+<td class="left">\(m=(-\infty,\infty)\), \(\sigma \geq 0\)</td>
+<td class="left">平均値 \(m=ax+b\)</td>
+<td class="left">identity</td>
+</tr>
+
+<tr>
+<td class="left">ガンマ分布</td>
+<td class="left">\(\alpha=(0,\infty)\), \(\beta =(0,\infty)\)</td>
+<td class="left">平均値 \(\frac{\alpha}{\beta} =\exp(ax+b)\)</td>
+<td class="left">log (注1)</td>
+</tr>
+
+<tr>
+<td class="left">対数正規分布</td>
+<td class="left">\(m=(-\infty,\infty)\), \(\sigma=(0,\infty)\)</td>
+<td class="left">平均値 \(m=ax+b\) ?</td>
+<td class="left">(注2)</td>
+</tr>
+
+<tr>
+<td class="left">ベータ分布</td>
+<td class="left">\(\alpha=(0,\infty)\), \(\beta =(0,\infty)\)</td>
+<td class="left">平均値 \(\frac{\alpha}{\alpha+\beta}=\frac{1}{1+\exp(-(ax+b))}\) ?</td>
+<td class="left">(注3)</td>
+</tr>
+
+<tr>
+<td class="left">指数分布</td>
+<td class="left">\(\beta=(0,\infty)\)</td>
+<td class="left">平均値 \(\frac{1}{\beta}=\frac{1}{exp(ax+b)}\) ?</td>
+<td class="left">(注3)</td>
+</tr>
+
+<tr>
+<td class="left">多変量正規分布</td>
+<td class="left">\(m_k=(-\infty,\infty)\)</td>
+<td class="left">\(m_k = a_k x + b_k\) (平均値 \(\vec{m}\))</td>
+<td class="left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="left">ディリクレ分布</td>
+<td class="left">\(\alpha_k=(0,\infty)\)</td>
+<td class="left">\(\alpha_k=\exp(a_k x + b_k)\) ? (平均値 \(\frac{\alpha_k}{\sum \alpha_k}\))</td>
+<td class="left">(注3)</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="left">ベルヌーイ分布</td>
+<td class="left">\(\theta=[0,1]\)</td>
+<td class="left">確率 \(\theta=\frac{1}{1+\exp(-(ax+b))}\)</td>
+<td class="left">logit</td>
+</tr>
+
+<tr>
+<td class="left">二項分布</td>
+<td class="left">\(\theta=[0,1]\)</td>
+<td class="left">確率 \(\theta=\frac{1}{1+\exp(-(ax+b))}\)</td>
+<td class="left">logit</td>
+</tr>
+
+<tr>
+<td class="left">ポアソン分布</td>
+<td class="left">\(\lambda=(0,\infty)\)</td>
+<td class="left">平均値(分散) \(\lambda=\exp(ax+b)\)</td>
+<td class="left">log (注4)</td>
+</tr>
+
+<tr>
+<td class="left">カテゴリカル分布</td>
+<td class="left">\(\theta_k=[0,1]\), \(\sum \theta_k =1\)</td>
+<td class="left">確率 \(\theta_k = \frac{\exp(a_k x+b_k)}{\sum \exp(a_k x+b_k)}\)</td>
+<td class="left">softmax</td>
+</tr>
+
+<tr>
+<td class="left">多項分布</td>
+<td class="left">\(\theta_k=[0,1]\), \(\sum \theta_k =1\)</td>
+<td class="left">確率 \(\theta_k = \frac{\exp(a_k x+b_k)}{\sum \exp(a_k x+b_k)}\)</td>
+<td class="left">softmax</td>
+</tr>
+</tbody>
+</table>
+<BR>
+
+<p>
+(注1):<br  />
+ガンマ分布の場合, \(\alpha(shape)\) は一定値で, \(\beta(rate)\) が \(x\) と関係する, と考えることが多い?<br  />
+glm の default の link 関数は inverse (<a href="http://www.statmethods.net/advstats/glm.html">http://www.statmethods.net/advstats/glm.html</a>)<br  />
+(注2):<br  />
+対数正規分布の場合, glm では, family=gaussian で link 関数を log にする(でいいのかな?).<br  />
+<a href="http://qiita.com/gigamori/items/acf6b45b4a5cc2f604ce">http://qiita.com/gigamori/items/acf6b45b4a5cc2f604ce</a><br  />
+(注3): よくわかんないので適当.<br  />
+以下の URL も参照<br  />
+<a href="http://tjo.hatenablog.com/entry/2013/09/23/232814">重回帰分析＆一般化線形モデル選択まわりの再まとめ 六本木で働くデータサイエンティストのブログ</a><br  />
+<a href="https://www.slideshare.net/simizu706/stan-64926504">Stanコードの書き方　中級編:</a><br  />
+(注4): \(\log(\lambda)=ax+b\)<br  />
+</p>
+<BR><BR>
+
+<p>
+パラメータ値の制限と使われる典型的な関数の関係<br  />
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">パタメータ制限</th>
+<th scope="col" class="left">関数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">\((-\infty,\infty)\)</td>
+<td class="left">\(ax+b\)</td>
+</tr>
+
+<tr>
+<td class="left">\((0,\infty)\)</td>
+<td class="left">\(\exp(ax+b)\)</td>
+</tr>
+
+<tr>
+<td class="left">\([0,1]\)</td>
+<td class="left">\(\frac{1}{1+\exp(-(ax+b))}\)</td>
+</tr>
+
+<tr>
+<td class="left">\(\sum = 1\)</td>
+<td class="left">\(\frac{\exp(a_k x+b_k)}{\sum \exp(a_k x+b_k)}\)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> #03: 同時確率(密度) = 尤度計算</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+変数 \((x,y)\) の具体的なデータ \((X^{(i)},Y^{(i)})\) (\(i=1 .. N\). \(N\) はデータ数) から, これらのデータが得られる同時確率(密度)について考える.<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> データが得られる確率(密度)の計算</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+まずは 1 つ目のデータ \((X^{(1)}, Y^{(1)})\) が得られる確率(密度)は, \(p(y)\) が(今回の例では)以下のように書けると仮定してるので,<br  />
+$$
+    p(y) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{(y-m)^2}{2\sigma^2})
+    $$<br  />
+</p>
+
+<p>
+\(y\) に具体的な値  \(Y^{(1)}\) を代入して<br  />
+$$
+    p(y=Y^{(1)}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{(Y^{(1)}-m)^2}{2\sigma^2})
+    $$<br  />
+一方 \(m\) については<br  />
+$$
+      m = \alpha x + \beta
+    $$<br  />
+と考えているので,<br  />
+\(x\) に具体的な値 \(X^{(1)}\) を代入して,<br  />
+$$
+      m = \alpha X^{(1)} + \beta
+    $$<br  />
+となって, 結局<br  />
+$$
+    p(y=Y^{(1)}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{(Y^{(1)}-\alpha X^{(1)} -\beta)^2}{2\sigma^2})
+    $$<br  />
+となった.<br  />
+</p>
+
+<p>
+データ \(2, 3, \ldots N\) についても同様に計算できる.<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> 尤度の計算</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+\(p(y=Y^{(1)})\) の式には, 未知な変数(パラメータ)として \(\alpha\), \(\beta\), \(\sigma\) がある.<br  />
+\(Y^{(1)}\), \(X^{(1)}\) は具体的な値で, 例えば 3 とか 5 とかが入っている.<br  />
+この式は, \(\alpha\), \(\beta\), \(\sigma\) の関数として見ることができる.<br  />
+つかわれてる数(変数, データ)を明示的にするため以下のように書いておく.<br  />
+</p>
+
+<p>
+$$
+    l(\alpha,\beta,\sigma,  y=Y^{(1)}, x=X^{(1)}) = p(y=Y^{(1)})
+    $$<br  />
+\(y\) についてみるとこの値は確率(密度)である(\(y\) について積分すると 1 になる).<br  />
+しかし \(\alpha\), \(\beta\), \(\sigma\) から見ると確率ではなく普通の関数である(規格化されてない)とみなせる.<br  />
+\(\alpha\), \(\beta\), \(\sigma\) の関数としてみたとき, この値は「尤度(ゆうど)」と呼ばれている.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-3" class="outline-4">
+<h4 id="sec-2-3-3"><span class="section-number-4">2.3.3</span> 同時確率(密度)の計算</h4>
+<div class="outline-text-4" id="text-2-3-3">
+<p>
+さて, \(p(y=Y^{(1)})\) は データ \(Y^{(1)}\) が得られる確率(密度)だが, データはさらに \(Y^{(2)}\), \ldots \(Y^{(N)}\) まで, 全部で \(N\) 個ある.<br  />
+ここで, \(N\) 個のデータが得られる同時確率(密度)について考えてみる.<br  />
+各々のデータ \(Y^{(i)}\) はそれぞれ独立(\(Y^{(1)}\) の値が \(Y^{(2)}\) の値の出方(確率)に影響しない) であると普通は考えられるので, 同時確率(密度) \(q\) は<br  />
+$$
+    q = \Pi_{i=1}^{N} p(y=Y^{(i)})
+    $$<br  />
+となる.<br  />
+$$
+    p(y=Y^{(i)}) = l(\alpha,\beta,\sigma,   y=Y^{(i)}, x=X^{(i)})
+    $$<br  />
+なので \(q\) は以下のように書ける.<br  />
+$$
+    q = \Pi_{i=1}^{N} l(\alpha,\beta,\sigma,  y=Y^{(i)}, x=X^{(i)})
+    $$<br  />
+使われてる数(パラメータ, データ)を明示して書くと以下のようになる.<br  />
+$$
+    q(\alpha,\beta,\sigma, Y^{(1)},X^{(1)},...,Y^{(N)},X^{(N)}) =  \Pi_{i=1}^{N} l(\alpha,\beta,\sigma,  Y^{(i)}, X^{(i)})
+    $$<br  />
+\(Y^{(1)}\), \(X^{(1)}\) &#x2026; には具体的な数値がはいっている.<br  />
+</p>
+
+<p>
+\(q\) は掛け算の繰り返し(\(\Pi\))があって取扱いにくいので, 計算の際には普通は上式の対数をとったものが使われる.<br  />
+対数をとると掛け算(\(\Pi\)) は足し算(\(\sum\)) になる.<br  />
+\(L = \log q\) とかいて,<br  />
+</p>
+
+<p>
+$$
+    L(\alpha,\beta,\sigma,  Y^{(1)},X^{(1)},...,Y^{(N)},X^{(N)}) = \sum_{i=1}^{N} \log l(\alpha,\beta,\sigma,  Y^{(i)},X^{(i)})
+    $$<br  />
+これを「対数尤度」をいったりするらしい.<br  />
+基本これを元に色々な計算を行っていく.<br  />
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> パラメータの推定</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+推定はたいていの場合, コンピュータがよしなにやってくれるが, 考え方位は知っておこうと思うので本を読んだ部分をまとめておく.<br  />
+</p>
+</div>
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 最尤推定</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+\(q\) (あるいは \(L\)) は \(\alpha\), \(\beta\), \(\sigma\) の関数であるが, データ \(X^{(i)}\), \(Y^{(i)}\) \((i=1..N)\) から見れば確率でもある.<br  />
+データ \(X^{(i)}\), \(Y^{(i)}\) (\(i=1..N\)) が得られる同時確率 \(q\) が 最も大きくなる \(\alpha\), \(\beta\), \(\sigma\) が実現する値であると考えるのは自然かとおもわれる.<br  />
+</p>
+
+<p>
+つまり求める \(\alpha\), \(\beta\), \(\sigma\) は, \(q\) を最大化する  \(\alpha\), \(\beta\), \(\sigma\) と考えていいかと思われる.<br  />
+</p>
+
+<p>
+具体的に値を求めるには, \(\frac{\partial q}{\partial \alpha} = 0\) などを解けばよい.<br  />
+極値の場所は log をとっても変わらないので, \(q\) の全体に log をとった \(L\) を使うことが多いようだ.<br  />
+</p>
+
+<p>
+$$
+   \frac{\partial L}{\partial \alpha} = 0
+   $$<br  />
+</p>
+
+<p>
+\(\beta\), \(\sigma\) についても同様の計算を行う.<br  />
+実際には, 上式を数値的に解いてパタメータの値を求める.<br  />
+コンピュータにやらせればよい部分である.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> ベイズ推定</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> パラメータの「分布」の推定</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+ベイズ推定では, パラメータの「真の値」を推定するのではなくパラメータの「分布」(事後分布)を求める.<br  />
+</p>
+
+<p>
+ベイズの公式:<br  />
+$$
+    P(A,B) = P(A|B)P(B) = P(B|A)P(A)
+    $$<br  />
+</p>
+
+<p>
+$$
+    P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+    $$<br  />
+</p>
+
+<p>
+\(A\) を パラメータ(\(\alpha\),\(\beta\),\(\sigma\)), \(B\) をデータ(\(X^{(i)}\),\(Y^{(i)}\) \(i=1..N\)) とすると,<br  />
+\(P(B|A)\) (パラメータ \(A\) が与えられたもとでの データ \(B\) の確率)は以下の \(q\) に相当する.<br  />
+$$
+    q(\alpha,\beta,\sigma, Y^{(1)},X^{(1)},...,Y^{(N)},X^{(N)}) =  \Pi_{i=1}^{N} l(\alpha,\beta,\sigma, Y^{(i)}, X^{(i)})
+    $$<br  />
+これは \(y\) にとっては確率で, パラメータ(\(\alpha\),\(\beta\),\(\sigma\))にとっては尤度と呼ばれる値でもある.<br  />
+</p>
+
+<p>
+\(P(A)\) は事前確率と呼ばれていて, パラメータに関するの事前知識に基づいた偏りを示す.<br  />
+何も知識がなければ定数にしておく(ほんとは確率(密度)だから足して(積分して) 1 にならないといけないんだけど&#x2026;).<br  />
+</p>
+
+<p>
+\(P(B)\) はデータが得られる確率で, \(A\) とは関係ない値.<br  />
+今の状況ではデータ \(B\) は具体的な値なので, \(P(B)\) も何か具体的な値となる.<br  />
+つまりこいつは 5 とか 8 とか 1000 とかの定数値となるはず.<br  />
+</p>
+
+<p>
+まとめると,<br  />
+$$
+    (事後分布) = (尤度) * \frac{(事前分布)}{(定数)}
+    $$<br  />
+</p>
+
+<p>
+事前分布が定数であれば事後分布は尤度と同じ(定数分だけ異なる)で, 目的関数は最尤推定とほぼ同様になるが, 最尤推定は最大の尤度をもつパラメータ 1 つをゲットするのに対して,<br  />
+ベイズ推定ではパラメータの「分布」を考えるところが違うのであった.<br  />
+</p>
+
+<p>
+事後分布の推定は, この分布に従う多数の粒子を発生させる方法(MCMC)を用いて数値的に行う.<br  />
+コンピュータがいい感じでやってくれると思う.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> (参考) 正則化と事前分布</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+ここからは, 求めるパラメータ(上の例では \(\alpha\), \(\beta\), \(\sigma\)) を \(\theta\) という一つの文字で代表させる.<br  />
+$$
+    p(\theta|y) = \frac{p(y|\theta) p(\theta)}{p(y)}
+    $$<br  />
+</p>
+
+<p>
+\(p(\theta)\) を定数とすれば(= \(\theta\) に関して何の仮定もおかない),<br  />
+$$
+    \log p(\theta|y) = \log p(y|\theta) + const(\theta) - const(y)
+    $$<br  />
+なので,<br  />
+</p>
+\begin{align*}
+\log p(\theta|y) &\propto& \log p(y|\theta)
+\end{align*}
+<p>
+となる.<br  />
+</p>
+
+<p>
+一方, \(p(\theta) \sim  normal(0,\tau)\) (正規分布) とすれば(= \(\theta\) の平均値は 0 っぽい, という仮定をおく. \(\tau\) が小さいほど \(\theta=0\) を確信してる, というイメージ),<br  />
+</p>
+\begin{align*}
+p(\theta) &=& \frac{1}{\sqrt{2\pi\tau^2}} \exp(-\frac{(\theta-0)^2}{2\tau^2}) \\
+\log p(\theta) &\sim& - \frac{\theta^2}{2 \tau^2} \equiv  - \gamma \theta^2
+\end{align*}
+
+<p>
+よって,<br  />
+</p>
+\begin{align*}
+\log p(\theta|y) &\propto& \log p(y|\theta) + \log p(\theta) \\
+                 &\propto& \log p(y|\theta) - \gamma \theta^2
+\end{align*}
+<p>
+となる.<br  />
+ここで, \(\gamma\) は分散に関係するパラメータ(計算前に自分で適当に決める値. \(\gamma\sim\frac{1}{\tau^2})\) である.<br  />
+</p>
+
+<p>
+右辺第二項が追加された状態での回帰はリッジ(Ridge)回帰あるいはチノコフの正則化と呼ばれている.<br  />
+右辺第二項にパラメータの制限を加えることを正則化というらしいのだが, これはパラメータの事前分布を上のように設定してベイズ的に推定してるのと同じ.<br  />
+</p>
+
+<p>
+事前分布にラプラス分布<br  />
+$$
+    p(y) = \frac{1}{2\sigma} \exp(-\frac{|y-m|}{\sigma})
+    $$<br  />
+を使ったものがラッソ(Lasso)回帰と言われるものである(見た感じラプラス分布だと思うんだけど要確認です).<br  />
+</p>
+
+<p>
+このあたりの超わかりやすい説明は, プログラミングのための確率統計 8.1.回帰分析と多変量解析から p277 に書いてあった.<br  />
+正則化の説明をどっかでみたときに, 後ろに勝手に適当な関数を追加したりして, そんなことやっていいの? とか思ったのだが, ここを読んでやっと意味がわかったような気がした.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> (参考) 階層ベイズ</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<p>
+パラメータ \(\alpha\) は, 最尤推定ではすべてのデータに共通した一つの値として求まる..<br  />
+ベイズ推定ではすべてのデータに共通した一つの分布として求まる.<br  />
+階層ベイズでは, パラメータ \(\alpha\) はデータあるいはグループ毎に異なる複数の分布からなると考える.<br  />
+ここでは, \(\alpha\) はグループに関するデータ \(z\) に依存すると考え, \(y\) について考えたのと同様に以下の 3 点を考えてみる.<br  />
+</p>
+</div>
+
+<ol class="org-ol"><li><a id="sec-3-2-3-1" name="sec-3-2-3-1"></a>#01 \(\alpha\) の(観測値 \(z\) を固定したときの)分布の形<br  /><div class="outline-text-5" id="text-3-2-3-1">
+<p>
+データあるいはグループ毎に異なるパラメータ \(\alpha\) は, ある一つの分布から生成された値.<br  />
+この分布によって, 異なる \(\alpha\) にゆるい制限をかける.<br  />
+</p>
+
+<p>
+例えば, \(\alpha\) は正規分布すると想定出来たとき:<br  />
+$$
+     \alpha \sim normal(m_a,\sigma_a)
+     $$<br  />
+</p>
+</div>
+</li>
+
+<li><a id="sec-3-2-3-2" name="sec-3-2-3-2"></a>#02 \(\alpha\) のパラメータと \(z\) との関係<br  /><div class="outline-text-5" id="text-3-2-3-2">
+<p>
+例えば, 以下のような線形関係を想定できたとする:<br  />
+$$
+     m_a = \alpha_a z + \beta_a
+     $$<br  />
+</p>
+</div>
+</li>
+<li><a id="sec-3-2-3-3" name="sec-3-2-3-3"></a>#03 同時確率(事後確率)<br  /><div class="outline-text-5" id="text-3-2-3-3">
+<p>
+データ数値をつかって同時確率を考える.<br  />
+$$
+     p(\alpha_a,\beta_a,\sigma_a,\beta,\sigma,\alpha_{z} |Y^{(i=1..N)})
+     $$<br  />
+の計算は省略.<br  />
+</p>
+</div>
+</li></ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 例</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+#01, #02, #03 に沿って考えを進めていった例をしめす.<br  />
+</p>
+</div>
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> 線形回帰</h3>
+<div class="outline-text-3" id="text-4-1">
+</div><div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1"><span class="section-number-4">4.1.1</span> #01 \(y\) の分布の形</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<p>
+\(y\) は正規分布と仮定.<br  />
+$$
+    p(y) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{(y-m)^2}{2\sigma^2})
+    $$<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> #02 \(y\) のパラメータと \(x\) との関係</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<p>
+\(y\) のパラメータ \(m\) (期待値)が, データ \(x\) と線形関係にあると仮定.<br  />
+$$
+    m = \alpha x + \beta
+    $$<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> #03 同時確率</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<p>
+データ \((X^{(i)},Y^{(i)})\) の確率は,<br  />
+$$
+    l(\alpha,\beta,\sigma,  Y^{(i)}, X^{(i)}) = p(Y^{(i)})
+    $$<br  />
+同時確率(尤度) \(q\) は<br  />
+$$
+    q(\alpha,\beta,\sigma) =  \Pi_{i=1}^{N} l(\alpha,\beta,\sigma,  Y^{(i)}, X^{(i)})
+    $$<br  />
+対数尤度 \(L\) は<br  />
+$$
+    L(\alpha,\beta,\sigma) = \sum_{i=1}^{N} \log l(\alpha,\beta,\sigma,  Y^{(i)},X^{(i)})
+    $$<br  />
+この部分の計算を行うと,<br  />
+$$
+      -\sum_{i=1}^{N} (Y^{(i)}- (\alpha X^{(i)} + \beta))^2
+    $$<br  />
+という形になる.<br  />
+これは最小二乗法として知られている関数の形です.<br  />
+つまり, 最小二乗法を使った直線の当てはめ = \(y\) に正規分布を仮定 してるのと同じ.<br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> ロジスティック回帰</h3>
+<div class="outline-text-3" id="text-4-2">
+</div><div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1"><span class="section-number-4">4.2.1</span> #01 \(y\) の分布の形</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<p>
+\(y\) は 0 or 1 であり, ベルヌーイ分布を想定するのが自然だろう.<br  />
+$$
+    p(y) = t^y (1-t)^{(1-y)}
+    $$<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> #02 \(y\) のパラメータと \(x\) との関係</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<p>
+\(y\) のパラメータは \(t\) で, これは \(y=1\) である確率という意味を持つ.<br  />
+確率なので, \(0 \leq t \leq 1\) です.<br  />
+\(x\) は一般に \(-\infty < x < \infty\) なので, ロジスティック関数<br  />
+$$
+    f(x) = \frac{1}{1 + \exp(-x)}
+    $$<br  />
+を使って,<br  />
+$$
+    t = f(\alpha x + \beta)
+    $$<br  />
+とし, \(t\) を 0 から 1 の間に押し込めることにする.<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-2-3" class="outline-4">
+<h4 id="sec-4-2-3"><span class="section-number-4">4.2.3</span> #03 同時確率</h4>
+<div class="outline-text-4" id="text-4-2-3">
+<p>
+データ \((X^{(i)},Y^{(i)})\) の確率は,<br  />
+$$
+    l(\alpha,\beta,  Y^{(i)}, X^{(i)}) = p(Y^{(i)})
+    $$<br  />
+同時確率(尤度) \(q\) は<br  />
+$$
+    q(\alpha,\beta) =  \Pi_{i=1}^{N} l(\alpha,\beta,  Y^{(i)}, X^{(i)})
+    $$<br  />
+対数尤度 \(L\) は<br  />
+$$
+    L(\alpha,\beta) = \sum_{i=1}^{N} \log l(\alpha,\beta,  Y^{(i)},X^{(i)})
+    $$<br  />
+この部分の計算はどんな感じかというと,<br  />
+</p>
+\begin{align*}
+L &=& \sum_{i=1}^{N} [ t \log(Y^{(i)}) + (1-t) \log(1-Y^{(i)}) ]\\
+  &=& \sum_{i=1}^{N} [ f(\alpha X^{(i)} + \beta) \log(Y^{(i)}) + (1-f(\alpha X^{(i)} + \beta)) \log(1-Y^{(i)}) ]
+\end{align*}
+<p>
+\(- A \log B\) の和 = 交差エントロピー(cross entropy) と言う.<br  />
+L の最大化 = 交差エントロピーの最小化.<br  />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> 多クラス分類</h3>
+<div class="outline-text-3" id="text-4-3">
+</div><div id="outline-container-sec-4-3-1" class="outline-4">
+<h4 id="sec-4-3-1"><span class="section-number-4">4.3.1</span> #01 \(y\) の分布の形</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<p>
+1-of-K 表記法を利用する.<br  />
+この記法では,<br  />
+$$
+    y = (y_1, y_2, .. y_k, .. y_K)
+    $$<br  />
+\(y_k\) は, クラス \(k\) であれば 1, それ以外は 0 である.<br  />
+(\(y_k\) のうち一つだけが 1, それ以外は 0).<br  />
+\(y\) について以下の式が成り立つ.<br  />
+$$
+    \sum_{i=1}^{K} y_k = 1
+    $$<br  />
+</p>
+
+<p>
+\(p(y)\) は以下のカテゴリカル分布と想定される.<br  />
+$$
+    p(y) = \Pi_{k=1}^{K} t_{k}^{y_k}
+    $$<br  />
+\(t_k\) はクラス \(k\) である確率を示す.<br  />
+</p>
+
+<p>
+\(t\) について以下の式が成り立つ.<br  />
+$$
+    \sum_{i=1}^{K} t_{k} = 1
+    $$<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3-2" class="outline-4">
+<h4 id="sec-4-3-2"><span class="section-number-4">4.3.2</span> #02 \(y\) のパラメータと \(x\) との関係</h4>
+<div class="outline-text-4" id="text-4-3-2">
+<p>
+\(t_k\) は確率なので \(0 \leq t_k \leq 1\) を満たし,<br  />
+なおかつ<br  />
+$$
+    \sum_{i=1}^{K} t_{k} = 1
+    $$<br  />
+も満たさないといけない.<br  />
+</p>
+
+<p>
+これを満たすものとして,<br  />
+$$
+    t_k = \frac{\exp(\alpha_k x + \beta_k)}{\sum_{k=1}^{K} \exp(\alpha_k x + \beta_k)}
+    $$<br  />
+例えばこんなのを考える事ができる.<br  />
+ソフトマックス関数と呼ばれてるらしい.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3-3" class="outline-4">
+<h4 id="sec-4-3-3"><span class="section-number-4">4.3.3</span> #03 同時確率</h4>
+<div class="outline-text-4" id="text-4-3-3">
+<p>
+ロジスティック回帰とほぼおなじ.<br  />
+対数尤度に 1 から \(K\) の和が加わる.<br  />
+$$
+    L(\alpha,\beta) = \sum_{k=1}^{K} \sum_{i=1}^{N} \log l(\alpha_k,\beta_k,  Y^{(i)},X^{(i)})
+    $$<br  />
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> ニューラルネット</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+ニューラルネットでは, #02 の部分が微妙に変わってくる.<br  />
+とは言っても, 求める関数のパラメータ(\(\alpha\),\(\beta\))がニューラルネットの重み \(w\) に変わるだけである.<br  />
+ニューラルネットでは一般に入力が多次元なので, \(x =\vec{x}\) とする.<br  />
+</p>
+</div>
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> 線形回帰</h3>
+<div class="outline-text-3" id="text-5-1">
+</div><div id="outline-container-sec-5-1-1" class="outline-4">
+<h4 id="sec-5-1-1"><span class="section-number-4">5.1.1</span> #02 \(y\) のパラメータと \(x\) との関係</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<p>
+重み \(w = \vec{w}\) とバイアス \(b\) をパラメータとして \(m = \vec{w} \vec{x} + b\)<br  />
+とかる. 上の例と全く一緒である.<br  />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> ロジスティック回帰</h3>
+<div class="outline-text-3" id="text-5-2">
+</div><div id="outline-container-sec-5-2-1" class="outline-4">
+<h4 id="sec-5-2-1"><span class="section-number-4">5.2.1</span> #02 \(y\) のパラメータと \(x\) との関係</h4>
+<div class="outline-text-4" id="text-5-2-1">
+\begin{align*}
+\mu &=& \vec{w} \vec{x} + b \\
+t   &=& \frac{1}{1 + \exp(-\mu)}
+\end{align*}
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3"><span class="section-number-3">5.3</span> 多クラス分類</h3>
+<div class="outline-text-3" id="text-5-3">
+</div><div id="outline-container-sec-5-3-1" class="outline-4">
+<h4 id="sec-5-3-1"><span class="section-number-4">5.3.1</span> #02 \(y\) のパラメータと \(x\) との関係</h4>
+<div class="outline-text-4" id="text-5-3-1">
+<p>
+$$
+    \vec{\mu} = \vec{w} \vec{x} + \vec{b}
+    $$<br  />
+\(\vec{\mu}\) は K 次元ベクトル.<br  />
+\(\vec{w}\) は K 行 N 列の行列.<br  />
+\(\vec{x}\) は N 次元ベクトル.<br  />
+\(\vec{b}\) は K 次元ベクトル.<br  />
+</p>
+
+<p>
+$$
+    t_k = \frac{\exp(\mu_k)}{\sum_{k=1}^{K} \exp(\mu_k)}
+    $$<br  />
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-06-20T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-06-20 (Tue)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2017-06-20-184414.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2017-06-20-184414.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2017-06-01-134010.html" title="Previous Post: thing-at-point を応用したファイルの検索">&laquo; thing-at-point を応用したファイルの検索</a></li>
+            
+            
+            <li class="next"><a href="/blog/2017-07-26-003653.html" title="Next Post: 主成分分析の学習">主成分分析の学習 &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2017-06-20-184414.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2017-06-20-184414.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

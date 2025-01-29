@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>tab 区切りファイルの読込み - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2017-05-04-fread.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2017-05-04-fread.html">
+  <meta property="og:title" content="tab 区切りファイルの読込み - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-05-04T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-05-04 (Thu)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        tab 区切りファイルの読込み
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/java/'>java</a> <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/perl/'>perl</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a> <a class='category label label-primary' href='/blog/categories/ruby/'>ruby</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. Perl</a></li>
+<li><a href="#sec-3">3. Python</a></li>
+<li><a href="#sec-4">4. Julia</a></li>
+<li><a href="#sec-5">5. Ruby</a></li>
+<li><a href="#sec-6">6. R</a></li>
+<li><a href="#sec-7">7. Java</a></li>
+<li><a href="#sec-8">8. かんそう</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2016-07-16 Sat 13:44&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-21 Wed 20:51&gt;</span></span><br  />
+</p>
+<p>
+tab 区切りファイル読込み/書込みの各言語でのやりかたの違いを整理する.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<p>
+参考:<br  />
+配列操作の比較表: Ruby, Python, JavaScript, Perl, C++ - bkブログ<br  />
+<a href="http://0xcc.net/blog/archives/000043.html">http://0xcc.net/blog/archives/000043.html</a><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+私は普段の生活においては perl でプログラムを書いている.<br  />
+ささっと書いて捨てちゃうことが多いが,<br  />
+そのようなプログラムで最も多いぱたーんは以下のようなものである:<br  />
+</p>
+
+<ol class="org-ol">
+<li>何か(tab 区切りとかの)ファイルを読込む.<br  />
+</li>
+<li>何かやる(読み込んだデータを加工したり計算したりする).<br  />
+</li>
+<li>別のファイルに結果等を書き出す.<br  />
+</li>
+</ol>
+
+<p>
+Python を始めとした色んな言語をこれから学んでいくにあたって,<br  />
+上記操作のやり方の違いををまずは見ていくのが自分にとっては一番しっくり来るかなぁと思ったのでまとめておく.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Perl</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+これが基準<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ifile</span>=<span style="color: #ffa07a;">'input.txt'</span>;
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ofile</span>=<span style="color: #ffa07a;">'output.perl.txt'</span>;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">input</span>
+<span class="linenr"> 8: </span><span style="color: #9370db;">open</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$fh</span>,<span style="color: #ffa07a;">"&lt;"</span>,$ifile;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cnt</span>=0;
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@head</span>;
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$data</span>;
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">while</span>(&lt;$fh&gt;) {
+<span class="linenr">13: </span>  <span style="color: #ff83fa;">chomp</span>;
+<span class="linenr">14: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@bf</span>=<span style="color: #ff83fa;">split</span>(<span style="color: #1e90ff;">/</span><span style="color: #76ee00;">\</span><span style="color: #9370db;">t</span><span style="color: #1e90ff;">/</span>,$_);
+<span class="linenr">15: </span>  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27096;&#12293;&#12394;&#29366;&#27841;&#12395;&#23550;&#24540;&#12391;&#12365;&#12427;&#12424;&#12358;&#12395;</span>
+<span class="linenr">16: </span>  <span style="color: #20b2aa; font-weight: bold;">unless</span>($cnt) { <span style="color: #cd853f;"># </span><span style="color: #cd853f;">header</span>
+<span class="linenr">17: </span>    <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@head</span>=<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@bf</span>;
+<span class="linenr">18: </span>  }<span style="color: #20b2aa; font-weight: bold;">else</span> {        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">data</span>
+<span class="linenr">19: </span>    <span style="color: #ff83fa;">push</span>(@{$data},\<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@bf</span>);
+<span class="linenr">20: </span>  }
+<span class="linenr">21: </span>  $cnt++;
+<span class="linenr">22: </span>}
+<span class="linenr">23: </span><span style="color: #9370db;">close</span> $fh;
+<span class="linenr">24: </span>
+<span class="linenr">25: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">output</span>
+<span class="linenr">26: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$prnt</span>;
+<span class="linenr">27: </span>$prnt=<span style="color: #9370db;">join</span>(<span style="color: #ffa07a;">"\t"</span>,<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@head</span>).<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">28: </span><span style="color: #20b2aa; font-weight: bold;">for</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$d</span> (@{$data}) {
+<span class="linenr">29: </span>  $prnt.=<span style="color: #9370db;">join</span>(<span style="color: #ffa07a;">"\t"</span>,@{$d}).<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">30: </span>}
+<span class="linenr">31: </span><span style="color: #9370db;">open</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ofh</span>,<span style="color: #ffa07a;">"&gt;"</span>,$ofile;
+<span class="linenr">32: </span><span style="color: #ff83fa;">print</span> $ofh $prnt;
+<span class="linenr">33: </span><span style="color: #9370db;">close</span> $ofh;
+<span class="linenr">34: </span>
+<span class="linenr">35: </span><span style="color: #ff83fa;">print</span> $prnt; <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27161;&#28310;&#20986;&#21147;&#12395;&#12418;&#26360;&#12365;&#20986;&#12377;&#22580;&#21512;</span>
+</pre>
+</div>
+
+<pre class="example">
+name  age origin  gender  idata fdata type
+foo 10  jpn M 50  0.25  X
+bar 30  usa F 25  0.38  P
+hoge  10  jpn F 4 1 P
+fuga  40  eng M     X
+fuga  35    F 9 0.1 X
+</pre>
+
+<p>
+header の名前を key にして hash の配列にしてもよい.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Python</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+python での注意点と参考 URL:<br  />
+</p>
+
+<ul class="org-ul">
+<li>タブ区切りのファイルを読む<br  />
+<ul class="org-ul">
+<li>Python でファイルを読む<br  />
+<a href="http://osksn2.hep.sci.osaka-u.ac.jp/~taku/osx/python/readfile.html">http://osksn2.hep.sci.osaka-u.ac.jp/~taku/osx/python/readfile.html</a><br  />
+</li>
+</ul>
+</li>
+<li>unless の代わりに not を使う<br  />
+<ul class="org-ul">
+<li>【python】unlessがないのでnotを使う | chat-blog<br  />
+<a href="http://chat-rate.com/it/255">http://chat-rate.com/it/255</a><br  />
+</li>
+</ul>
+</li>
+<li>文字列を数値に変換する(めんどくさいなぁ&#x2026;)<br  />
+<ul class="org-ul">
+<li>Pythonメモ: 文字列を数値に変換する<br  />
+<a href="http://yoshi-python.blogspot.jp/2009/09/blog-post_4656.html">http://yoshi-python.blogspot.jp/2009/09/blog-post_4656.html</a><br  />
+</li>
+</ul>
+</li>
+<li>辞書オブジェクトの使い方<br  />
+<ul class="org-ul">
+<li>Python - 辞書（ディクショナリ）の使い方 - ざっくりん雑記<br  />
+<a href="http://azuuun-memorandum.hatenablog.com/entry/2015/05/01/075000">http://azuuun-memorandum.hatenablog.com/entry/2015/05/01/075000</a><br  />
+</li>
+</ul>
+</li>
+<li>ファイルに書き込み<br  />
+<ul class="org-ul">
+<li>Python: テキストファイルに書き込み – write()、writelines()メソッド<br  />
+<a href="http://www.yukun.info/blog/2008/09/python-file-write-writelines.html">http://www.yukun.info/blog/2008/09/python-file-write-writelines.html</a><br  />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> sys
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span style="color: #9acd32;">ifile</span>=<span style="color: #ffa07a;">'input.txt'</span>
+<span class="linenr"> 4: </span><span style="color: #9acd32;">ofile</span>=<span style="color: #ffa07a;">'output.python.txt'</span>
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span style="color: #9acd32;">fh</span>=<span style="color: #76ee00;">open</span>(ifile,<span style="color: #ffa07a;">'r'</span>)
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">lines=fh.readlines() # &#20840;&#37096;&#35501;&#12415;&#36796;&#12435;&#12391; lines &#12395;&#20837;&#12428;&#12427;&#22580;&#21512;.</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">input</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">perl &#12392;&#21516;&#12376;&#24863;&#12376;&#12391;&#12363;&#12356;&#12390;&#12415;&#12427;.</span>
+<span class="linenr">11: </span><span style="color: #9acd32;">cnt</span>=0
+<span class="linenr">12: </span><span style="color: #9acd32;">head</span>=[]
+<span class="linenr">13: </span><span style="color: #9acd32;">data</span>=[]
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">for</span> li <span style="color: #20b2aa; font-weight: bold;">in</span> fh:   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">li &#12395; 1 &#34892;&#27598;(&#25913;&#34892;&#21547;&#12416;)&#12364;&#20837;&#12387;&#12390;&#12367;&#12427;</span>
+<span class="linenr">15: </span>  <span style="color: #9acd32;">bf</span> = li[:-1].split(<span style="color: #ffa07a;">"\t"</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429;&#12398;&#25913;&#34892;&#12434;&#21462;&#12426;&#38500;&#12356;&#12390;(li[:-1]) split</span>
+<span class="linenr">16: </span>  <span style="color: #20b2aa; font-weight: bold;">if</span> <span style="color: #20b2aa; font-weight: bold;">not</span> cnt:
+<span class="linenr">17: </span>     <span style="color: #9acd32;">head</span>=bf
+<span class="linenr">18: </span>  <span style="color: #20b2aa; font-weight: bold;">else</span>:
+<span class="linenr">19: </span>     data.append(bf)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">push &#12391;&#12399;&#12394;&#12367; append</span>
+<span class="linenr">20: </span>  <span style="color: #9acd32;">cnt</span>+=1
+<span class="linenr">21: </span>fh.close
+<span class="linenr">22: </span>
+<span class="linenr">23: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25991;&#23383;&#21015;&#12392;&#12375;&#12390;&#20837;&#12387;&#12390;&#12427;&#12371;&#12392;&#12434;&#30906;&#35469;&#12377;&#12427;.</span>
+<span class="linenr">24: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(head)</span>
+<span class="linenr">25: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(data)</span>
+<span class="linenr">26: </span>
+<span class="linenr">27: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hash &#12398;&#37197;&#21015;&#12392;&#12375;&#12390;&#20837;&#12428;&#12390;&#12415;&#12427;</span>
+<span class="linenr">28: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hashs[0]['name'] &#12371;&#12435;&#12394;&#24863;&#12376;&#12391;&#21508;&#12293;&#12398;&#35201;&#32032;&#12395;&#12450;&#12463;&#12475;&#12473;&#12377;&#12427;.</span>
+<span class="linenr">29: </span><span style="color: #9acd32;">hashs</span>=[]
+<span class="linenr">30: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dr <span style="color: #20b2aa; font-weight: bold;">in</span> data:
+<span class="linenr">31: </span>  <span style="color: #76ee00;">hash</span>={}
+<span class="linenr">32: </span>  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">print(dr)</span>
+<span class="linenr">33: </span>  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">sys.exit(0) # &#12371;&#12371;&#12391;&#32066;&#12431;&#12427;&#26178;(for debug)</span>
+<span class="linenr">34: </span>  <span style="color: #20b2aa; font-weight: bold;">for</span> j,d <span style="color: #20b2aa; font-weight: bold;">in</span> <span style="color: #76ee00;">enumerate</span>(dr):
+<span class="linenr">35: </span>     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">j &#12364; 1 &#12363; 4 &#12398;&#12392;&#12365;&#12399;, &#25972;&#25968;&#12392;&#12375;&#12390;&#20837;&#12428;&#12427;</span>
+<span class="linenr">36: </span>     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">j &#12364; 5      &#12398;&#12392;&#12365;&#12399;, &#28014;&#21205;&#23567;&#25968;&#28857;&#12392;&#12375;&#12390;&#20837;&#12428;&#12427;. &#38754;&#20498;...</span>
+<span class="linenr">37: </span>     <span style="color: #9acd32;">dk</span> = d
+<span class="linenr">38: </span>     <span style="color: #20b2aa; font-weight: bold;">if</span> <span style="color: #20b2aa; font-weight: bold;">not</span> d==<span style="color: #ffa07a;">''</span>:
+<span class="linenr">39: </span>       <span style="color: #20b2aa; font-weight: bold;">if</span> j==1 <span style="color: #20b2aa; font-weight: bold;">or</span> j==4:
+<span class="linenr">40: </span>         <span style="color: #9acd32;">dk</span> = <span style="color: #76ee00;">int</span>(d)
+<span class="linenr">41: </span>       <span style="color: #20b2aa; font-weight: bold;">elif</span> j==5:         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">elsif &#12391;&#12399;&#12394;&#12367; elif</span>
+<span class="linenr">42: </span>         <span style="color: #9acd32;">dk</span> = <span style="color: #76ee00;">float</span>(d)
+<span class="linenr">43: </span>     <span style="color: #76ee00;">hash</span>[head[j]]=dk
+<span class="linenr">44: </span>  hashs.append(<span style="color: #76ee00;">hash</span>)
+<span class="linenr">45: </span>
+<span class="linenr">46: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(hashs)</span>
+<span class="linenr">47: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(hashs[0]['name'])</span>
+<span class="linenr">48: </span>
+<span class="linenr">49: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">output</span>
+<span class="linenr">50: </span><span style="color: #9acd32;">ofh</span>=<span style="color: #76ee00;">open</span>(ofile,<span style="color: #ffa07a;">'w'</span>)
+<span class="linenr">51: </span><span style="color: #9acd32;">prnt</span>=<span style="color: #ffa07a;">"\t"</span>.join(head)+<span style="color: #ffa07a;">"\n"</span>
+<span class="linenr">52: </span><span style="color: #20b2aa; font-weight: bold;">for</span> d <span style="color: #20b2aa; font-weight: bold;">in</span> data:
+<span class="linenr">53: </span>  <span style="color: #9acd32;">prnt</span>+=<span style="color: #ffa07a;">"\t"</span>.join(d)+<span style="color: #ffa07a;">"\n"</span>
+<span class="linenr">54: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(prnt)
+<span class="linenr">55: </span>ofh.write(prnt)
+<span class="linenr">56: </span>ofh.close()
+</pre>
+</div>
+
+<pre class="example">
+name  age origin  gender  idata fdata type
+foo 10  jpn M 50  0.25  X
+bar 30  usa F 25  0.38  P
+hoge  10  jpn F 4 1 P
+fuga  40  eng M     X
+fuga  35    F 9 0.1 X
+</pre>
+
+<p>
+dataframe とか使う場合はまた別でまとめようと思うが, 一応書いておく.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #9acd32;">ifile</span>=<span style="color: #ffa07a;">'input.txt'</span>
+<span style="color: #9acd32;">ofile</span>=<span style="color: #ffa07a;">'output.pandas.txt'</span>
+
+<span style="color: #9acd32;">df</span> = pd.read_csv(ifile,sep=<span style="color: #ffa07a;">"\t"</span>,header=0)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20309;&#12363;&#12420;&#12427;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">0 &#34892;&#30446;&#12398; 'name' &#21015;&#12434;&#26360;&#12365;&#25563;&#12360;</span>
+<span style="color: #9acd32;">df.ix</span>[0,<span style="color: #ffa07a;">'name'</span>] = <span style="color: #ffa07a;">'foo2'</span>
+df.to_csv(ofile,sep=<span style="color: #ffa07a;">"\t"</span>,index=<span style="color: #1e90ff;">False</span>)
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df)
+</pre>
+</div>
+
+<pre class="example">
+   name  age origin gender  idata  fdata type
+0  foo2   10    jpn      M   50.0   0.25    X
+1   bar   30    usa      F   25.0   0.38    P
+2  hoge   10    jpn      F    4.0   1.00    P
+3  fuga   40    eng      M    NaN    NaN    X
+4  fuga   35    NaN      F    9.0   0.10    X
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Julia</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Julia での注意点と参考 URL:<br  />
+</p>
+
+<p>
+全般的に, 型を意識する必要がある(? 全部 Any でいいのかなぁ)のでちょっと面倒くさい印象.<br  />
+文字列は '' ではなく "" で囲わないといけない(Java と同じ)<br  />
+and, or は &amp;&amp; || (これも Java と同じ)<br  />
+if 文は, if .. elseif .. end という感じで書く.<br  />
+関数は function hoge(x) &#x2026; end という感じで書く.<br  />
+配列の添字は 1 から始まる.<br  />
+二次元配列は arr[1,2] (1行2列目), 配列の配列は arr<br  />
+hash の宣言: Dict{keyの型, value の型}()<br  />
+主な型指定: Int64, Float64, ASCIIString, Any(何を入れてもいい型)<br  />
+文字列連結は "." でも "+" でもなく, 何と "*" を使うらしい. 何で?<br  />
+</p>
+
+<ul class="org-ul">
+<li>基本<br  />
+<ul class="org-ul">
+<li>Juliaことはじめ - 0x00 nullbyte blog<br  />
+<a href="http://nullbyte.hatenablog.com/entry/2015/05/27/013949">http://nullbyte.hatenablog.com/entry/2015/05/27/013949</a><br  />
+</li>
+<li>Julia Language Programming (Julia の基礎知識)<br  />
+<a href="http://www.geocities.jp/m_hiroi/light/julia01.html#abc02">http://www.geocities.jp/m_hiroi/light/julia01.html#abc02</a><br  />
+</li>
+</ul>
+</li>
+<li>ファイルの開き方など<br  />
+<ul class="org-ul">
+<li>Introducing Julia/Working with text files - Wikibooks, open books for an open world<br  />
+<a href="https://en.wikibooks.org/wiki/Introducing_Julia/Working_with_text_files">https://en.wikibooks.org/wiki/Introducing_Julia/Working_with_text_files</a><br  />
+</li>
+<li>Juliaでファイル操作 | mwSoft<br  />
+<a href="http://www.mwsoft.jp/programming/julia/file.html">http://www.mwsoft.jp/programming/julia/file.html</a><br  />
+</li>
+<li>Julia でデータのセーブとロード - yomichi's blog<br  />
+<a href="http://yomichi.hateblo.jp/entry/2015/12/19/014201">http://yomichi.hateblo.jp/entry/2015/12/19/014201</a><br  />
+</li>
+<li>＜紙＞さんＬｏＧ Julia 学習：ファイル入出力<br  />
+<a href="http://jn1inl.blog77.fc2.com/blog-entry-2209.html">http://jn1inl.blog77.fc2.com/blog-entry-2209.html</a><br  />
+</li>
+</ul>
+</li>
+<li>型について<br  />
+<ul class="org-ul">
+<li>Julia カテゴリーの記事一覧 - 0x00 nullbyte blog<br  />
+<a href="http://nullbyte.hatenablog.com/archive/category/Julia">http://nullbyte.hatenablog.com/archive/category/Julia</a><br  />
+</li>
+</ul>
+</li>
+<li>配列など<br  />
+<ul class="org-ul">
+<li>Learn Julia in Y Minutes<br  />
+<a href="https://learnxinyminutes.com/docs/julia/">https://learnxinyminutes.com/docs/julia/</a><br  />
+</li>
+<li>Julia入門 配列 - 0x00 nullbyte blog<br  />
+<a href="http://nullbyte.hatenablog.com/entry/2015/05/30/001107">http://nullbyte.hatenablog.com/entry/2015/05/30/001107</a><br  />
+</li>
+<li>Julia の超入門（配列編） - 中野智文<br  />
+<a href="http://blog.goo.ne.jp/nakano-tomofumi/e/135ed54502fd7a23d4b53fc3340240d2">http://blog.goo.ne.jp/nakano-tomofumi/e/135ed54502fd7a23d4b53fc3340240d2</a><br  />
+</li>
+<li>光学設計者の学習メモ: Julia Array操作の基本をメモ。<br  />
+<a href="http://retrofocus28.blogspot.jp/2014/11/julia-array.html">http://retrofocus28.blogspot.jp/2014/11/julia-array.html</a><br  />
+</li>
+</ul>
+</li>
+<li>ハッシュ等<br  />
+<ul class="org-ul">
+<li>Julia入門 辞書（ハッシュテーブル）、Set型について - 0x00 nullbyte blog<br  />
+<a href="http://nullbyte.hatenablog.com/entry/2015/06/03/000106">http://nullbyte.hatenablog.com/entry/2015/06/03/000106</a><br  />
+</li>
+</ul>
+</li>
+<li>join<br  />
+<ul class="org-ul">
+<li>配列から文字列、文字列から配列への変換 (convert array to string, string to array) - MATLAB移民のためのJulia tips<br  />
+<a href="http://julia.hatenablog.jp/entry/2016/04/17/144129">http://julia.hatenablog.jp/entry/2016/04/17/144129</a><br  />
+</li>
+</ul>
+</li>
+<li>文字列連結<br  />
+<ul class="org-ul">
+<li>Julia の文字列結合演算が積 (*) である理由（他言語との比較） - Moriturus te saluto<br  />
+<a href="http://dsng.hatenablog.com/entry/2014/07/03/214526">http://dsng.hatenablog.com/entry/2014/07/03/214526</a><br  />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span>ifile=<span style="color: #ffa07a;">"input.txt"</span>
+<span class="linenr"> 2: </span>ofile=<span style="color: #ffa07a;">"output.julia.txt"</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">fh=open(ifile,"r")</span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">str=readall(fh)  # &#19968;&#27671;&#12395;&#35501;&#12415;&#36796;&#12416;&#22580;&#21512;&#12399;&#12371;&#12358;&#12377;&#12427;.</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(str)</span>
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>head=[]  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">head=Array{Any,1}()</span>
+<span class="linenr"> 9: </span>data=<span style="color: #9370db;">Array</span>{<span style="color: #9370db;">Array</span>{<span style="color: #9370db;">Any</span>,1},1}()  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1x1 &#12398;, &#37197;&#21015;&#12398;&#37197;&#21015;&#12434;&#20316;&#12387;&#12390;&#12362;&#12367;.</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">data=[][] &#12371;&#12428;&#12376;&#12419;&#12480;&#12513;&#12425;&#12375;&#12356;.</span>
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">filehandle &#12399;&#20197;&#19979;&#12398;&#12424;&#12358;&#12395;&#26360;&#12367;&#12398;&#12364;&#26222;&#36890;&#12398;&#12424;&#12358;&#12384;</span>
+<span class="linenr">13: </span>open(ifile,<span style="color: #ffa07a;">"r"</span>) <span style="color: #20b2aa; font-weight: bold;">do</span> fh
+<span class="linenr">14: </span>    cnt=0
+<span class="linenr">15: </span>    <span style="color: #20b2aa; font-weight: bold;">for</span> li <span style="color: #20b2aa; font-weight: bold;">in</span> eachline(fh)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#34892;&#12378;&#12388;&#35501;&#12435;&#12391;&#12356;&#12367;</span>
+<span class="linenr">16: </span>        <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(li)</span>
+<span class="linenr">17: </span>        li = chomp(li)          <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25913;&#34892;&#12434;&#21462;&#12426;&#38500;&#12367;</span>
+<span class="linenr">18: </span>        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">li = rstrip(li,'\n')  # &#25913;&#34892;&#21066;&#38500;&#12399;&#12371;&#12428;&#12391;&#12418;&#12356;&#12356;</span>
+<span class="linenr">19: </span>        bf = split(li,<span style="color: #ffa07a;">"\t"</span>)     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">\t &#12391; split</span>
+<span class="linenr">20: </span>        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">println(bf)</span>
+<span class="linenr">21: </span>        <span style="color: #20b2aa; font-weight: bold;">if</span> cnt == 0             <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#34892;&#30446;(header)</span>
+<span class="linenr">22: </span>            append!(head,bf)       <span style="color: #cd853f;"># </span><span style="color: #cd853f;">head=bf &#12391;&#12399;&#12456;&#12521;&#12540;&#12392;&#12394;&#12427;. append! &#12434;&#20351;&#12358;</span>
+<span class="linenr">23: </span>            <span style="color: #cd853f;">#</span><span style="color: #cd853f;">for i in 1:length(bf)</span>
+<span class="linenr">24: </span>            <span style="color: #cd853f;">#   </span><span style="color: #cd853f;">push!(head,bf[i])</span>
+<span class="linenr">25: </span>            <span style="color: #cd853f;">#</span><span style="color: #cd853f;">end</span>
+<span class="linenr">26: </span>        <span style="color: #20b2aa; font-weight: bold;">else</span>                    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">2 &#34892;&#30446;&#20197;&#38477;(&#12391;&#12540;&#12383;)</span>
+<span class="linenr">27: </span>            push!(data,bf)
+<span class="linenr">28: </span>        <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">29: </span>        cnt+=1
+<span class="linenr">30: </span>    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">31: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">32: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">close(fh) # &#33258;&#21205;&#12391;&#38281;&#12376;&#12427;&#12398;&#12391;&#26360;&#12363;&#12394;&#12367;&#12390;&#12418;&#12356;&#12356;&#12387;&#12413;&#12356;.</span>
+<span class="linenr">33: </span>
+<span class="linenr">34: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">data[][] &#12434; hash &#12398;&#37197;&#21015;&#12395;&#12375;&#12390;&#12415;&#12427;.</span>
+<span class="linenr">35: </span>hashs=[]
+<span class="linenr">36: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dt <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">37: </span>    hash = <span style="color: #9370db;">Dict</span>{<span style="color: #9370db;">Any</span>,<span style="color: #9370db;">Any</span>}()
+<span class="linenr">38: </span>     <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:length(dt)
+<span class="linenr">39: </span>        hash[head[i]]=dt[i]
+<span class="linenr">40: </span>     <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">41: </span>    push!(hashs,hash)
+<span class="linenr">42: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">43: </span>
+<span class="linenr">44: </span>println(head)
+<span class="linenr">45: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">println(data)</span>
+<span class="linenr">46: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">println(data[1][1])</span>
+<span class="linenr">47: </span>
+<span class="linenr">48: </span>println(head[1])
+<span class="linenr">49: </span>println(hashs[1][<span style="color: #ffa07a;">"fdata"</span>])
+<span class="linenr">50: </span>println(hashs[2][<span style="color: #ffa07a;">"fdata"</span>])
+<span class="linenr">51: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">exit() &#12503;&#12525;&#12464;&#12521;&#12512;&#12434;&#32066;&#12431;&#12425;&#12379;&#12427;&#12392;&#12365;</span>
+<span class="linenr">52: </span>
+<span class="linenr">53: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22411;&#12461;&#12515;&#12473;&#12488;&#30340;&#12394;&#12371;&#12392;&#12399;, parse(type,str) &#12434;&#29992;&#12356;&#12427;</span>
+<span class="linenr">54: </span>itx = parse(<span style="color: #9370db;">Float64</span>,hashs[1][<span style="color: #ffa07a;">"fdata"</span>]) + parse(<span style="color: #9370db;">Float64</span>,hashs[2][<span style="color: #ffa07a;">"fdata"</span>])
+<span class="linenr">55: </span>println(itx)
+<span class="linenr">56: </span>
+<span class="linenr">57: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#26360;&#12365;&#36796;&#12415;</span>
+<span class="linenr">58: </span>open(ofile,<span style="color: #ffa07a;">"w"</span>) <span style="color: #20b2aa; font-weight: bold;">do</span> fp
+<span class="linenr">59: </span>   write(fp,join(head,<span style="color: #ffa07a;">"\t"</span>)*<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">60: </span>   <span style="color: #20b2aa; font-weight: bold;">for</span> d <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">61: </span>      write(fp,join(d,<span style="color: #ffa07a;">"\t"</span>)*<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">62: </span>   <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">63: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+Any["name","age","origin","gender","idata","fdata","type"]
+name
+0.25
+0.38
+0.63
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Ruby</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Ruby での注意点と参考 URL:<br  />
+</p>
+<ul class="org-ul">
+<li>基本<br  />
+<ul class="org-ul">
+<li>逆引きRuby - ファイルアクセス<br  />
+<a href="http://bit.ly/2am8jkn">http://bit.ly/2am8jkn</a><br  />
+</li>
+<li>【Ruby】表示メソッドについて（print,puts,p） - TASK NOTES<br  />
+<a href="http://www.task-notes.com/entry/20141109/1415520719">http://www.task-notes.com/entry/20141109/1415520719</a><br  />
+</li>
+</ul>
+</li>
+<li>hash<br  />
+<ul class="org-ul">
+<li>【Ruby】配列とハッシュの基本的な使い方 - TASK NOTES<br  />
+<a href="http://www.task-notes.com/entry/20141115/1416045573">http://www.task-notes.com/entry/20141115/1416045573</a><br  />
+</li>
+</ul>
+</li>
+<li>型キャスト(to_f)<br  />
+<ul class="org-ul">
+<li>数値クラスを変換する - 数値(Numeric)クラス - Ruby入門<br  />
+<a href="http://www.rubylife.jp/ini/numeric_class/index2.html">http://www.rubylife.jp/ini/numeric_class/index2.html</a><br  />
+</li>
+</ul>
+</li>
+<li>each_with_index (python の enumerate に相当)<br  />
+<ul class="org-ul">
+<li>Python's enumerate in Ruby? - Stack Overflow<br  />
+<a href="http://stackoverflow.com/questions/13936922/pythons-enumerate-in-ruby">http://stackoverflow.com/questions/13936922/pythons-enumerate-in-ruby</a><br  />
+</li>
+</ul>
+</li>
+<li>join 等(文字列連結)<br  />
+ruby の文字列連結は "+" あるいは "&lt;&lt;"<br  />
+<ul class="org-ul">
+<li>Rubyの文字列連結に関して知っておくべきこと - Qiita<br  />
+<a href="http://qiita.com/Kta-M/items/c7c2fb0b61b11d3a2c48">http://qiita.com/Kta-M/items/c7c2fb0b61b11d3a2c48</a><br  />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr"> 1: </span>ifile=<span style="color: #ffa07a;">'input.txt'</span>
+<span class="linenr"> 2: </span>ofile=<span style="color: #ffa07a;">'output.ruby.txt'</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>fh=<span style="color: #76ee00;">open</span>(ifile,<span style="color: #ffa07a;">"r"</span>)
+<span class="linenr"> 5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">str=fh.read     # &#19968;&#27671;&#12395;&#20840;&#37096;&#35501;&#12415;&#36796;&#12416;&#22580;&#21512;</span>
+<span class="linenr"> 6: </span>cnt=0
+<span class="linenr"> 7: </span>head=[]    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">head=Array.new &#12391;&#12418;&#33391;&#12356;</span>
+<span class="linenr"> 8: </span>data=[]
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">while</span> li = fh.gets
+<span class="linenr">10: </span>  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print li</span>
+<span class="linenr">11: </span>  li=li.chomp         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25913;&#34892;&#21462;&#12426;&#38500;&#12365;</span>
+<span class="linenr">12: </span>  bf=li.split(<span style="color: #ffa07a;">"\t"</span>)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">tab &#12391; split</span>
+<span class="linenr">13: </span>  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(bf)</span>
+<span class="linenr">14: </span>  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">exit</span>
+<span class="linenr">15: </span>  <span style="color: #20b2aa; font-weight: bold;">if</span> cnt==0
+<span class="linenr">16: </span>    head=bf
+<span class="linenr">17: </span>  <span style="color: #20b2aa; font-weight: bold;">else</span>
+<span class="linenr">18: </span>    data.push(bf)
+<span class="linenr">19: </span>  <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">20: </span>  cnt+=1
+<span class="linenr">21: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">22: </span>fh.close
+<span class="linenr">23: </span>
+<span class="linenr">24: </span><span style="color: #76ee00;">print</span>(head)
+<span class="linenr">25: </span><span style="color: #76ee00;">print</span>(<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">26: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(data[0])</span>
+<span class="linenr">27: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">exit   &#12371;&#12371;&#12391;&#32066;&#12431;&#12427;&#12392;&#12365; (for debug)</span>
+<span class="linenr">28: </span>
+<span class="linenr">29: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hash &#12398;&#37197;&#21015;&#12395;&#12375;&#12390;&#12415;&#12427;.</span>
+<span class="linenr">30: </span>hashs=[]
+<span class="linenr">31: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dr <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">32: </span>  hash={}
+<span class="linenr">33: </span>  dr.each_with_index <span style="color: #20b2aa; font-weight: bold;">do</span> |d,j|   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">enumerate</span>
+<span class="linenr">34: </span>    dk=d
+<span class="linenr">35: </span>    <span style="color: #20b2aa; font-weight: bold;">if</span> <span style="color: #20b2aa; font-weight: bold;">not</span> d==<span style="color: #ffa07a;">''</span>
+<span class="linenr">36: </span>       <span style="color: #20b2aa; font-weight: bold;">if</span> j==1 <span style="color: #20b2aa; font-weight: bold;">or</span> j==4
+<span class="linenr">37: </span>         dk=d.to_i         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25972;&#25968;&#22411;&#12408;&#12461;&#12515;&#12473;&#12488;</span>
+<span class="linenr">38: </span>       <span style="color: #20b2aa; font-weight: bold;">elsif</span> j==5
+<span class="linenr">39: </span>         dk=d.to_f         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#28014;&#21205;&#23567;&#25968;&#28857;&#22411;&#12408;&#12461;&#12515;&#12473;&#12488;</span>
+<span class="linenr">40: </span>       <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">41: </span>    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">42: </span>    hash[head[j]]=dk
+<span class="linenr">43: </span>  <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">44: </span>  hashs.push(hash)
+<span class="linenr">45: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">46: </span>
+<span class="linenr">47: </span><span style="color: #76ee00;">print</span>(hashs[0])
+<span class="linenr">48: </span><span style="color: #76ee00;">print</span>(<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">49: </span>
+<span class="linenr">50: </span>itx = hashs[0][<span style="color: #ffa07a;">"fdata"</span>] + hashs[1][<span style="color: #ffa07a;">"fdata"</span>]
+<span class="linenr">51: </span><span style="color: #76ee00;">puts</span>(itx)
+<span class="linenr">52: </span>
+<span class="linenr">53: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">file &#26360;&#12365;&#20986;&#12375;</span>
+<span class="linenr">54: </span>ofh=<span style="color: #76ee00;">open</span>(ofile,<span style="color: #ffa07a;">"w"</span>)
+<span class="linenr">55: </span>ofh.write(head.join(<span style="color: #ffa07a;">"\t"</span>)+<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">56: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dt <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">57: </span>   str=dt.join(<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">58: </span>   ofh.write(str+<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">59: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">60: </span>ofh.close
+</pre>
+</div>
+
+<pre class="example">
+["name", "age", "origin", "gender", "idata", "fdata", "type"]
+{"name"=&gt;"foo", "age"=&gt;10, "origin"=&gt;"jpn", "gender"=&gt;"M", "idata"=&gt;50, "fdata"=&gt;0.25, "type"=&gt;"X"}
+0.63
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> R</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+おまけ(1)<br  />
+read.table でファイルを読むプログラムを一応作っておく.<br  />
+</p>
+
+<p>
+R での注意点と参考 URL:<br  />
+</p>
+<ul class="org-ul">
+<li>read.table()<br  />
+<ul class="org-ul">
+<li>R-Source 40. ファイルからデータを読み込む<br  />
+<a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/40.html">http://cse.naro.affrc.go.jp/takezawa/r-tips/r/40.html</a><br  />
+</li>
+</ul>
+</li>
+<li>write.table() のパラメータ<br  />
+<ul class="org-ul">
+<li>R: データ出力<br  />
+<a href="http://www.is.titech.ac.jp/~mase/mase/html.jp/temp/write.table.jp.html">http://www.is.titech.ac.jp/~mase/mase/html.jp/temp/write.table.jp.html</a><br  />
+</li>
+<li>R-Source 45. ファイルへのデータ出力<br  />
+<a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/45.html">http://cse.naro.affrc.go.jp/takezawa/r-tips/r/45.html</a><br  />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>ifile <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">'input.txt'</span>
+<span class="linenr"> 2: </span>ofile <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">'output.R.txt'</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>data <span style="color: #1e90ff;">&lt;-</span> read.table(ifile,sep=<span style="color: #ffa07a;">"\t"</span>,head=T)
+<span class="linenr"> 5: </span>data
+<span class="linenr"> 6: </span>names(data)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">header &#12398;&#21517;&#21069;</span>
+<span class="linenr"> 7: </span>data[<span style="color: #ffa07a;">'name'</span>]   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21462;&#24471;</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">quote=F  : "" &#12434;&#20184;&#12369;&#12394;&#12356;</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">append=F : &#19978;&#26360;&#12365;</span>
+<span class="linenr">11: </span>write.table(data,ofile,quote=F,sep=<span style="color: #ffa07a;">"\t"</span>,col.names=T,row.names=F,append=F,na=<span style="color: #ffa07a;">""</span>)
+</pre>
+</div>
+
+<pre class="example">
+  name age origin gender idata fdata type
+1  foo  10    jpn      M    50  0.25    X
+2  bar  30    usa      F    25  0.38    P
+3 hoge  10    jpn      F     4  1.00    P
+4 fuga  40    eng      M    NA    NA    X
+5 fuga  35             F     9  0.10    X
+[1] "name"   "age"    "origin" "gender" "idata"  "fdata"  "type"  
+  name
+1  foo
+2  bar
+3 hoge
+4 fuga
+5 fuga
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Java</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+おまけ(2)<br  />
+</p>
+
+<p>
+Java での注意点と参考 URL:<br  />
+</p>
+<ul class="org-ul">
+<li>join(Java8)<br  />
+<ul class="org-ul">
+<li>あなたのJavaコードをスッキリさせる、地味に便利な新API 10選（前編） - Taste of Tech Topics<br  />
+<a href="http://acro-engineer.hatenablog.com/entry/2014/03/12/112402">http://acro-engineer.hatenablog.com/entry/2014/03/12/112402</a><br  />
+</li>
+</ul>
+</li>
+<li>可変長の配列は List(ArrayList), hash は Map(HashMap) を用いるが何か面倒<br  />
+push するために List という配列の拡張を使ったが, 何かイマイチな感じ.<br  />
+<ul class="org-ul">
+<li>【Java】配列・リスト・マップの使い方についての基本 - TASK NOTES<br  />
+<a href="http://www.task-notes.com/entry/20140923/1411477102">http://www.task-notes.com/entry/20140923/1411477102</a><br  />
+</li>
+<li>ArrayListクラス - コレクション(ArrayList) - Java入門<br  />
+<a href="http://www.javadrive.jp/start/arraylist/index1.html">http://www.javadrive.jp/start/arraylist/index1.html</a><br  />
+</li>
+</ul>
+</li>
+<li>ファイル書き出し<br  />
+<ul class="org-ul">
+<li>便利な書き込み用クラス - テキストファイルの入出力 - Java入門<br  />
+<a href="http://www.javadrive.jp/start/stream/index7.html">http://www.javadrive.jp/start/stream/index7.html</a><br  />
+</li>
+</ul>
+</li>
+<li>trim()<br  />
+<ul class="org-ul">
+<li>先頭又は最後の空白を取り除く(trim) - Stringクラス<br  />
+<a href="http://www.javadrive.jp/start/string_class/index4.html">http://www.javadrive.jp/start/string_class/index4.html</a><br  />
+</li>
+</ul>
+</li>
+<li>拡張 for 文<br  />
+<ul class="org-ul">
+<li>【Java】for文と拡張for文の違い - Qiita<br  />
+<a href="http://qiita.com/Mocacamo/items/290457f9d378ad80ddba">http://qiita.com/Mocacamo/items/290457f9d378ad80ddba</a><br  />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-java"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">File</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">FileReader</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">BufferedReader</span>;
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">HashMap</span>;
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">Map</span>;
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">List</span>;
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">ArrayList</span>;
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">FileWriter</span>;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">BufferedWriter</span>;
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">PrintWriter</span>;
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">public</span> <span style="color: #20b2aa; font-weight: bold;">class</span> <span style="color: #9370db;">fread</span> {
+<span class="linenr">12: </span>  <span style="color: #20b2aa; font-weight: bold;">public</span> <span style="color: #20b2aa; font-weight: bold;">static</span> <span style="color: #9370db;">void</span> <span style="color: #00ff7f;">main</span>(<span style="color: #9370db;">String</span>[] <span style="color: #9acd32;">args</span>) {
+<span class="linenr">13: </span>    <span style="color: #9370db;">String</span> <span style="color: #9acd32;">ifile</span>=<span style="color: #ffa07a;">"input.txt"</span>;
+<span class="linenr">14: </span>    <span style="color: #9370db;">String</span> <span style="color: #9acd32;">ofile</span>=<span style="color: #ffa07a;">"output.java.txt"</span>;
+<span class="linenr">15: </span>
+<span class="linenr">16: </span>    <span style="color: #9370db;">List</span>&lt;<span style="color: #9370db;">Map</span>&gt; <span style="color: #9acd32;">data</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">ArrayList</span>();<span style="color: #4682b4; text-decoration: underline;"> </span>
+<span class="linenr">17: </span>    <span style="color: #9370db;">List</span>&lt;<span style="color: #9370db;">String</span>&gt; <span style="color: #9acd32;">head</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">ArrayList</span>();
+<span class="linenr">18: </span>    <span style="color: #20b2aa; font-weight: bold;">try</span> {
+<span class="linenr">19: </span>      <span style="color: #9370db;">File</span> <span style="color: #9acd32;">file</span>=<span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">File</span>(ifile);
+<span class="linenr">20: </span>      <span style="color: #9370db;">BufferedReader</span> <span style="color: #9acd32;">br</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">BufferedReader</span>(<span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">FileReader</span>(file));
+<span class="linenr">21: </span>      <span style="color: #9370db;">int</span> <span style="color: #9acd32;">cnt</span>=0;
+<span class="linenr">22: </span>      <span style="color: #9370db;">String</span> <span style="color: #9acd32;">str</span>;
+<span class="linenr">23: </span>      <span style="color: #20b2aa; font-weight: bold;">while</span>((str=br.readLine())!=<span style="color: #1e90ff;">null</span>) {
+<span class="linenr">24: </span>        <span style="color: #9370db;">String</span> [] <span style="color: #9acd32;">row</span>=str.split(<span style="color: #ffa07a;">"\t"</span>);
+<span class="linenr">25: </span>        <span style="color: #20b2aa; font-weight: bold;">if</span>(cnt==0) {
+<span class="linenr">26: </span>          <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">String</span> <span style="color: #9acd32;">s</span> : row) { <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#20309;&#12363;&#27671;&#25345;&#12385;&#24746;&#12356;&#12369;&#12393;</span>
+<span class="linenr">27: </span>             head.add(s);
+<span class="linenr">28: </span>          }
+<span class="linenr">29: </span>        }<span style="color: #20b2aa; font-weight: bold;">else</span> {
+<span class="linenr">30: </span>          <span style="color: #9370db;">Map</span>&lt;<span style="color: #9370db;">String</span>,<span style="color: #9370db;">String</span>&gt; <span style="color: #9acd32;">hash</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">HashMap</span>();
+<span class="linenr">31: </span>          <span style="color: #9370db;">int</span> <span style="color: #9acd32;">i</span>=0;
+<span class="linenr">32: </span>          <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">String</span> <span style="color: #9acd32;">s</span> : head) {
+<span class="linenr">33: </span>             hash.put(s,row[i++]);
+<span class="linenr">34: </span>          }
+<span class="linenr">35: </span>          data.add(hash);
+<span class="linenr">36: </span>        }
+<span class="linenr">37: </span>        cnt++;
+<span class="linenr">38: </span>      }
+<span class="linenr">39: </span>    }<span style="color: #20b2aa; font-weight: bold;">catch</span>(<span style="color: #9370db;">Exception</span> <span style="color: #9acd32;">e</span>) {
+<span class="linenr">40: </span>      System.out.println(e);
+<span class="linenr">41: </span>    }
+<span class="linenr">42: </span>    System.out.println(String.join(<span style="color: #ffa07a;">"\t"</span>,head));
+<span class="linenr">43: </span>    System.out.println(data.get(0).get(<span style="color: #ffa07a;">"name"</span>));
+<span class="linenr">44: </span>    <span style="color: #cd853f;">// </span><span style="color: #cd853f;">System.exit(0);  // &#32066;&#12431;&#12427;&#12392;&#12365;</span>
+<span class="linenr">45: </span>
+<span class="linenr">46: </span>    <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#26360;&#12365;&#20986;&#12375;</span>
+<span class="linenr">47: </span>    <span style="color: #20b2aa; font-weight: bold;">try</span> {
+<span class="linenr">48: </span>      <span style="color: #9370db;">File</span> <span style="color: #9acd32;">ofh</span>          = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">File</span>(ofile);
+<span class="linenr">49: </span>      <span style="color: #9370db;">FileWriter</span> <span style="color: #9acd32;">fw</span>     = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">FileWriter</span>(ofh);
+<span class="linenr">50: </span>      <span style="color: #9370db;">BufferedWriter</span> <span style="color: #9acd32;">bw</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">BufferedWriter</span>(fw);
+<span class="linenr">51: </span>      <span style="color: #9370db;">PrintWriter</span> <span style="color: #9acd32;">pw</span>    = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">PrintWriter</span>(bw);
+<span class="linenr">52: </span>      <span style="color: #9370db;">String</span> <span style="color: #9acd32;">prnt</span>=String.join(<span style="color: #ffa07a;">"\t"</span>,head)+<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">53: </span>      <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">Map</span> <span style="color: #9acd32;">mp</span> : data) {       <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#25313;&#24373; for</span>
+<span class="linenr">54: </span>        <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">String</span> <span style="color: #9acd32;">s</span> : head) {   <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#33510;&#32905;&#12398;&#31574;</span>
+<span class="linenr">55: </span>          prnt+=mp.get(s)+<span style="color: #ffa07a;">"\t"</span>;
+<span class="linenr">56: </span>        }
+<span class="linenr">57: </span>        prnt.trim();  <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#20808;&#38957;, &#26368;&#24460;&#12398;&#31354;&#30333;&#12434;&#21462;&#12426;&#38500;&#12367;</span>
+<span class="linenr">58: </span>        prnt+=<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">59: </span>      }
+<span class="linenr">60: </span>      System.out.print(prnt);
+<span class="linenr">61: </span>      pw.print(prnt);
+<span class="linenr">62: </span>      pw.close();
+<span class="linenr">63: </span>    }<span style="color: #20b2aa; font-weight: bold;">catch</span>(<span style="color: #9370db;">Exception</span> <span style="color: #9acd32;">e</span>) {
+<span class="linenr">64: </span>      System.out.println(e);
+<span class="linenr">65: </span>    }
+<span class="linenr">66: </span>  }
+<span class="linenr">67: </span>}
+</pre>
+</div>
+
+<pre class="example">
+name  age origin  gender  idata fdata type
+foo
+name  age origin  gender  idata fdata type
+foo 10  jpn M 50  0.25  X 
+bar 30  usa F 25  0.38  P 
+hoge  10  jpn F 4 1 P 
+fuga  40  eng M     X 
+fuga  35    F 9 0.1 X
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> かんそう</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+perl, python, ruby は似たような感じ.<br  />
+ruby は書きやすかった. きっちりしてる感じ.<br  />
+ruby に比べると python はやっぱり何か, 開きっぱなしで閉じてない感じがいまんとこしっくりこないんだけどなぁ.<br  />
+常に何か忘れてるような, そんな一抹の不安を覚えたりします. 慣れればなんともないんでしょーか.<br  />
+変数のスコープもよくわかんないし&#x2026;<br  />
+Julia も上記の言語と同じような感じでいけるのかなぁと思っていたのですが, 何かいちいち勝手が違う感じ.<br  />
+こんな感じでうまくいくかな, という適当さが全然通用しなかった. python, ruby は適当にやっても何とかなったんだけど&#x2026;<br  />
+色々と調べることが多かった.<br  />
+つーか文字列の連結が "*" って意味わかんないような&#x2026; こういうの検索とかで探しにくいから困るんだよなぁ.<br  />
+"." か "+" か, 最悪 "&amp;" とか, わかりやすい感じにして欲しいなぁ&#x2026; あるいは concat とか.<br  />
+R, Java はおまけでやってみましたが, いまいちうまく比較できなかったのでやらなくてもよかったかも.<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-05-04T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-05-04 (Thu)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/java/'>java</a> <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/perl/'>perl</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a> <a class='category label label-primary' href='/blog/categories/ruby/'>ruby</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2017-05-04-fread.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2017-05-04-fread.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2017-03-18-0103_Julia_Essentials.html" title="Previous Post: Julia Essentials のまとめ">&laquo; Julia Essentials のまとめ</a></li>
+            
+            
+            <li class="next"><a href="/blog/2017-05-18-diary_float.html" title="Next Post: diary-float による org-mode の日付作成">diary-float による org-mode の日付作成 &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2017-05-04-fread.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2017-05-04-fread.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

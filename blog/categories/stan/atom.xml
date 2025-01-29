@@ -1,0 +1,2326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: stan | easy cure]]></title>
+  <link href="http://saito1369.github.io/blog/categories/stan/atom.xml" rel="self"/>
+  <link href="http://saito1369.github.io/"/>
+  <updated>2025-01-29T16:44:35+09:00</updated>
+  <id>http://saito1369.github.io/</id>
+  <author>
+    <name><![CDATA[saito1369]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[混合二項分布の推定]]></title>
+    <link href="http://saito1369.github.io/blog/2022-09-09-Mix_C.html"/>
+    <updated>2022-09-09T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/Mix_C</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 二項分布</a></li>
+<li><a href="#sec-2">2. 混合二項分布の推定</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 混合二項分布の式</a></li>
+<li><a href="#sec-2-2">2.2. 混合二項分布の例</a></li>
+<li><a href="#sec-2-3">2.3. Stan による MCMC 計算</a></li>
+<li><a href="#sec-2-4">2.4. Stan 計算結果の表示(1) 結果 summary</a></li>
+<li><a href="#sec-2-5">2.5. Stan 計算結果の表示(2) 図示 bayesplot</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2022-09-09 Fri 18:54&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 12:51&gt;</span></span><br />
+</p>
+<p>
+混合二項分布の解析を通じて, cmdstanr の簡単な使い方をまとめておく.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 二項分布</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+二項分布: 1回当りの成功確率を \(p\) とし, 試行回数 \(M\), そのうちの成功回数が \(y\) 回である確率 \(P(y)\) は<br />
+$$
+  P(y) = {}_M \mathrm{C}_{y} p^{y} (1-p)^{M-y}
+  $$<br />
+</p>
+
+<p>
+これを以下のように書くことにしよう.<br />
+$$
+  y \sim binomial(M,p)
+  $$<br />
+</p>
+
+<p>
+例: テストの点数分布<br />
+100 点満点のテストの場合 \(M=100\)<br />
+テストの得点を \(y\) とすると<br />
+$$
+  y \sim binomial(100,p)
+  $$<br />
+</p>
+
+<p>
+未知パラメータは \(p\) (0 から 1 まで)<br />
+テストの得点データから \(p\) の値(分布)を求めるのがよくある問題設定.<br />
+</p>
+
+<p>
+注: \(p\) は 0 から 1 までなので, 別の変数 \(x\) との関係がみたいときなどは \(p = 1/(1+\exp(-a - b x))\) 的な変換がよくなされる.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 混合二項分布の推定</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 混合二項分布の式</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+混合二項分布(あるのか？ ネットで調べても出てこないけど)は,<br />
+２つ以上の二項分布がある割合(\(\alpha\)) で足し合わされたもの.<br />
+</p>
+
+<p>
+$$
+   y \sim \alpha \times binomial(y|100,p_1) + (1-\alpha) \times binomial(y|100,p_2)
+   $$<br />
+</p>
+
+<p>
+こんな感じで書ける(はず). \(\alpha\) が混合比と呼ばれるパラメータ<br />
+(混合正規分布(これはネットで調べるとたくさん出てくる)からの類推).<br />
+</p>
+
+<p>
+データ \(y\) は \(N\) 個あってそれぞれ独立だから, 同時確率は上の式の掛け算でよい.<br />
+普通は同時確率の対数をとって掛け算 &#x2013;&gt; 足し算にしてから計算する.<br />
+</p>
+
+<p>
+この値の最大値をとるパラメータ \(p_1\), \(p_2\) を求めるのが最尤法.<br />
+\(p_1\), \(p_2\) の分布を求めるのがベイズ推定.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 混合二項分布の例</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+テストのため, R で混合二項分布に従う乱数を生成してみる.<br />
+\(\alpha = 0.6\), \(p_1 = 0.55\), \(p_2 = 0.82\) とする混合二項分布から \(N=100\) 個の乱数を作成する<br />
+(速度は気にしないのでループを使って書く).<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #87cefa;">mix_bin</span> <span style="color: #7fffd4;">&lt;-</span> <span style="color: #00ffff;">function</span>(alpha, N, p1, p2) {
+<span class="linenr"> 2: </span>    r <span style="color: #7fffd4;">&lt;-</span> runif(1,0,1)
+<span class="linenr"> 3: </span>    <span style="color: #00ffff;">if</span>(r &lt; alpha) {
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>l <span style="color: #7fffd4;">&lt;-</span> 0
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>y <span style="color: #7fffd4;">&lt;-</span> rbinom(1,N,p1)
+<span class="linenr"> 6: </span>    }<span style="color: #00ffff;">else</span> {
+<span class="linenr"> 7: </span><span style="background-color: #222222;">        </span>l <span style="color: #7fffd4;">&lt;-</span> 1
+<span class="linenr"> 8: </span><span style="background-color: #222222;">        </span>y <span style="color: #7fffd4;">&lt;-</span> rbinom(1,N,p2)
+<span class="linenr"> 9: </span>    }
+<span class="linenr">10: </span>    <span style="color: #00ffff;">return</span>(c(y,l))
+<span class="linenr">11: </span>}
+<span class="linenr">12: </span>N <span style="color: #7fffd4;">&lt;-</span> 100
+<span class="linenr">13: </span>alpha <span style="color: #7fffd4;">&lt;-</span> 0.6
+<span class="linenr">14: </span>p1 <span style="color: #7fffd4;">&lt;-</span> 0.55
+<span class="linenr">15: </span>p2 <span style="color: #7fffd4;">&lt;-</span> 0.82
+<span class="linenr">16: </span>
+<span class="linenr">17: </span>Num <span style="color: #7fffd4;">&lt;-</span> 100
+<span class="linenr">18: </span>ys <span style="color: #7fffd4;">&lt;-</span> c()
+<span class="linenr">19: </span>ls <span style="color: #7fffd4;">&lt;-</span> c()
+<span class="linenr">20: </span><span style="color: #00ffff;">for</span>(i <span style="color: #00ffff;">in</span> 1:Num) {
+<span class="linenr">21: </span>    ret <span style="color: #7fffd4;">&lt;-</span> mix_bin(alpha,N,p1,p2)
+<span class="linenr">22: </span>    y <span style="color: #7fffd4;">&lt;-</span> ret[1]
+<span class="linenr">23: </span>    l <span style="color: #7fffd4;">&lt;-</span> ret[2]
+<span class="linenr">24: </span>    ys <span style="color: #7fffd4;">&lt;-</span> c(ys,y)
+<span class="linenr">25: </span>    ls <span style="color: #7fffd4;">&lt;-</span> c(ls,l)
+<span class="linenr">26: </span>}
+<span class="linenr">27: </span><span style="color: #ff7f24;">#</span><span style="color: #ff7f24;">print(ys)</span>
+<span class="linenr">28: </span>
+<span class="linenr">29: </span>df <span style="color: #7fffd4;">&lt;-</span> data.frame(score=ys, label=ls)
+<span class="linenr">30: </span>head(df)
+<span class="linenr">31: </span>
+<span class="linenr">32: </span>write.table(df,<span style="color: #ffa07a;">'mix_biom_test.csv'</span>,sep=<span style="color: #ffa07a;">','</span>, quote=F,row.names=F,col.names=T)
+</pre>
+</div>
+
+<pre class="example">
+  score label
+1    76     1
+2    80     1
+3    88     1
+4    45     0
+5    67     0
+6    79     1
+</pre>
+
+<p>
+図示してみる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>df <span style="color: #7fffd4;">&lt;-</span> read.csv(<span style="color: #ffa07a;">'mix_biom_test.csv'</span>, header=<span style="color: #98fb98;">TRUE</span>)
+<span class="linenr">2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr">3: </span>
+<span class="linenr">4: </span>g <span style="color: #7fffd4;">&lt;-</span> ggplot(data=df,mapping=aes(x=score,y=..density..)) + geom_density(alpha=0.4) + geom_histogram(alpha=0.2,color=<span style="color: #ffa07a;">'black'</span>) + xlim(0,100)
+<span class="linenr">5: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_biom_test.png'</span>
+<span class="linenr">6: </span>ggsave(file=fname, plot=g, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_biom_test.png" alt="Mix_C-mix_biom_test.png" /><br />
+</p>
+</div>
+
+<p>
+このデータを使って, \(\alpha\), \(p_1\), \(p_2\) の値(と分布)を推定したい.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Stan による MCMC 計算</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+まずは Stan コードを以下のように書いてみる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span style="color: #00ffff;">data</span> {
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">Y</span>[N];
+}
+
+<span style="color: #00ffff;">parameters</span> {
+  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0,<span style="color: #00ffff;">upper</span><span style="color: #7fffd4;">=</span>1&gt; <span style="color: #eedd82;">a</span>;
+  <span style="color: #98fb98;">vector</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0,<span style="color: #00ffff;">upper</span><span style="color: #7fffd4;">=</span>1&gt;[2] <span style="color: #eedd82;">p</span>;
+}
+
+<span style="color: #00ffff;">model</span> {
+  <span style="color: #00ffff;">for</span>(n <span style="color: #00ffff;">in</span> 1:N) {
+    <span style="color: #00ffff;">target</span> <span style="color: #7fffd4;">+=</span> <span style="color: #87cefa;">log_sum_exp</span>(<span style="color: #87cefa;">log</span>(a)   + <span style="color: #87cefa;">binomial_lpmf</span>(Y[n] | 100, p[1]),
+<span style="background-color: #222222;">                        </span>  <span style="color: #87cefa;">log1m</span>(a) + <span style="color: #87cefa;">binomial_lpmf</span>(Y[n] | 100, p[2]));
+  }
+}
+</pre>
+</div>
+
+<p>
+注: array の書き方が変わるらしい <a href="https://mc-stan.org/docs/2_28/reference-manual/brackets-array-syntax.html">13.12 Brackets array syntax | Stan Reference Manual</a><br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span class="linenr">1: </span><span style="color: #00ffff;">data</span> {
+<span class="linenr">2: </span>  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+<span class="linenr">3: </span>  array[N] <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">Y</span>;
+<span class="linenr">4: </span>}
+</pre>
+</div>
+<p>
+こんな感じ？ とりあえず今は旧版の書き方でいく.<br />
+</p>
+
+<p>
+暗黙のうちに p[ 1 ] &lt; p[ 2 ] を期待しているが, プログラム上でこの制約を定義できていないので<br />
+値がうまく計算できなくなることがある.<br />
+改良する.<br />
+</p>
+
+<p>
+ p の値を ordered にしたいが, ordered は値の範囲を指定できない.<br />
+<a href="https://hoxo-m.hatenablog.com/entry/20150930/p1"> Stan でパラメータに大小関係の制約をつける - ほくそ笑む</a><br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span style="color: #00ffff;">data</span> {
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">Y</span>[N];
+}
+
+<span style="color: #00ffff;">parameters</span> {
+  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0,<span style="color: #00ffff;">upper</span><span style="color: #7fffd4;">=</span>1&gt; <span style="color: #eedd82;">a</span>;
+  <span style="color: #ff7f24;"># ordered&lt;lower=0,upper=1&gt;[2] p;  # &#12456;&#12521;&#12540;&#12392;&#12394;&#12387;&#12390;&#12375;&#12414;&#12358;&#65281;&#65281;</span>
+  <span style="color: #98fb98;">ordered</span>[2] <span style="color: #eedd82;">p_inv</span>;
+}
+
+<span style="color: #00ffff;">transformed parameters</span> {
+  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0, <span style="color: #00ffff;">upper</span><span style="color: #7fffd4;">=</span>1&gt; <span style="color: #eedd82;">p</span>[2];
+  p[1] <span style="color: #ffc0cb; font-weight: bold;">&lt;-</span> <span style="color: #87cefa;">inv_logit</span>(p_inv[1]);
+  p[2] <span style="color: #ffc0cb; font-weight: bold;">&lt;-</span> <span style="color: #87cefa;">inv_logit</span>(p_inv[2]);
+}
+
+<span style="color: #00ffff;">model</span> {
+  <span style="color: #00ffff;">for</span>(n <span style="color: #00ffff;">in</span> 1:N) {
+    <span style="color: #00ffff;">target</span> <span style="color: #7fffd4;">+=</span> <span style="color: #87cefa;">log_sum_exp</span>(<span style="color: #87cefa;">log</span>(a)   + <span style="color: #87cefa;">binomial_lpmf</span>(Y[n] | 100, p[1]),
+<span style="background-color: #222222;">                        </span>  <span style="color: #87cefa;">log1m</span>(a) + <span style="color: #87cefa;">binomial_lpmf</span>(Y[n] | 100, p[2]));
+  }
+}
+</pre>
+</div>
+
+<p>
+ロジスティック関数を使って 0 から 1 の範囲に無理やりする.<br />
+</p>
+
+<p>
+ついでに, generated quantities で,  得点 1 - 100 点に対して最初の分布に属する確率を計算するような式を追加する.<br />
+ここをうまく使うと, 知りたいことの分布(乱数列)を直接的に生成できる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span style="color: #00ffff;">data</span> {
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">Y</span>[N];
+}
+
+<span style="color: #00ffff;">parameters</span> {
+  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0,<span style="color: #00ffff;">upper</span><span style="color: #7fffd4;">=</span>1&gt; <span style="color: #eedd82;">a</span>;
+  <span style="color: #98fb98;">ordered</span>[2] <span style="color: #eedd82;">p_inv</span>;
+}
+
+<span style="color: #00ffff;">transformed parameters</span> {
+  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0, <span style="color: #00ffff;">upper</span><span style="color: #7fffd4;">=</span>1&gt; <span style="color: #eedd82;">p</span>[2];
+  p[1] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">inv_logit</span>(p_inv[1]);
+  p[2] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">inv_logit</span>(p_inv[2]);
+
+  <span style="color: #98fb98;">vector</span>[2] <span style="color: #eedd82;">lp</span>[N];
+  <span style="color: #00ffff;">for</span>(n <span style="color: #00ffff;">in</span> 1:N) {
+    lp[n,1] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">log</span>(a)   + <span style="color: #87cefa;">binomial_lpmf</span>(Y[n] | 100, p[1]);
+    lp[n,2] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">log1m</span>(a) + <span style="color: #87cefa;">binomial_lpmf</span>(Y[n] | 100, p[2]);
+  }
+}
+
+<span style="color: #00ffff;">model</span> {
+  <span style="color: #00ffff;">for</span>(n <span style="color: #00ffff;">in</span> 1:N) {
+    <span style="color: #00ffff;">target</span> <span style="color: #7fffd4;">+=</span> <span style="color: #87cefa;">log_sum_exp</span>(lp[n]);
+  }
+}
+
+<span style="color: #00ffff;">generated quantities</span> {
+  <span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">&#12487;&#12540;&#12479;&#12398;&#20104;&#28204;&#20998;&#24067;&#12434;&#20316;&#12427;&#22580;&#21512;</span>
+  <span style="color: #ff7f24;">//</span><span style="color: #ff7f24;">vector[N] pi;</span>
+  <span style="color: #ff7f24;">//</span><span style="color: #ff7f24;">for(n in 1:N) {</span>
+  <span style="color: #ff7f24;">//  </span><span style="color: #ff7f24;">pi[n] = softmax(lp[n])[1];</span>
+  <span style="color: #ff7f24;">//</span><span style="color: #ff7f24;">}</span>
+  <span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">1 - 100 &#28857;&#12414;&#12391;&#12434;&#20351;&#12358;&#22580;&#21512;</span>
+  <span style="color: #98fb98;">vector</span>[2] <span style="color: #eedd82;">lx</span>[100];
+  <span style="color: #00ffff;">for</span>(n <span style="color: #00ffff;">in</span> 1:100) {
+    lx[n,1] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">log</span>(a)   + <span style="color: #87cefa;">binomial_lpmf</span>(n | 100, p[1]);
+    lx[n,2] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">log1m</span>(a) + <span style="color: #87cefa;">binomial_lpmf</span>(n | 100, p[2]);
+  }
+  <span style="color: #98fb98;">vector</span>[100] <span style="color: #eedd82;">px</span>;
+  <span style="color: #00ffff;">for</span>(n <span style="color: #00ffff;">in</span> 1:100) {
+    px[n] <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">softmax</span>(lx[n])[1];
+  }
+}
+</pre>
+</div>
+
+<p>
+rstan はもう古いらしいので, cmdstanr を使ってパラメータをベイズ推定する<br />
+<a href="https://www.slideshare.net/simizu706/cmdstanrreducesum">Cmdstanr入門とreduce_sum()解説</a><br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>df <span style="color: #7fffd4;">&lt;-</span> read.csv(<span style="color: #ffa07a;">'mix_biom_test.csv'</span>, header=<span style="color: #98fb98;">TRUE</span>)
+<span class="linenr">3: </span>data <span style="color: #7fffd4;">&lt;-</span> list(N=nrow(df), Y=df$score)
+<span class="linenr">4: </span>model <span style="color: #7fffd4;">&lt;-</span> cmdstan_model(<span style="color: #ffa07a;">'mix_biom_test.stan'</span>)
+<span class="linenr">5: </span>fit <span style="color: #7fffd4;">&lt;-</span> model$sample(data=data, chains=4, parallel_chains=4, seed=1234)
+<span class="linenr">6: </span>fit$save_output_files(dir=<span style="color: #ffa07a;">"./"</span>, basename=<span style="color: #ffa07a;">'mix_biom_test'</span>, timestamp=<span style="color: #98fb98;">FALSE</span>, random=<span style="color: #98fb98;">FALSE</span>)
+</pre>
+</div>
+
+<pre class="example">
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) 
+Chain 1 Iteration:  100 / 2000 [  5%]  (Warmup) 
+Chain 1 Iteration:  200 / 2000 [ 10%]  (Warmup) 
+Chain 1 Iteration:  300 / 2000 [ 15%]  (Warmup) 
+Chain 1 Iteration:  400 / 2000 [ 20%]  (Warmup) 
+....
+Chain 4 Iteration: 1800 / 2000 [ 90%]  (Sampling) 
+Chain 4 Iteration: 1900 / 2000 [ 95%]  (Sampling) 
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) 
+Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) 
+Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) 
+Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) 
+Chain 1 finished in 0.7 seconds.
+Chain 2 finished in 0.6 seconds.
+Chain 3 finished in 0.6 seconds.
+Chain 4 finished in 0.6 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 0.6 seconds.
+Total execution time: 0.8 seconds.
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> Stan 計算結果の表示(1) 結果 summary</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+結果ファイルの読み込みと基本的な情報の書き出し<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #ff7f24;">#</span><span style="color: #ff7f24;">df &lt;- read.csv('mix_biom_test.csv', header=TRUE)</span>
+<span class="linenr"> 2: </span><span style="color: #ff7f24;">#</span><span style="color: #ff7f24;">head(df)</span>
+<span class="linenr"> 3: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 4: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 7: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 8: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 9: </span>fit$summary(c(<span style="color: #ffa07a;">"a"</span>,<span style="color: #ffa07a;">"p"</span>))
+<span class="linenr">10: </span>fit$summary(c(<span style="color: #ffa07a;">"px[1]"</span>,<span style="color: #ffa07a;">"px[2]"</span>,<span style="color: #ffa07a;">"px[3]"</span>,<span style="color: #ffa07a;">"px[4]"</span>,<span style="color: #ffa07a;">"px[5]"</span>,<span style="color: #ffa07a;">"px[6]"</span>))
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 3 × 10
+  variable  mean median      sd     mad    q5   q95  rhat ess_bulk ess_tail
+  &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 a        0.549  0.549 0.0493  0.0505  0.469 0.631 0.999    2972.    2834.
+2 p[1]     0.546  0.546 0.00680 0.00676 0.535 0.557 1.00     2517.    2658.
+3 p[2]     0.819  0.819 0.00587 0.00597 0.809 0.828 1.00     4432.    3389.
+# A tibble: 6 × 10
+  variable  mean median    sd   mad    q5   q95  rhat ess_bulk ess_tail
+  &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 px[1]        1      1     0     0     1     1    NA       NA       NA
+2 px[2]        1      1     0     0     1     1    NA       NA       NA
+3 px[3]        1      1     0     0     1     1    NA       NA       NA
+4 px[4]        1      1     0     0     1     1    NA       NA       NA
+5 px[5]        1      1     0     0     1     1    NA       NA       NA
+6 px[6]        1      1     0     0     1     1    NA       NA       NA
+</pre>
+
+<p>
+rhat &lt; 1.1 なので収束は問題なし.<br />
+\(a = 0.55\) (\(0.47 &lt; a &lt; 0.63\))   # 実際は 0.6 なので微妙かも&#x2026;<br />
+\(p_1 = 0.55\)  これは結構ぴったり<br />
+\(p_2 = 0.82\)  これもぴったりかも.<br />
+</p>
+
+<p>
+2.5% - 97.5% の quantile を知りたいときは, 自分で関数を作る必要がある.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr">3: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr">4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr">5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr">6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">7: </span><span style="color: #87cefa;">q95</span> <span style="color: #7fffd4;">&lt;-</span> <span style="color: #00ffff;">function</span>(x) quantile(x, probs=c(0.025, 0.25, 0.5, 0.75, 0.975))  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#33258;&#20316;&#38306;&#25968;</span>
+<span class="linenr">8: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#33258;&#20316;&#38306;&#25968; q95 &#12434;&#21547;&#12416;&#12356;&#12367;&#12388;&#12363;&#12398;&#20195;&#34920;&#20516;&#12434;&#34920;&#31034;&#12373;&#12379;&#12427;</span>
+<span class="linenr">9: </span>fit$summary(c(<span style="color: #ffa07a;">"a"</span>,<span style="color: #ffa07a;">"p"</span>), <span style="color: #ffa07a;">'mean'</span>, <span style="color: #ffa07a;">'sd'</span>, <span style="color: #ffa07a;">'median'</span>, q95, <span style="color: #ffa07a;">'rhat'</span>)
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 3 × 10
+  variable  mean      sd median `2.5%` `25%` `50%` `75%` `97.5%`  rhat
+  &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+1 a        0.549 0.0493   0.549  0.454 0.514 0.549 0.582   0.645 0.999
+2 p[1]     0.546 0.00680  0.546  0.533 0.542 0.546 0.551   0.560 1.00 
+3 p[2]     0.819 0.00587  0.819  0.807 0.815 0.819 0.823   0.830 1.00 
+</pre>
+
+<p>
+RStan の資産を使いたいとき<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(rstan)
+<span class="linenr"> 2: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 3: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 6: </span>rstanfit <span style="color: #7fffd4;">&lt;-</span> rstan::read_stan_csv(files)  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">rstan &#12398; fit object &#12364;&#20316;&#25104;&#12391;&#12365;&#12383;. &#12371;&#12428;&#12434;&#20351;&#12358;.</span>
+<span class="linenr"> 7: </span><span style="color: #7fffd4;">options</span>(width=180)
+<span class="linenr"> 8: </span>summary(rstanfit)$summary[c(<span style="color: #ffa07a;">'px[60]'</span>,<span style="color: #ffa07a;">'px[90]'</span>),]
+<span class="linenr"> 9: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#26360;&#12365;&#20986;&#12377;&#30906;&#29575;&#12434;&#22793;&#12360;&#12383;&#12356;&#12392;&#12365;</span>
+<span class="linenr">10: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">summary(rstanfit, probs=c(0.1,0.5,0.9))$summary[c('px[60]','px[90]'),]</span>
+<span class="linenr">11: </span>summary(rstanfit, pars=c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'p'</span>))$summary
+</pre>
+</div>
+
+<pre class="example">
+               mean      se_mean           sd          10%         50%          90%    n_eff     Rhat
+px[60] 9.999951e-01 7.913990e-08 5.046006e-06 9.999890e-01 9.99997e-01 9.999990e-01 4065.411 0.999612
+px[90] 3.111517e-12 9.539589e-14 4.091990e-12 4.786479e-13 1.83679e-12 6.993533e-12 1839.966 1.001073
+          mean      se_mean          sd      2.5%       25%      50%       75%     97.5%    n_eff      Rhat
+a    0.5490803 8.938196e-04 0.049338188 0.4536839 0.5143332 0.548623 0.5823223 0.6453881 3046.959 0.9991678
+p[1] 0.5463507 1.357109e-04 0.006801235 0.5326670 0.5417878 0.546397 0.5508498 0.5596871 2511.574 1.0010315
+p[2] 0.8186793 8.864559e-05 0.005869632 0.8069147 0.8146545 0.818802 0.8226557 0.8300441 4384.372 0.9994753
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> Stan 計算結果の表示(2) 図示 bayesplot</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+パラメータの分布<br />
+fit$draws で MCMC データを extract する.<br />
+mcmc_dens<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_dens(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'p'</span>)))
+<span class="linenr"> 9: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">p &lt;- bayesplot::mcmc_hist(fit$draws(c('a','p')))  # &#12498;&#12473;&#12488;&#12464;&#12521;&#12512;&#12434;&#25551;&#12367;&#22580;&#21512;</span>
+<span class="linenr">10: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_biom_test_dens.png'</span>
+<span class="linenr">11: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_biom_test_dens.png" alt="Mix_C-mix_biom_test_dens.png" /><br />
+</p>
+</div>
+
+<p>
+chain ごとの density<br />
+mcmc_dens_overlay<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_dens_overlay(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'p'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_biom_test_dens_overlay.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_biom_test_dens_overlay.png" alt="Mix_C-mix_biom_test_dens_overlay.png" /><br />
+</p>
+</div>
+
+<p>
+ヒストグラム(対角線上)及びパラメータ間の相関<br />
+mcmc_pairs<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_pairs(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'p'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_biom_test_pairs.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_biom_test_pairs.png" alt="Mix_C-mix_biom_test_pairs.png" /><br />
+</p>
+</div>
+
+<p>
+一応 traceplot も見ておく<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_trace(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'p'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_biom_test_trace.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_biom_test_trace.png" alt="Mix_C-mix_biom_test_trace.png" /><br />
+</p>
+</div>
+
+<p>
+データと推定結果の重ね合わせ.<br />
+\(\alpha = 0.55\) とする.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 2: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(<span style="color: #ffa07a;">'mix_biom_test.csv'</span>,header=<span style="color: #98fb98;">TRUE</span>)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot(data=d,mapping=aes(x=score,y=..density..))
+<span class="linenr"> 5: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_histogram(fill=<span style="color: #ffa07a;">'white'</span>,color=<span style="color: #ffa07a;">'black'</span>)
+<span class="linenr"> 6: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_density(fill=<span style="color: #ffa07a;">'black'</span>,alpha=0.3)
+<span class="linenr"> 7: </span>p <span style="color: #7fffd4;">&lt;-</span> p + xlim(0,100)
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span>x <span style="color: #7fffd4;">&lt;-</span> seq(0,100, by=1)
+<span class="linenr">10: </span>alpha <span style="color: #7fffd4;">&lt;-</span> 0.55
+<span class="linenr">11: </span>p1 <span style="color: #7fffd4;">&lt;-</span> 0.55
+<span class="linenr">12: </span>y1 <span style="color: #7fffd4;">&lt;-</span> alpha * dbinom(x, 100, p1)
+<span class="linenr">13: </span>dy1 <span style="color: #7fffd4;">&lt;-</span> data.frame(x=x,y1=y1)
+<span class="linenr">14: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(data=dy1,mapping=aes(x=x,y=y1),colour=<span style="color: #ffa07a;">'green'</span>,size=2, linetype=<span style="color: #ffa07a;">'dashed'</span>)
+<span class="linenr">15: </span>
+<span class="linenr">16: </span>p2 <span style="color: #7fffd4;">&lt;-</span> 0.82
+<span class="linenr">17: </span>y2 <span style="color: #7fffd4;">&lt;-</span> (1 - alpha) * dbinom(x, 100, p2)
+<span class="linenr">18: </span>dy2 <span style="color: #7fffd4;">&lt;-</span> data.frame(x=x,y2=y2)
+<span class="linenr">19: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(data=dy2,mapping=aes(x=x,y=y2),colour=<span style="color: #ffa07a;">'blue'</span>,size=2, linetype=<span style="color: #ffa07a;">'dashed'</span>)
+<span class="linenr">20: </span>
+<span class="linenr">21: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_binom_test_hist.png'</span>
+<span class="linenr">22: </span>ggsave(plot=p,file=fname,dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_binom_test_hist.png" alt="Mix_C-mix_binom_test_hist.png" /><br />
+</p>
+</div>
+
+<p>
+score(1 〜 100) が黄緑のクラスタに入っている確率を図示する.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'mix_biom_test-1.csv'</span>,
+<span class="linenr"> 3: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-2.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-3.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'mix_biom_test-4.csv'</span>)
+<span class="linenr"> 6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 7: </span>mat <span style="color: #7fffd4;">&lt;-</span> fit$summary(c(<span style="color: #ffa07a;">"px"</span>), <span style="color: #ffa07a;">"median"</span>,<span style="color: #ffa07a;">"rhat"</span>)
+<span class="linenr"> 8: </span>mat$score <span style="color: #7fffd4;">&lt;-</span> 1:100
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr">11: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot(data=mat) + geom_point(mapping=aes(x=score, y=median)) + xlim(0,100)
+<span class="linenr">12: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'mix_biom_test_pred.png'</span>
+<span class="linenr">13: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Mix_C-mix_biom_test_pred.png" alt="Mix_C-mix_biom_test_pred.png" /><br />
+</p>
+</div>
+</div>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Stan と R でベイズ統計モデリング 第四章]]></title>
+    <link href="http://saito1369.github.io/blog/2022-03-18-Stan04.html"/>
+    <updated>2022-03-18T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/Stan04</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Stan の基本的文法</a>
+<ul>
+<li><a href="#sec-1-1">1.1. ブロック構成</a></li>
+<li><a href="#sec-1-2">1.2. コーディング規約</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Stan の lp__ と target</a></li>
+<li><a href="#sec-3">3. 単回帰</a>
+<ul>
+<li><a href="#sec-3-1">3.1. データの図示</a></li>
+<li><a href="#sec-3-2">3.2. 単回帰(lm)</a></li>
+<li><a href="#sec-3-3">3.3. Stan で実装 (1) cmdstanr</a></li>
+<li><a href="#sec-3-4">3.4. Stan 結果解析</a></li>
+<li><a href="#sec-3-5">3.5. ベイズ信頼区間</a></li>
+<li><a href="#sec-3-6">3.6. ベイズ予測区間</a></li>
+<li><a href="#sec-3-7">3.7. transformed parametes 及び generated quantities ブロック</a></li>
+<li><a href="#sec-3-8">3.8. Stan で実装(2) cmdstanpy</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2022-03-18 Fri 17:42&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 12:57&gt;</span></span><br />
+</p>
+<p>
+<a href="https://amzn.to/3eLjQip">Stan と R でベイズ統計モデリング</a> (第四章)の学習記録<br />
+</p>
+
+<p>
+この本は素晴らしい. めちゃんこ賢い人が書いた本って感じがする.<br />
+疑問に思いそうなところをちゃんと先回りしてわかりやすく解説してくれているし,<br />
+書き方に統一感があって, 読み進めていくうちに自然に身につくような構成となっている.<br />
+</p>
+
+<p>
+この本では RStan を使った解説が行われているが,<br />
+これからは cmdstanr/cmdstanpy らしい( <a href="https://www.slideshare.net/simizu706/cmdstanrreducesum">Cmdstanr入門とreduce_sum()解説</a> ) のでこれらを用いて書き直してみる.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<p>
+基礎となる単回帰の説明がある第四章を見てみる.<br />
+自分用メモ.<br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Stan の基本的文法</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> ブロック構成</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Stan の最も簡単なプログラム例.<br />
+データ Y は正規分布する.<br />
+求めたいパラメータは平均値 mu. の場合.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span class="linenr"> 1: </span><span style="color: #00ffff;">data</span> {
+<span class="linenr"> 2: </span>  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+<span class="linenr"> 3: </span>  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">Y</span>[N];
+<span class="linenr"> 4: </span>}
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span style="color: #00ffff;">parameters</span> {
+<span class="linenr"> 7: </span>  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">mu</span>;
+<span class="linenr"> 8: </span>}
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span style="color: #00ffff;">model</span> {
+<span class="linenr">11: </span>  <span style="color: #00ffff;">for</span>(i <span style="color: #00ffff;">in</span> 1:N) {
+<span class="linenr">12: </span>    Y[N] <span style="color: #7fffd4;">~</span> <span style="color: #87cefa;">normal</span>(mu,1)
+<span class="linenr">13: </span>  }
+<span class="linenr">14: </span>  mu <span style="color: #7fffd4;">~</span> <span style="color: #87cefa;">normal</span>(0,100);
+<span class="linenr">15: </span>}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> コーディング規約</h3>
+<div class="outline-text-3" id="text-1-2">
+<ol class="org-ol">
+<li>インデント<br />
+</li>
+<li>データ変数は大文字から, パラメータは小文字から始める.<br />
+</li>
+<li>ブロックの間は1行あける.<br />
+</li>
+<li>変数名は snake_case にする.<br />
+</li>
+<li>~ 及び = の前後はスペースあける.<br />
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Stan の lp__ と target</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+事後確率は以下のように計算できる.<br />
+$$
+  p(\theta|Y) \propto p(Y|\theta) p(\theta)
+  $$<br />
+</p>
+
+<p>
+対数事後確率は<br />
+$$
+  \log p(\theta|Y) \propto \log p(Y|\theta) + \log p(\theta)
+  $$<br />
+</p>
+
+<p>
+Stan の結果データの中に出てくる lp__ (log posterior) は, 各 MCMC step でパラメータ \(\theta\) に何か具体的な値 \(\theta^{\star}\) を入れたときの \(\log p(\theta^{\star}|Y)\) の値.<br />
+</p>
+
+<p>
+$$
+  lp\_\_ = \log p(\theta^{\star}|Y)  \propto \log p(Y|\theta^{\star}) + \log p(\theta^{\star})
+  $$<br />
+</p>
+
+<p>
+データが \(N\) 個あれば以下のようになる. もちろん \(Y_i\) には何らかの具体的な数値が入っている.<br />
+</p>
+
+<p>
+$$
+  lp\_\_ = \log p(\theta^{\star}|Y)  \propto \sum_{i=1}^{N} \log p(Y_i|\theta^{\star}) + \log p(\theta^{\star})
+  $$<br />
+</p>
+
+<p>
+Stan の model ブロックでの \(Y \sim dist(\theta)\) という書き方は,<br />
+内部的には以下のように計算されている.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span class="linenr">1: </span><span style="color: #ffc0cb; font-weight: bold;">lp__</span> <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">log</span>(p(theta));   <span style="color: #ff7f24;"># &#20107;&#21069;&#20998;&#24067;(&#12398; log)</span>
+<span class="linenr">2: </span><span style="color: #00ffff;">for</span>(i <span style="color: #00ffff;">in</span> 1:N) {
+<span class="linenr">3: </span>  <span style="color: #ffc0cb; font-weight: bold;">lp__</span> <span style="color: #7fffd4;">+=</span> <span style="color: #87cefa;">log</span>(p(Y[i]|theta));  <span style="color: #ff7f24;"># &#12487;&#12540;&#12479;&#12399;&#29420;&#31435;&#12394;&#12398;&#12391;&#30906;&#29575;&#12434;&#25499;&#12369;&#31639;(log &#12394;&#12398;&#12391;&#36275;&#12375;&#31639;&#12395;&#12394;&#12427;)</span>
+<span class="linenr">4: </span>}
+</pre>
+</div>
+
+<p>
+target は lp__ の別名である.<br />
+Stan では, target に \(\log p(Y|\theta)\) を足し込んでいく上のような書き方が出来るようになっている.<br />
+特に複雑な尤度計算を行う際にはこっちの書き方をする場合がある.<br />
+</p>
+
+<p>
+普通の書き方<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span class="linenr">1: </span><span style="color: #00ffff;">model</span> {
+<span class="linenr">2: </span>  <span style="color: #00ffff;">for</span>(i <span style="color: #00ffff;">in</span> 1:N) {
+<span class="linenr">3: </span>    Y[i] <span style="color: #7fffd4;">~</span> <span style="color: #87cefa;">normal</span>(mu,1);
+<span class="linenr">4: </span>  }
+<span class="linenr">5: </span>  mu <span style="color: #7fffd4;">~</span> <span style="color: #87cefa;">normal</span>(0,100);
+<span class="linenr">6: </span>}
+</pre>
+</div>
+
+<p>
+を target に足し込む形式で書くと以下のようになる.<br />
+normal_ldf(Y[i]|mu, sigma)  は \(\log normal(Y[i]|\mu, sigma)\) を表す便利な関数.<br />
+(ldf は log probability density function. log 確率密度関数)<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-stan"><span class="linenr">1: </span><span style="color: #00ffff;">model</span> {
+<span class="linenr">2: </span>  <span style="color: #00ffff;">for</span>(i <span style="color: #00ffff;">in</span> 1:N) {
+<span class="linenr">3: </span>    <span style="color: #00ffff;">target</span> <span style="color: #7fffd4;">+=</span> <span style="color: #87cefa;">normal_lpdf</span>(Y[i]|mu,1);
+<span class="linenr">4: </span>  }
+<span class="linenr">5: </span>  <span style="color: #00ffff;">target</span> <span style="color: #7fffd4;">+=</span> <span style="color: #87cefa;">normal_lpdf</span>(mu|0,100);
+<span class="linenr">6: </span>}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 単回帰</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+これが全ての基礎. よくわかんなくなったらここに戻ってくること.<br />
+単回帰の例で Stan 及び cmdstanr/cmdstanpy の典型的な使い方を見てみる.<br />
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> データの図示</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+データファイル: data-salary.txt (X 列, Y 列がある. X 列の値から Y の値をよそくしたい！！)<br />
+ggplot2 で図を描いてみる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr">2: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr">3: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot(data=d) + geom_point(mapping=aes(x=X,y=Y),shape=1, size=3)
+<span class="linenr">4: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'04_01_fig.png'</span>
+<span class="linenr">5: </span>ggsave(file=fname, plot=p, dpi=50)   <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">dpi &#12391;&#22259;&#12398;&#22823;&#12365;&#12373;(&#35299;&#20687;&#24230;)&#12434;&#25351;&#23450;</span>
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-04_01_fig.png" alt="Stan04-04_01_fig.png" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> 単回帰(lm)</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+lm 関数を使って単回帰を行う.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr">2: </span>res <span style="color: #7fffd4;">&lt;-</span> lm(Y ~ X, data=d)
+<span class="linenr">3: </span>summary(res)
+</pre>
+</div>
+
+<pre class="example">
+Call:
+lm(formula = Y ~ X, data = d)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-155.471  -51.523   -6.663   52.822  141.349 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -119.697     68.148  -1.756    0.096 .  
+X             21.904      1.518  14.428 2.47e-11 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 79.1 on 18 degrees of freedom
+Multiple R-squared:  0.9204,	Adjusted R-squared:  0.916 
+F-statistic: 208.2 on 1 and 18 DF,  p-value: 2.466e-11
+</pre>
+
+<p>
+信頼区間<br />
+coord_cartesian(xlim=Xの範囲, ylim=Yの範囲)<br />
+scale_y_continuous() で Y の補助目盛りの設定など<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr"> 2: </span>res <span style="color: #7fffd4;">&lt;-</span> lm(Y ~ X, data=d)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>X_new <span style="color: #7fffd4;">&lt;-</span> data.frame(X=23:60)
+<span class="linenr"> 5: </span>conf_95 <span style="color: #7fffd4;">&lt;-</span> predict(res, X_new, interval=<span style="color: #ffa07a;">'confidence'</span>, level=0.95)
+<span class="linenr"> 6: </span>conf_50 <span style="color: #7fffd4;">&lt;-</span> predict(res, X_new, interval=<span style="color: #ffa07a;">'confidence'</span>, level=0.50)
+<span class="linenr"> 7: </span>conf_95 <span style="color: #7fffd4;">&lt;-</span> data.frame(X_new,conf_95)  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#21015;&#21517; = (X,fit,lwr,upr)</span>
+<span class="linenr"> 8: </span>conf_50 <span style="color: #7fffd4;">&lt;-</span> data.frame(X_new,conf_50)
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr">11: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot()
+<span class="linenr">12: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=conf_95, mapping=aes(x=X,ymin=lwr,ymax=upr), alpha=1/6)
+<span class="linenr">13: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=conf_50, mapping=aes(x=X,ymin=lwr,ymax=upr), alpha=3/6)
+<span class="linenr">14: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(data=conf_50,aes(x=X,y=fit),size=1) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#32218;</span>
+<span class="linenr">15: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_point(data=d, aes(x=X, y=Y), shape=1, size=3) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12414;&#12427;</span>
+<span class="linenr">16: </span>p <span style="color: #7fffd4;">&lt;-</span> p + labs(x=<span style="color: #ffa07a;">'X'</span>, y=<span style="color: #ffa07a;">'Y'</span>) + coord_cartesian(xlim=c(22, 61), ylim=c(200, 1400))
+<span class="linenr">17: </span>p <span style="color: #7fffd4;">&lt;-</span> p + scale_y_continuous(breaks=seq(from=200, to=1400, by=400))
+<span class="linenr">18: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-3-left.png'</span>
+<span class="linenr">19: </span>ggsave(file=fname, plot=p, dpi=50)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-3-left.png" alt="Stan04-fig4-3-left.png" /><br />
+</p>
+</div>
+
+<p>
+予測区間を描く.<br />
+confidence &#x2013;&gt; prediction にする.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr"> 2: </span>res <span style="color: #7fffd4;">&lt;-</span> lm(Y ~ X, data=d)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>X_new <span style="color: #7fffd4;">&lt;-</span> data.frame(X=23:60)
+<span class="linenr"> 5: </span>pred_95 <span style="color: #7fffd4;">&lt;-</span> predict(res, X_new, interval=<span style="color: #ffa07a;">'prediction'</span>, level=0.95)
+<span class="linenr"> 6: </span>pred_50 <span style="color: #7fffd4;">&lt;-</span> predict(res, X_new, interval=<span style="color: #ffa07a;">'prediction'</span>, level=0.50)
+<span class="linenr"> 7: </span>pred_95 <span style="color: #7fffd4;">&lt;-</span> data.frame(X_new,pred_95)  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#21015;&#21517; = (X,fit,lwr,upr)</span>
+<span class="linenr"> 8: </span>pred_50 <span style="color: #7fffd4;">&lt;-</span> data.frame(X_new,pred_50)
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr">11: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot()
+<span class="linenr">12: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=pred_95, mapping=aes(x=X,ymin=lwr,ymax=upr), alpha=1/6)
+<span class="linenr">13: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=pred_50, mapping=aes(x=X,ymin=lwr,ymax=upr), alpha=3/6)
+<span class="linenr">14: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(data=pred_50,aes(x=X,y=fit),size=1) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#32218;</span>
+<span class="linenr">15: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_point(data=d, aes(x=X, y=Y), shape=1, size=3) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12414;&#12427;</span>
+<span class="linenr">16: </span>p <span style="color: #7fffd4;">&lt;-</span> p + labs(x=<span style="color: #ffa07a;">'X'</span>, y=<span style="color: #ffa07a;">'Y'</span>) + coord_cartesian(xlim=c(22, 61), ylim=c(200, 1400))
+<span class="linenr">17: </span>p <span style="color: #7fffd4;">&lt;-</span> p + scale_y_continuous(breaks=seq(from=200, to=1400, by=400))
+<span class="linenr">18: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-3-right.png'</span>
+<span class="linenr">19: </span>ggsave(file=fname, plot=p, dpi=50)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-3-right.png" alt="Stan04-fig4-3-right.png" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Stan で実装 (1) cmdstanr</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-stan"><span class="linenr"> 1: </span><span style="color: #00ffff;">data</span> {
+<span class="linenr"> 2: </span>  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+<span class="linenr"> 3: </span>  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">X</span>[N];
+<span class="linenr"> 4: </span>  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">Y</span>[N];
+<span class="linenr"> 5: </span>}
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #00ffff;">parameters</span> {
+<span class="linenr"> 8: </span>  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">a</span>;
+<span class="linenr"> 9: </span>  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">b</span>;
+<span class="linenr">10: </span>  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0&gt; <span style="color: #eedd82;">sigma</span>;
+<span class="linenr">11: </span>}
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span style="color: #00ffff;">model</span> {
+<span class="linenr">14: </span>  <span style="color: #00ffff;">for</span>(i <span style="color: #00ffff;">in</span> 1:N) {
+<span class="linenr">15: </span>    Y[i] <span style="color: #7fffd4;">~</span> <span style="color: #87cefa;">normal</span>(a + b*X[i], sigma);
+<span class="linenr">16: </span>  }
+<span class="linenr">17: </span>}
+</pre>
+</div>
+
+<p>
+これをキックする R コードを書く.<br />
+本にある RStan ではなく comdstanr で書いてみる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr">3: </span>data <span style="color: #7fffd4;">&lt;-</span> list(N=nrow(d), X=d$X, Y=d$Y)
+<span class="linenr">4: </span>model  <span style="color: #7fffd4;">&lt;-</span> cmdstan_model(<span style="color: #ffa07a;">'model4-5.stan'</span>)
+<span class="linenr">5: </span>fit <span style="color: #7fffd4;">&lt;-</span> model$sample(data=data, chains=4, parallel_chains=4, seed=1234)
+<span class="linenr">6: </span>fit$save_output_files(dir=<span style="color: #ffa07a;">"./"</span>, basename=<span style="color: #ffa07a;">'model4-5'</span>, timestamp=<span style="color: #98fb98;">FALSE</span>, random=<span style="color: #98fb98;">FALSE</span>)
+</pre>
+</div>
+
+<pre class="example">
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) 
+...
+Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 1100 / 2000 [ 55%]  (Sampling) 
+Chain 1 Iteration: 1200 / 2000 [ 60%]  (Sampling) 
+Chain 1 Iteration: 1300 / 2000 [ 65%]  (Sampling) 
+Chain 1 Iteration: 1400 / 2000 [ 70%]  (Sampling) 
+Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 1600 / 2000 [ 80%]  (Sampling) 
+Chain 1 Iteration: 1700 / 2000 [ 85%]  (Sampling) 
+Chain 1 Iteration: 1800 / 2000 [ 90%]  (Sampling) 
+Chain 1 Iteration: 1900 / 2000 [ 95%]  (Sampling) 
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) 
+.....
+Chain 4 Iteration: 1700 / 2000 [ 85%]  (Sampling) 
+Chain 4 Iteration: 1800 / 2000 [ 90%]  (Sampling) 
+Chain 4 Iteration: 1900 / 2000 [ 95%]  (Sampling) 
+Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) 
+Chain 1 finished in 0.1 seconds.
+Chain 2 finished in 0.1 seconds.
+Chain 3 finished in 0.1 seconds.
+Chain 4 finished in 0.1 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 0.1 seconds.
+Total execution time: 0.3 seconds.
+</pre>
+
+<p>
+csv ファイルからの読み込み<br />
+結果を見てみる.<br />
+<a href="https://mc-stan.org/cmdstanr/reference/read_cmdstan_csv.html">Read CmdStan CSV files into R — read_cmdstan_csv • cmdstanr</a><br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr">3: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr">4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr">5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr">6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">7: </span>fit$summary()
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 4 × 10
+  variable   mean median    sd   mad     q5    q95  rhat ess_bulk ess_tail
+  &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 lp__      -93.6  -93.3  1.26  1.04  -96.1 -92.2   1.01    1304.    1691.
+2 a        -117.  -119.  71.3  68.7  -236.    2.08  1.00    1377.    1556.
+3 b          21.9   21.9  1.60  1.54   19.2  24.5   1.00    1349.    1501.
+4 sigma      84.5   82.4 15.2  14.3    63.8 112.    1.01    1615.    1361.
+</pre>
+
+
+<p>
+lm では a = -119.7, b = 21.9 と推定されていたのでほぼ同じ結果が出たと言って良いだろう.<br />
+</p>
+
+<p>
+RStan の形式で見るには以下のようにする.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(rstan)
+<span class="linenr">2: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr">3: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr">4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr">5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr">6: </span>rstanfit <span style="color: #7fffd4;">&lt;-</span> rstan::read_stan_csv(files)  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">rstan &#12398; fit object &#12364;&#20316;&#25104;&#12391;&#12365;&#12383;. &#12371;&#12428;&#12434;&#20351;&#12358;.</span>
+<span class="linenr">7: </span><span style="color: #7fffd4;">options</span>(width=180)
+<span class="linenr">8: </span>summary(rstanfit)$summary
+</pre>
+</div>
+
+<pre class="example">
+            mean    se_mean        sd       2.5%        25%        50%       75%     97.5%    n_eff     Rhat
+a     -117.45496 1.93495619 71.307379 -257.65965 -164.64975 -119.17350 -71.97750  23.16816 1358.084 1.000974
+b       21.85965 0.04379069  1.597700   18.67989   20.82737   21.88625  22.90630  24.97104 1331.149 1.001300
+sigma   84.50608 0.40945078 15.213551   61.08729   73.71800   82.41410  93.17735 120.02752 1380.568 1.005035
+lp__   -93.60737 0.03683109  1.256416  -96.86346  -94.18972  -93.27450 -92.69150 -92.13598 1163.691 1.007309
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Stan 結果解析</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+MCMC データの extract は fit$draws<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr">3: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr">4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr">5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr">6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">7: </span>ms <span style="color: #7fffd4;">&lt;-</span> fit$draws(format=<span style="color: #ffa07a;">'matrix'</span>)  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">chain &#12434;&#19968;&#12388;&#12395;&#12414;&#12392;&#12417;&#12427;</span>
+<span class="linenr">8: </span>dim(ms)
+<span class="linenr">9: </span>head(ms)
+</pre>
+</div>
+
+<pre class="example">
+[1] 4000    4
+# A draws_matrix: 6 iterations, 1 chains, and 4 variables
+    variable
+draw lp__      a  b sigma
+   1  -93  -94.6 21    72
+   2  -93  -79.0 21    87
+   3  -94  -34.5 21    95
+   4  -93  -50.5 20    96
+   5  -94    6.4 19    90
+   6  -92 -133.7 22    81
+</pre>
+
+<p>
+パラメータの分布を図示<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_dens(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'b'</span>,<span style="color: #ffa07a;">'sigma'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'model4-5_param_dens.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_dens.png" alt="Stan04-model4-5_param_dens.png" /><br />
+</p>
+</div>
+
+<p>
+ヒストグラムで描くと<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_hist(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'b'</span>,<span style="color: #ffa07a;">'sigma'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'model4-5_param_hist.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_hist.png" alt="Stan04-model4-5_param_hist.png" /><br />
+</p>
+</div>
+
+<p>
+trace plot<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_trace(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'b'</span>,<span style="color: #ffa07a;">'sigma'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'model4-5_param_trace.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_trace.png" alt="Stan04-model4-5_param_trace.png" /><br />
+</p>
+</div>
+
+<p>
+mcmc_dens_overlay<br />
+chain ごとに描く.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_dens_overlay(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'b'</span>,<span style="color: #ffa07a;">'sigma'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'model4-5_param_dens_overlay.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_dens_overlay.png" alt="Stan04-model4-5_param_dens_overlay.png" /><br />
+</p>
+</div>
+
+<p>
+mcmc_pairs<br />
+パラメータ間の関係をみる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>p <span style="color: #7fffd4;">&lt;-</span> bayesplot::mcmc_pairs(fit$draws(c(<span style="color: #ffa07a;">'a'</span>,<span style="color: #ffa07a;">'b'</span>)))
+<span class="linenr"> 9: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'model4-5_param_pairs.png'</span>
+<span class="linenr">10: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_pairs.png" alt="Stan04-model4-5_param_pairs.png" /><br />
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 3: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 7: </span>ms <span style="color: #7fffd4;">&lt;-</span> fit$draws(format=<span style="color: #ffa07a;">'df'</span>)
+<span class="linenr"> 8: </span>head(ms)
+<span class="linenr"> 9: </span>head(ms$a)
+<span class="linenr">10: </span>length(ms$a)
+<span class="linenr">11: </span>quantile(ms$b, probs=c(0.025,0.975))
+</pre>
+</div>
+
+<pre class="example">
+# A draws_df: 6 iterations, 1 chains, and 4 variables
+  lp__      a  b sigma
+1  -93  -94.6 21    72
+2  -93  -79.0 21    87
+3  -94  -34.5 21    95
+4  -93  -50.5 20    96
+5  -94    6.4 19    90
+6  -92 -133.7 22    81
+# ... hidden reserved variables {'.chain', '.iteration', '.draw'}
+[1]  -94.58260  -79.03710  -34.45430  -50.53660    6.44861 -133.72600
+[1] 4000
+    2.5%    97.5% 
+18.67989 24.97104
+</pre>
+
+<p>
+mcmc_pairs に似た図を ggplot を用いて描いてみる<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>df_mcmc <span style="color: #7fffd4;">&lt;-</span> fit$draws(format=<span style="color: #ffa07a;">'df'</span>)
+<span class="linenr"> 9: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#25955;&#24067;&#22259;</span>
+<span class="linenr">10: </span>p_xy <span style="color: #7fffd4;">&lt;-</span> ggplot(df_mcmc,aes(x=a,y=b)) +
+<span class="linenr">11: </span>    geom_point(alpha=1/4,size=2,shape=1) +
+<span class="linenr">12: </span>    scale_x_continuous(breaks=seq(-400,200,200), limits=c(-420,210)) +
+<span class="linenr">13: </span>    scale_y_continuous(breaks=seq(15,25,5),limits=c(14.5,29))
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">a &#12398;&#20998;&#24067;&#22259;</span>
+<span class="linenr">16: </span>p_x <span style="color: #7fffd4;">&lt;-</span> ggplot(df_mcmc,aes(x=a)) + theme_bw(base_size=18) + theme(legend.position=<span style="color: #ffa07a;">'none'</span>) +
+<span class="linenr">17: </span>    geom_histogram(aes(y=..density..),color=<span style="color: #ffa07a;">'black'</span>,fill=<span style="color: #ffa07a;">'white'</span>) +
+<span class="linenr">18: </span>    geom_density(alpha=0.3,fill=<span style="color: #ffa07a;">'gray20'</span>) +
+<span class="linenr">19: </span>    scale_x_continuous(breaks=seq(-400,200,200),limits=c(-420,210))+
+<span class="linenr">20: </span>    labs(x=<span style="color: #ffa07a;">''</span>,y=<span style="color: #ffa07a;">''</span>)
+<span class="linenr">21: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">b &#12398;&#20998;&#24067;&#22259;</span>
+<span class="linenr">22: </span>p_y <span style="color: #7fffd4;">&lt;-</span> ggplot(df_mcmc, aes(x=b)) + theme_bw(base_size=18) + theme(legend.position=<span style="color: #ffa07a;">'none'</span>) +
+<span class="linenr">23: </span>    coord_flip() +
+<span class="linenr">24: </span>    geom_histogram(aes(y=..density..), colour=<span style="color: #ffa07a;">'black'</span>, fill=<span style="color: #ffa07a;">'white'</span>) +
+<span class="linenr">25: </span>    geom_density(alpha=0.3, fill=<span style="color: #ffa07a;">'gray20'</span>) +
+<span class="linenr">26: </span>    scale_x_continuous(breaks=seq(15, 25, 5), limits=c(14.5, 29)) +
+<span class="linenr">27: </span>    labs(x=<span style="color: #ffa07a;">''</span>, y=<span style="color: #ffa07a;">''</span>)
+<span class="linenr">28: </span>
+<span class="linenr">29: </span>p_emp <span style="color: #7fffd4;">&lt;-</span> ggplot(data.frame(0,0)) + theme(rect=element_rect(fill=<span style="color: #ffa07a;">'white'</span>), panel.border=element_blank())
+<span class="linenr">30: </span>
+<span class="linenr">31: </span>g_xy  <span style="color: #7fffd4;">&lt;-</span> ggplotGrob(p_xy)
+<span class="linenr">32: </span>g_x   <span style="color: #7fffd4;">&lt;-</span> ggplotGrob(p_x)
+<span class="linenr">33: </span>g_y   <span style="color: #7fffd4;">&lt;-</span> ggplotGrob(p_y)
+<span class="linenr">34: </span>g_emp <span style="color: #7fffd4;">&lt;-</span> ggplotGrob(p_emp)
+<span class="linenr">35: </span>
+<span class="linenr">36: </span>g1 <span style="color: #7fffd4;">&lt;-</span> cbind(g_x,  g_emp, size=<span style="color: #ffa07a;">'first'</span>)
+<span class="linenr">37: </span>g2 <span style="color: #7fffd4;">&lt;-</span> cbind(g_xy, g_y,   size=<span style="color: #ffa07a;">'first'</span>)
+<span class="linenr">38: </span>g  <span style="color: #7fffd4;">&lt;-</span> rbind(g1,   g2,    size=<span style="color: #ffa07a;">'first'</span>)
+<span class="linenr">39: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-7.png'</span>
+<span class="linenr">40: </span>ggsave(file=fname, plot=g, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-7.png" alt="Stan04-fig4-7.png" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> ベイズ信頼区間</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+ベイズ信頼区間(R の中での計算の例)<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>ms <span style="color: #7fffd4;">&lt;-</span> fit$draws(format=<span style="color: #ffa07a;">'df'</span>)
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>X_new <span style="color: #7fffd4;">&lt;-</span> 23:60
+<span class="linenr">11: </span>N_X <span style="color: #7fffd4;">&lt;-</span> length(X_new)
+<span class="linenr">12: </span>N_mcmc <span style="color: #7fffd4;">&lt;-</span> length(ms$lp__)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>set.seed(1234)
+<span class="linenr">15: </span>y_base_mcmc <span style="color: #7fffd4;">&lt;-</span> as.data.frame(matrix(nrow=N_mcmc,ncol=N_X))
+<span class="linenr">16: </span>y_mcmc      <span style="color: #7fffd4;">&lt;-</span> as.data.frame(matrix(nrow=N_mcmc,ncol=N_X))
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">i &#21015;&#30446;&#12398;&#12487;&#12540;&#12479;&#12434;&#20316;&#12427;</span>
+<span class="linenr">19: </span><span style="color: #00ffff;">for</span> (i <span style="color: #00ffff;">in</span> 1:N_X) {
+<span class="linenr">20: </span>    y_base_mcmc[,i] <span style="color: #7fffd4;">&lt;-</span> ms$a + ms$b * X_new[i]
+<span class="linenr">21: </span>    y_mcmc[,i]      <span style="color: #7fffd4;">&lt;-</span> rnorm(n=N_mcmc,mean=y_base_mcmc[,i],sd=ms$sigma)
+<span class="linenr">22: </span>}
+<span class="linenr">23: </span>conf <span style="color: #7fffd4;">&lt;-</span> data.frame(X=X_new,t(apply(y_base_mcmc,2,quantile,probs=c(0.025,0.25,0.50,0.75,0.975))))
+<span class="linenr">24: </span>colnames(conf) <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'X'</span>,<span style="color: #ffa07a;">'p025'</span>,<span style="color: #ffa07a;">'p250'</span>,<span style="color: #ffa07a;">'p500'</span>,<span style="color: #ffa07a;">'p750'</span>,<span style="color: #ffa07a;">'p975'</span>)
+<span class="linenr">25: </span>
+<span class="linenr">26: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr">27: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot()
+<span class="linenr">28: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=conf,aes(x=X,ymin=p025,ymax=p975),alpha=1/6)
+<span class="linenr">29: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=conf,aes(x=X,ymin=p250,ymax=p750),alpha=2/6)
+<span class="linenr">30: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(  data=conf,aes(x=X,y=p500),size=0.2) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#32218;</span>
+<span class="linenr">31: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_point( data=d,   aes(x=X,y=Y), shape=1, size=3) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12414;&#12427;</span>
+<span class="linenr">32: </span>p <span style="color: #7fffd4;">&lt;-</span> p + labs(x=<span style="color: #ffa07a;">'X'</span>, y=<span style="color: #ffa07a;">'Y'</span>) + coord_cartesian(xlim=c(22, 61), ylim=c(200, 1400))
+<span class="linenr">33: </span>p <span style="color: #7fffd4;">&lt;-</span> p + scale_y_continuous(breaks=seq(from=200, to=1400, by=400))
+<span class="linenr">34: </span>
+<span class="linenr">35: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-8-left.png'</span>
+<span class="linenr">36: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-8-left.png" alt="Stan04-fig4-8-left.png" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> ベイズ予測区間</h3>
+<div class="outline-text-3" id="text-3-6">
+<p>
+ベイズ予測区間(R の中での計算の例)<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-5-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-5-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>ms <span style="color: #7fffd4;">&lt;-</span> fit$draws(format=<span style="color: #ffa07a;">'df'</span>)
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>X_new <span style="color: #7fffd4;">&lt;-</span> 23:60
+<span class="linenr">11: </span>N_X <span style="color: #7fffd4;">&lt;-</span> length(X_new)
+<span class="linenr">12: </span>N_mcmc <span style="color: #7fffd4;">&lt;-</span> length(ms$lp__)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>set.seed(1234)
+<span class="linenr">15: </span>y_base_mcmc <span style="color: #7fffd4;">&lt;-</span> as.data.frame(matrix(nrow=N_mcmc,ncol=N_X))
+<span class="linenr">16: </span>y_mcmc      <span style="color: #7fffd4;">&lt;-</span> as.data.frame(matrix(nrow=N_mcmc,ncol=N_X))
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">i &#21015;&#30446;&#12398;&#12487;&#12540;&#12479;&#12434;&#20316;&#12427;</span>
+<span class="linenr">19: </span><span style="color: #00ffff;">for</span> (i <span style="color: #00ffff;">in</span> 1:N_X) {
+<span class="linenr">20: </span>    y_base_mcmc[,i] <span style="color: #7fffd4;">&lt;-</span> ms$a + ms$b * X_new[i]
+<span class="linenr">21: </span>    y_mcmc[,i]      <span style="color: #7fffd4;">&lt;-</span> rnorm(n=N_mcmc,mean=y_base_mcmc[,i],sd=ms$sigma)
+<span class="linenr">22: </span>}
+<span class="linenr">23: </span>
+<span class="linenr">24: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">y_base_mcmc --&gt; y_mcmc &#12395;&#22793;&#26356;&#12375;&#12383;&#12384;&#12369;</span>
+<span class="linenr">25: </span>conf <span style="color: #7fffd4;">&lt;-</span> data.frame(X=X_new,t(apply(y_mcmc,2,quantile,probs=c(0.025,0.25,0.50,0.75,0.975))))
+<span class="linenr">26: </span>colnames(conf) <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'X'</span>,<span style="color: #ffa07a;">'p025'</span>,<span style="color: #ffa07a;">'p250'</span>,<span style="color: #ffa07a;">'p500'</span>,<span style="color: #ffa07a;">'p750'</span>,<span style="color: #ffa07a;">'p975'</span>)
+<span class="linenr">27: </span>
+<span class="linenr">28: </span>d <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">'data-salary.txt'</span>)
+<span class="linenr">29: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot()
+<span class="linenr">30: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=conf,aes(x=X,ymin=p025,ymax=p975),alpha=1/6)
+<span class="linenr">31: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=conf,aes(x=X,ymin=p250,ymax=p750),alpha=2/6)
+<span class="linenr">32: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(  data=conf,aes(x=X,y=p500),size=0.2) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#32218;</span>
+<span class="linenr">33: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_point( data=d,   aes(x=X,y=Y), shape=1, size=3) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12414;&#12427;</span>
+<span class="linenr">34: </span>p <span style="color: #7fffd4;">&lt;-</span> p + labs(x=<span style="color: #ffa07a;">'X'</span>, y=<span style="color: #ffa07a;">'Y'</span>) + coord_cartesian(xlim=c(22, 61), ylim=c(200, 1400))
+<span class="linenr">35: </span>p <span style="color: #7fffd4;">&lt;-</span> p + scale_y_continuous(breaks=seq(from=200, to=1400, by=400))
+<span class="linenr">36: </span>
+<span class="linenr">37: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-8-right.png'</span>
+<span class="linenr">38: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-8-right.png" alt="Stan04-fig4-8-right.png" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> transformed parametes 及び generated quantities ブロック</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+処理は出来るだけ Stan 側でやらせたい.<br />
+R では出てきたデータの解析と図示に使う.<br />
+</p>
+
+<p>
+ベイズ信頼区間, 予測区間など, サンプルから派生する乱数計算部分を Stan に任せる.<br />
+(model4-4.stan)<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-stan"><span style="color: #00ffff;">data</span> {
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N</span>;
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">X</span>[N];
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">Y</span>[N];
+  <span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">&#36861;&#21152;&#37096;&#20998;</span>
+  <span style="color: #98fb98;">int</span> <span style="color: #eedd82;">N_new</span>;
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">X_new</span>[N_new];
+}
+
+<span style="color: #00ffff;">parameters</span> {
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">a</span>;
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">b</span>;
+  <span style="color: #98fb98;">real</span>&lt;<span style="color: #00ffff;">lower</span><span style="color: #7fffd4;">=</span>0&gt; <span style="color: #eedd82;">sigma</span>;
+}
+
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">transformed parameters &#12391;&#12399;,</span>
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">data, parameter &#12434;&#32068;&#12415;&#21512;&#12431;&#12379;&#12390;,</span>
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">&#26032;&#12375;&#12356;&#12469;&#12531;&#12503;&#12522;&#12531;&#12464;&#12497;&#12521;&#12513;&#12540;&#12479;&#12434;&#20316;&#25104;&#20986;&#26469;&#12427;.</span>
+<span style="color: #00ffff;">transformed parameters</span> {
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">y_base</span>[N];
+  <span style="color: #00ffff;">for</span> (i <span style="color: #00ffff;">in</span> 1:N) {
+    y_base[i] <span style="color: #7fffd4;">=</span> a + b*X[i];
+  }
+}
+
+<span style="color: #00ffff;">model</span> {
+  <span style="color: #00ffff;">for</span> (i <span style="color: #00ffff;">in</span> 1:N) {
+    Y[i] <span style="color: #7fffd4;">~</span> <span style="color: #87cefa;">normal</span>(y_base[i],sigma);
+  }
+}
+
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">generated quantities &#12391;&#12399;,</span>
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">data, parameter, transformed parameter &#12434;&#20351;&#12387;&#12390;,</span>
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">&#26032;&#12375;&#12356;&#12469;&#12531;&#12503;&#12522;&#12531;&#12464;&#12497;&#12521;&#12513;&#12540;&#12479;&#12434;&#20316;&#25104;&#20986;&#26469;&#12427;.</span>
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">&#20998;&#24067;&#12395;&#24467;&#12358;&#20081;&#25968;&#20316;&#25104;&#12398;&#38555;&#12395;&#12399;, ~ &#12391;&#12399;&#12394;&#12367;</span>
+<span style="color: #ff7f24;">// </span><span style="color: #ff7f24;">y = &#20998;&#24067;&#21517;_rng(parameter) &#12392;&#12356;&#12358;&#24418;&#12391; = &#12391;&#20195;&#20837;&#12377;&#12427;&#28857;&#12395;&#27880;&#24847;&#12377;&#12427;.</span>
+<span style="color: #00ffff;">generated quantities</span> {
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">y_base_new</span>[N_new];
+  <span style="color: #98fb98;">real</span> <span style="color: #eedd82;">y_new</span>[N_new];
+  <span style="color: #00ffff;">for</span> (i <span style="color: #00ffff;">in</span> 1:N_new) {
+    y_base_new[i] <span style="color: #7fffd4;">=</span> a + b*X_new[i];
+    y_new[i]      <span style="color: #7fffd4;">=</span> <span style="color: #87cefa;">normal_rng</span>(y_base_new[i],sigma);
+  }
+}
+</pre>
+</div>
+
+<p>
+cmdstanr を用いてキックする R code を作成する.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #7fffd4;">library</span>(cmdstanr)
+d     <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data-salary.txt"</span>)
+X_new <span style="color: #7fffd4;">&lt;-</span> 23:60
+data  <span style="color: #7fffd4;">&lt;-</span> list(N=nrow(d),X=d$X,Y=d$Y,N_new=length(X_new),X_new=X_new)
+model <span style="color: #7fffd4;">&lt;-</span> cmdstan_model(<span style="color: #ffa07a;">'model4-4.stan'</span>)
+fit   <span style="color: #7fffd4;">&lt;-</span> model$sample(data=data, chains=4, parallel_chains=4, seed=1234)
+fit$save_output_files(dir=<span style="color: #ffa07a;">"./"</span>, basename=<span style="color: #ffa07a;">'model4-4'</span>, timestamp=<span style="color: #98fb98;">FALSE</span>, random=<span style="color: #98fb98;">FALSE</span>)
+</pre>
+</div>
+
+<pre class="example">
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) 
+Chain 1 Iteration:  100 / 2000 [  5%]  (Warmup) 
+Chain 1 Iteration:  200 / 2000 [ 10%]  (Warmup) 
+....
+Chain 4 Iteration: 1400 / 2000 [ 70%]  (Sampling) 
+Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) 
+Chain 4 Iteration: 1600 / 2000 [ 80%]  (Sampling) 
+Chain 4 Iteration: 1700 / 2000 [ 85%]  (Sampling) 
+Chain 4 Iteration: 1800 / 2000 [ 90%]  (Sampling) 
+Chain 4 Iteration: 1900 / 2000 [ 95%]  (Sampling) 
+Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) 
+Chain 1 finished in 0.1 seconds.
+Chain 2 finished in 0.1 seconds.
+Chain 3 finished in 0.1 seconds.
+Chain 4 finished in 0.1 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 0.1 seconds.
+Total execution time: 0.3 seconds.
+</pre>
+
+<p>
+ちょっとテスト. df の中身を確認.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-4-1.csv'</span>,
+<span class="linenr">3: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-2.csv'</span>,
+<span class="linenr">4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-3.csv'</span>,
+<span class="linenr">5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-4.csv'</span>)
+<span class="linenr">6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">7: </span>df <span style="color: #7fffd4;">&lt;-</span> fit$summary(variables=c(<span style="color: #ffa07a;">'y_base_new'</span>),<span style="color: #ffa07a;">'mean'</span>,<span style="color: #ffa07a;">'sd'</span>, <span style="color: #ffa07a;">'quantile'</span>, <span style="color: #ffa07a;">'rhat'</span>,<span style="color: #ffa07a;">'ess_bulk'</span>,<span style="color: #ffa07a;">'ess_tail'</span>)
+<span class="linenr">8: </span>head(df)
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 6 × 11
+  variable     mean    sd  `0%` `25%` `50%` `75%` `100%`  rhat ess_bulk ess_tail
+  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 y_base_new…  386.  40.9  217.  360.  386.  412.   575.  1.00    1366.    1353.
+2 y_base_new…  408.  39.3  246.  383.  407.  432.   588.  1.00    1382.    1303.
+3 y_base_new…  429.  37.8  274.  405.  429.  453.   602.  1.00    1401.    1419.
+4 y_base_new…  451.  36.3  303.  428.  451.  474.   616.  1.00    1421.    1414.
+5 y_base_new…  473.  34.9  331.  451.  473.  495.   630.  1.00    1444.    1395.
+6 y_base_new…  495.  33.4  359.  474.  495.  516.   644.  1.00    1473.    1438.
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #87cefa;">q95</span> <span style="color: #7fffd4;">&lt;-</span> <span style="color: #00ffff;">function</span>(x) quantile(x, probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
+<span class="linenr"> 3: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-4-1.csv'</span>,
+<span class="linenr"> 4: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-2.csv'</span>,
+<span class="linenr"> 5: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-3.csv'</span>,
+<span class="linenr"> 6: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-4.csv'</span>)
+<span class="linenr"> 7: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr"> 8: </span>df <span style="color: #7fffd4;">&lt;-</span> fit$summary(variables=c(<span style="color: #ffa07a;">'y_base_new'</span>),<span style="color: #ffa07a;">'mean'</span>,<span style="color: #ffa07a;">'sd'</span>, q95)
+<span class="linenr"> 9: </span>X_new <span style="color: #7fffd4;">&lt;-</span> 23:60
+<span class="linenr">10: </span>df$X_new <span style="color: #7fffd4;">&lt;-</span> X_new
+<span class="linenr">11: </span>print(df)
+<span class="linenr">12: </span>print(class(df$<span style="color: #ffa07a;">"50%"</span>))  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#26360;&#12365;&#20986;&#12377;&#12392;&#12365;&#12399;&#12371;&#12428;&#12391;&#12418;OK&#12384;&#12364;.</span>
+<span class="linenr">13: </span>print(df$<span style="color: #000000; background-color: #ffffff;">`50%`</span>)  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">ggplot &#12398; aes &#12391;&#20351;&#12358;&#12392;&#12365;&#12399; `50%` (back quote?) &#12434;&#20351;&#12358;</span>
+<span class="linenr">14: </span>print(X_new)
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 38 × 9
+   variable        mean    sd `2.5%` `25%` `50%` `75%` `97.5%` X_new
+   &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
+ 1 y_base_new[1]   386.  40.9   305.  360.  386.  412.    466.    23
+ 2 y_base_new[2]   408.  39.3   329.  383.  407.  432.    485.    24
+ 3 y_base_new[3]   429.  37.8   354.  405.  429.  453.    504.    25
+ 4 y_base_new[4]   451.  36.3   379.  428.  451.  474.    522.    26
+ 5 y_base_new[5]   473.  34.9   403.  451.  473.  495.    541.    27
+ 6 y_base_new[6]   495.  33.4   428.  474.  495.  516.    561.    28
+ 7 y_base_new[7]   517.  32.0   453.  497.  516.  537.    580.    29
+ 8 y_base_new[8]   538.  30.7   477.  519.  538.  558.    599.    30
+ 9 y_base_new[9]   560.  29.3   502.  542.  560.  579.    619.    31
+10 y_base_new[10]  582.  28.0   526.  564.  582.  600.    638.    32
+# … with 28 more rows
+[1] "numeric"
+ [1]  385.5130  407.4335  429.0850  451.3160  472.9815  494.5715  516.3015
+ [8]  537.9880  559.8315  581.7540  603.2995  625.3255  647.2970  669.3170
+[15]  691.0870  713.0220  734.9595  756.7530  778.5770  800.3400  822.2360
+[22]  844.0335  865.6885  887.4945  909.2655  931.0180  953.1985  975.1065
+[29]  996.8525 1018.6000 1040.5050 1062.1500 1084.0350 1105.8150 1127.7300
+[36] 1149.6500 1171.4100 1193.2600
+ [1] 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[26] 48 49 50 51 52 53 54 55 56 57 58 59 60
+</pre>
+
+<p>
+ベイズ信頼区間の図を描いてみる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">95% &#20449;&#38972;&#21306;&#38291;</span>
+<span class="linenr"> 5: </span><span style="color: #87cefa;">q95</span> <span style="color: #7fffd4;">&lt;-</span> <span style="color: #00ffff;">function</span>(x) quantile(x, probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
+<span class="linenr"> 6: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-4-1.csv'</span>,
+<span class="linenr"> 7: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-2.csv'</span>,
+<span class="linenr"> 8: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-3.csv'</span>,
+<span class="linenr"> 9: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-4.csv'</span>)
+<span class="linenr">10: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">11: </span>df <span style="color: #7fffd4;">&lt;-</span> fit$summary(variables=c(<span style="color: #ffa07a;">'y_base_new'</span>),<span style="color: #ffa07a;">'mean'</span>,<span style="color: #ffa07a;">'sd'</span>, q95)
+<span class="linenr">12: </span>X_new <span style="color: #7fffd4;">&lt;-</span> 23:60
+<span class="linenr">13: </span>df$X_new <span style="color: #7fffd4;">&lt;-</span> X_new
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#20803;&#12487;&#12540;&#12479;</span>
+<span class="linenr">16: </span>d     <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data-salary.txt"</span>)
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#22259;</span>
+<span class="linenr">19: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot() + geom_point(data=d, mapping=aes(x=X,y=Y), shape=1, size=3)
+<span class="linenr">20: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(data=df,mapping=aes(x=X_new,y=<span style="color: #000000; background-color: #ffffff;">`50%`</span>))
+<span class="linenr">21: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=df, mapping=aes(x=X_new, ymax=<span style="color: #000000; background-color: #ffffff;">`97.5%`</span>,ymin=<span style="color: #000000; background-color: #ffffff;">`2.5%`</span>),alpha=1/6)
+<span class="linenr">22: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=df, mapping=aes(x=X_new, ymax=<span style="color: #000000; background-color: #ffffff;">`75%`</span>  ,ymin=<span style="color: #000000; background-color: #ffffff;">`25%`</span> ),alpha=2/6)
+<span class="linenr">23: </span>
+<span class="linenr">24: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-8-left_cmdstan.png'</span>
+<span class="linenr">25: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-8-left_cmdstan.png" alt="Stan04-fig4-8-left_cmdstan.png" /><br />
+</p>
+</div>
+
+<p>
+ベイズ予測区間<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr"> 2: </span><span style="color: #7fffd4;">library</span>(ggplot2)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">95% &#20449;&#38972;&#21306;&#38291;</span>
+<span class="linenr"> 5: </span><span style="color: #87cefa;">q95</span> <span style="color: #7fffd4;">&lt;-</span> <span style="color: #00ffff;">function</span>(x) quantile(x, probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
+<span class="linenr"> 6: </span>files <span style="color: #7fffd4;">&lt;-</span> c(<span style="color: #ffa07a;">'model4-4-1.csv'</span>,
+<span class="linenr"> 7: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-2.csv'</span>,
+<span class="linenr"> 8: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-3.csv'</span>,
+<span class="linenr"> 9: </span><span style="background-color: #222222;">        </span>   <span style="color: #ffa07a;">'model4-4-4.csv'</span>)
+<span class="linenr">10: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">11: </span>df <span style="color: #7fffd4;">&lt;-</span> fit$summary(variables=c(<span style="color: #ffa07a;">'y_new'</span>),<span style="color: #ffa07a;">'mean'</span>,<span style="color: #ffa07a;">'sd'</span>, q95)
+<span class="linenr">12: </span>X_new <span style="color: #7fffd4;">&lt;-</span> 23:60
+<span class="linenr">13: </span>df$X_new <span style="color: #7fffd4;">&lt;-</span> X_new
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#20803;&#12487;&#12540;&#12479;</span>
+<span class="linenr">16: </span>d     <span style="color: #7fffd4;">&lt;-</span> read.csv(file=<span style="color: #ffa07a;">"data-salary.txt"</span>)
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#22259;</span>
+<span class="linenr">19: </span>p <span style="color: #7fffd4;">&lt;-</span> ggplot() + geom_point(data=d, mapping=aes(x=X,y=Y), shape=1, size=3)
+<span class="linenr">20: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_line(data=df,mapping=aes(x=X_new,y=<span style="color: #000000; background-color: #ffffff;">`50%`</span>))
+<span class="linenr">21: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=df, mapping=aes(x=X_new, ymax=<span style="color: #000000; background-color: #ffffff;">`97.5%`</span>,ymin=<span style="color: #000000; background-color: #ffffff;">`2.5%`</span>),alpha=1/6)
+<span class="linenr">22: </span>p <span style="color: #7fffd4;">&lt;-</span> p + geom_ribbon(data=df, mapping=aes(x=X_new, ymax=<span style="color: #000000; background-color: #ffffff;">`75%`</span>  ,ymin=<span style="color: #000000; background-color: #ffffff;">`25%`</span> ),alpha=2/6)
+<span class="linenr">23: </span>
+<span class="linenr">24: </span>fname <span style="color: #7fffd4;">&lt;-</span> <span style="color: #ffa07a;">'fig4-8-right_cmdstan.png'</span>
+<span class="linenr">25: </span>ggsave(file=fname, plot=p, dpi=70)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-8-right_cmdstan.png" alt="Stan04-fig4-8-right_cmdstan.png" /><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-8" class="outline-3">
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> Stan で実装(2) cmdstanpy</h3>
+<div class="outline-text-3" id="text-3-8">
+<p>
+Stan code は generated quantities がある model4-4.stan を用いよう.<br />
+キックする Python script (cmdstanpy) を書く.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> pandas <span style="color: #00ffff;">as</span> pd
+<span class="linenr"> 2: </span><span style="color: #00ffff;">from</span> cmdstanpy <span style="color: #00ffff;">import</span> CmdStanModel
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #eedd82;">d</span> = pd.read_csv(<span style="color: #ffa07a;">"data-salary.txt"</span>,header=0)
+<span class="linenr"> 5: </span><span style="color: #eedd82;">N</span> = <span style="color: #b0c4de;">len</span>(d)
+<span class="linenr"> 6: </span><span style="color: #eedd82;">X</span> = d.iloc[:,0]
+<span class="linenr"> 7: </span><span style="color: #eedd82;">Y</span> = d.iloc[:,1]
+<span class="linenr"> 8: </span><span style="color: #eedd82;">X_new</span> = <span style="color: #b0c4de;">range</span>(23,61)
+<span class="linenr"> 9: </span><span style="color: #eedd82;">N_new</span> = <span style="color: #b0c4de;">len</span>(X_new)
+<span class="linenr">10: </span><span style="color: #eedd82;">data</span> = {<span style="color: #ffa07a;">'N'</span>: N, <span style="color: #ffa07a;">'X'</span>: X,  <span style="color: #ffa07a;">'Y'</span>: Y, <span style="color: #ffa07a;">'N_new'</span>: N_new, <span style="color: #ffa07a;">'X_new'</span>: X_new}
+<span class="linenr">11: </span><span style="color: #eedd82;">model</span> = CmdStanModel(stan_file=<span style="color: #ffa07a;">'model4-4.stan'</span>,model_name=<span style="color: #ffa07a;">'model4-4'</span>)
+<span class="linenr">12: </span><span style="color: #eedd82;">fit</span> = model.sample(data=data, chains=4, parallel_chains=4, seed=1234)
+<span class="linenr">13: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12501;&#12449;&#12452;&#12523;&#21517;&#12434;&#25351;&#23450;&#12391;&#12365;&#12394;&#12356;... timestamp &#12392;&#12363;&#35201;&#12425;&#12394;&#12356;&#12435;&#12384;&#12364;.</span>
+<span class="linenr">14: </span>fit.save_csvfiles(<span style="color: #b0c4de;">dir</span>=<span style="color: #ffa07a;">'./'</span>)
+<span class="linenr">15: </span><span style="color: #eedd82;">fpd</span> = fit.summary()
+<span class="linenr">16: </span><span style="color: #00ffff;">print</span>(fpd.head(50))
+</pre>
+</div>
+
+<pre class="example">
+                  Mean   MCSE  StdDev      5%  ...     95%   N_Eff  N_Eff/s  R_hat
+name                                           ...                                
+lp__             -94.0  0.049     1.5   -96.0  ...   -92.0   910.0   3300.0    1.0
+a               -120.0  2.300    79.0  -240.0  ...    10.0  1200.0   4400.0    1.0
+b                 22.0  0.050     1.7    19.0  ...    25.0  1200.0   4400.0    1.0
+sigma             85.0  0.460    16.0    64.0  ...   110.0  1300.0   4600.0    1.0
+y_base[1]        408.0  1.100    39.0   345.0  ...   471.0  1337.0   4863.0    1.0
+y_base[2]        408.0  1.100    39.0   345.0  ...   471.0  1337.0   4863.0    1.0
+y_base[3]        451.0  0.980    36.0   394.0  ...   510.0  1376.0   5004.0    1.0
+y_base[4]        582.0  0.700    28.0   537.0  ...   627.0  1598.0   5810.0    1.0
+y_base[5]        604.0  0.660    27.0   561.0  ...   647.0  1667.0   6061.0    1.0
+y_base[6]        648.0  0.570    25.0   608.0  ...   687.0  1859.0   6759.0    1.0
+y_base[7]        713.0  0.440    22.0   677.0  ...   748.0  2443.0   8884.0    1.0
+y_base[8]        757.0  0.360    20.0   723.0  ...   789.0  3216.0  11694.0    1.0
+y_base[9]        757.0  0.360    20.0   723.0  ...   789.0  3216.0  11694.0    1.0
+y_base[10]       822.0  0.300    19.0   791.0  ...   853.0  4285.0  15580.0    1.0
+y_base[11]       822.0  0.300    19.0   791.0  ...   853.0  4285.0  15580.0    1.0
+y_base[12]       844.0  0.290    19.0   812.0  ...   875.0  4461.0  16224.0    1.0
+y_base[13]       931.0  0.320    21.0   897.0  ...   965.0  4192.0  15242.0    1.0
+y_base[14]      1019.0  0.460    24.0   979.0  ...  1058.0  2781.0  10114.0    1.0
+y_base[15]      1106.0  0.630    29.0  1058.0  ...  1154.0  2127.0   7734.0    1.0
+y_base[16]      1106.0  0.630    29.0  1058.0  ...  1154.0  2127.0   7734.0    1.0
+y_base[17]      1128.0  0.680    30.0  1078.0  ...  1178.0  2026.0   7367.0    1.0
+y_base[18]      1150.0  0.720    32.0  1097.0  ...  1202.0  1941.0   7058.0    1.0
+y_base[19]      1171.0  0.770    33.0  1117.0  ...  1226.0  1869.0   6796.0    1.0
+y_base[20]      1171.0  0.770    33.0  1117.0  ...  1226.0  1869.0   6796.0    1.0
+y_base_new[1]    386.0  1.100    41.0   320.0  ...   452.0  1322.0   4807.0    1.0
+y_base_new[2]    408.0  1.100    39.0   345.0  ...   471.0  1337.0   4863.0    1.0
+y_base_new[3]    429.0  1.000    38.0   370.0  ...   491.0  1355.0   4929.0    1.0
+y_base_new[4]    451.0  0.980    36.0   394.0  ...   510.0  1376.0   5004.0    1.0
+y_base_new[5]    473.0  0.930    35.0   418.0  ...   529.0  1400.0   5092.0    1.0
+y_base_new[6]    495.0  0.890    33.0   442.0  ...   548.0  1427.0   5187.0    1.0
+y_base_new[7]    517.0  0.840    32.0   466.0  ...   568.0  1458.0   5302.0    1.0
+y_base_new[8]    538.0  0.790    31.0   489.0  ...   588.0  1496.0   5440.0    1.0
+y_base_new[9]    560.0  0.750    29.0   514.0  ...   607.0  1542.0   5607.0    1.0
+y_base_new[10]   582.0  0.700    28.0   537.0  ...   627.0  1598.0   5810.0    1.0
+y_base_new[11]   604.0  0.660    27.0   561.0  ...   647.0  1667.0   6061.0    1.0
+y_base_new[12]   626.0  0.610    26.0   585.0  ...   667.0  1752.0   6371.0    1.0
+y_base_new[13]   648.0  0.570    25.0   608.0  ...   687.0  1859.0   6759.0    1.0
+y_base_new[14]   669.0  0.530    23.0   631.0  ...   708.0  1996.0   7257.0    1.0
+y_base_new[15]   691.0  0.480    23.0   654.0  ...   728.0  2191.0   7966.0    1.0
+y_base_new[16]   713.0  0.440    22.0   677.0  ...   748.0  2443.0   8884.0    1.0
+y_base_new[17]   735.0  0.400    21.0   700.0  ...   769.0  2771.0  10077.0    1.0
+y_base_new[18]   757.0  0.360    20.0   723.0  ...   789.0  3216.0  11694.0    1.0
+y_base_new[19]   779.0  0.330    20.0   746.0  ...   811.0  3615.0  13145.0    1.0
+y_base_new[20]   800.0  0.310    20.0   768.0  ...   832.0  4045.0  14708.0    1.0
+y_base_new[21]   822.0  0.300    19.0   791.0  ...   853.0  4285.0  15580.0    1.0
+y_base_new[22]   844.0  0.290    19.0   812.0  ...   875.0  4461.0  16224.0    1.0
+y_base_new[23]   866.0  0.290    20.0   834.0  ...   897.0  4526.0  16458.0    1.0
+y_base_new[24]   888.0  0.300    20.0   855.0  ...   919.0  4470.0  16255.0    1.0
+y_base_new[25]   909.0  0.310    20.0   876.0  ...   942.0  4314.0  15689.0    1.0
+y_base_new[26]   931.0  0.320    21.0   897.0  ...   965.0  4192.0  15242.0    1.0
+
+[50 rows x 9 columns]
+</pre>
+
+<p>
+csv ファイルからロードできる.<br />
+<a href="https://discourse.mc-stan.org/t/what-is-the-proper-way-to-save-a-cmdstanpy-model-after-a-fit-has-been-complete/25020/2">What is the proper way to save a cmdstanpy model after a fit has been complete? - General - The Stan Forums</a><br />
+<a href="https://cmdstanpy.readthedocs.io/en/v1.0.0rc1/api.html#cmdstanpy.from_csv">API Reference — CmdStanPy 1.0.0rc1 documentation</a><br />
+<a href="https://mc-stan.org/cmdstanpy/api.html">API Reference — CmdStanPy 1.0.1 documentation</a><br />
+<a href="https://mc-stan.org/cmdstanpy/index.html">cmdstanpy – Python interface to CmdStan — CmdStanPy 1.0.1 documentation</a><br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 2: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#20309;&#12363;&#38754;&#20498;</span>
+<span class="linenr"> 3: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 4: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr"> 5: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr"> 6: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr"> 7: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr"> 8: </span><span style="color: #eedd82;">df</span> = fit.summary(percentiles=(2.5, 50, 97.5))
+<span class="linenr"> 9: </span><span style="color: #00ffff;">print</span>(<span style="color: #b0c4de;">type</span>(df))   <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">pandas dataframe &#12392;&#12375;&#12390;&#20445;&#23384;&#12373;&#12428;&#12390;&#12356;&#12427;&#27096;&#23376;.</span>
+<span class="linenr">10: </span><span style="color: #00ffff;">print</span>(df.head(5))
+</pre>
+</div>
+
+<pre class="example">
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+            Mean   MCSE  StdDev   2.5%    50%  97.5%   N_Eff  N_Eff/s  R_hat
+name                                                                        
+lp__       -94.0  0.049     1.5  -98.0  -93.0  -92.0   910.0   3100.0    1.0
+a         -120.0  2.300    79.0 -290.0 -120.0   32.0  1200.0   4100.0    1.0
+b           22.0  0.050     1.7   18.0   22.0   25.0  1200.0   4100.0    1.0
+sigma       85.0  0.460    16.0   60.0   83.0  120.0  1300.0   4200.0    1.0
+y_base[1]  408.0  1.100    39.0  323.0  407.0  482.0  1337.0   4503.0    1.0
+</pre>
+
+<p>
+cmdstanpy の計算結果 csv ファイルを R (cmdstanr) で読み込むことも可能<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #7fffd4;">library</span>(cmdstanr)
+<span class="linenr">2: </span>files <span style="color: #7fffd4;">&lt;-</span>c(<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr">3: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr">4: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr">5: </span><span style="background-color: #222222;">        </span>  <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>)
+<span class="linenr">6: </span>fit <span style="color: #7fffd4;">&lt;-</span> as_cmdstan_fit(files)
+<span class="linenr">7: </span>fit$summary()
+</pre>
+</div>
+
+<pre class="example">
+# A tibble: 100 × 10
+   variable    mean median    sd   mad     q5    q95  rhat ess_bulk ess_tail
+   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+ 1 lp__       -93.7  -93.3  1.46  1.12  -96.5 -92.2   1.00    1133.    1216.
+ 2 a         -116.  -117.  78.6  74.3  -242.    9.99  1.00    1248.    1240.
+ 3 b           21.8   21.8  1.75  1.62   19.0  24.6   1.00    1253.    1232.
+ 4 sigma       85.3   82.9 16.4  14.2    63.7 114.    1.00    1523.    1343.
+ 5 y_base[1]  408.   407.  39.3  37.1   346.  471.    1.00    1382.    1303.
+ 6 y_base[2]  408.   407.  39.3  37.1   346.  471.    1.00    1382.    1303.
+ 7 y_base[3]  451.   451.  36.3  34.0   394.  510.    1.00    1421.    1414.
+ 8 y_base[4]  582.   582.  28.0  26.6   537.  627.    1.00    1662.    1715.
+ 9 y_base[5]  604.   603.  26.8  25.5   561.  647.    1.00    1736.    1745.
+10 y_base[6]  648.   647.  24.5  23.1   608.  687.    1.00    1939.    1927.
+# … with 90 more rows
+</pre>
+
+<p>
+パラメータの分布(密度グラフ)<br />
+<a href="https://www.delftstack.com/ja/howto/matplotlib/matplotlib-density-plot/">Matplotlib 密度プロット | Delft スタック</a><br />
+from scipy.stats import kde<br />
+density = kde.gaussian_kde(データ)<br />
+x = np.linspace(x最小, x最大, 分割数)<br />
+y = density(x)  # 密度値の推定<br />
+ax.plot(x,y)<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 4: </span><span style="color: #00ffff;">from</span> scipy.stats <span style="color: #00ffff;">import</span> kde
+<span class="linenr"> 5: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 6: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr"> 7: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr"> 8: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr"> 9: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">12: </span><span style="color: #eedd82;">adraw</span> = la[<span style="color: #ffa07a;">'a'</span>]
+<span class="linenr">13: </span><span style="color: #eedd82;">bdraw</span> = la[<span style="color: #ffa07a;">'b'</span>]
+<span class="linenr">14: </span><span style="color: #eedd82;">sdraw</span> = la[<span style="color: #ffa07a;">'sigma'</span>]
+<span class="linenr">15: </span>
+<span class="linenr">16: </span><span style="color: #eedd82;">adens</span> = kde.gaussian_kde(adraw)
+<span class="linenr">17: </span><span style="color: #eedd82;">x</span> = np.linspace(-350,150,100)
+<span class="linenr">18: </span><span style="color: #eedd82;">y</span> = adens(x)
+<span class="linenr">19: </span>
+<span class="linenr">20: </span><span style="color: #eedd82;">bdens</span> = kde.gaussian_kde(bdraw)
+<span class="linenr">21: </span><span style="color: #eedd82;">bx</span> = np.linspace(15,30,100)
+<span class="linenr">22: </span><span style="color: #eedd82;">by</span> = bdens(bx)
+<span class="linenr">23: </span>
+<span class="linenr">24: </span><span style="color: #eedd82;">sdens</span> = kde.gaussian_kde(sdraw)
+<span class="linenr">25: </span><span style="color: #eedd82;">sx</span> = np.linspace(50,170,100)
+<span class="linenr">26: </span><span style="color: #eedd82;">sy</span> = sdens(sx)
+<span class="linenr">27: </span>
+<span class="linenr">28: </span><span style="color: #eedd82;">fig</span> = plt.figure(dpi=100, figsize=(7,3))
+<span class="linenr">29: </span><span style="color: #eedd82;">ax</span> = fig.add_subplot(1,3,1)
+<span class="linenr">30: </span>ax.set_title(<span style="color: #ffa07a;">'a'</span>)
+<span class="linenr">31: </span>ax.plot(x,y)
+<span class="linenr">32: </span><span style="color: #eedd82;">ax2</span> = fig.add_subplot(1,3,2)
+<span class="linenr">33: </span>ax2.set_title(<span style="color: #ffa07a;">'b'</span>)
+<span class="linenr">34: </span>ax2.plot(bx,by)
+<span class="linenr">35: </span><span style="color: #eedd82;">ax3</span> = fig.add_subplot(1,3,3)
+<span class="linenr">36: </span>ax3.set_title(<span style="color: #ffa07a;">'sigma'</span>)
+<span class="linenr">37: </span>ax3.plot(sx,sy)
+<span class="linenr">38: </span>
+<span class="linenr">39: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">plt.rcParams['font.size'] = 5</span>
+<span class="linenr">40: </span>plt.tight_layout()
+<span class="linenr">41: </span>
+<span class="linenr">42: </span><span style="color: #eedd82;">fname</span> = <span style="color: #ffa07a;">'model4-5_param_dens_py.png'</span>
+<span class="linenr">43: </span>fig.show()
+<span class="linenr">44: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_dens_py.png" alt="Stan04-model4-5_param_dens_py.png" /><br />
+</p>
+</div>
+
+<p>
+<a href="https://pythondatascience.plavox.info/matplotlib/%E3%83%92%E3%82%B9%E3%83%88%E3%82%B0%E3%83%A9%E3%83%A0">matplotlib でヒストグラムを描く – Python でデータサイエンス</a><br />
+ヒストグラムのパラメータ<br />
+  plt.hist(x, bins=16) # 棒の数を 16 に<br />
+  plt.hist(x, range(50,100))  # 50 - 100 まで<br />
+  plt.hist(x, normed=True)    # 正規化<br />
+  plt.hist(x, rwidth=0.8)     # 棒の幅<br />
+  plt.hist(x, color="red")    # 棒の色<br />
+</p>
+
+<p>
+パラメータの分布(ヒストグラム)<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 4: </span><span style="color: #00ffff;">from</span> scipy.stats <span style="color: #00ffff;">import</span> kde
+<span class="linenr"> 5: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 6: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr"> 7: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr"> 8: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr"> 9: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">12: </span><span style="color: #eedd82;">adraw</span> = la[<span style="color: #ffa07a;">'a'</span>]
+<span class="linenr">13: </span><span style="color: #eedd82;">bdraw</span> = la[<span style="color: #ffa07a;">'b'</span>]
+<span class="linenr">14: </span><span style="color: #eedd82;">sdraw</span> = la[<span style="color: #ffa07a;">'sigma'</span>]
+<span class="linenr">15: </span>
+<span class="linenr">16: </span><span style="color: #eedd82;">fig</span> = plt.figure(dpi=100, figsize=(7,3))
+<span class="linenr">17: </span><span style="color: #eedd82;">ax</span> = fig.add_subplot(1,3,1)
+<span class="linenr">18: </span>ax.set_title(<span style="color: #ffa07a;">'a'</span>)
+<span class="linenr">19: </span>ax.hist(adraw)
+<span class="linenr">20: </span><span style="color: #eedd82;">ax2</span> = fig.add_subplot(1,3,2)
+<span class="linenr">21: </span>ax2.set_title(<span style="color: #ffa07a;">'b'</span>)
+<span class="linenr">22: </span>ax2.hist(bdraw)
+<span class="linenr">23: </span><span style="color: #eedd82;">ax3</span> = fig.add_subplot(1,3,3)
+<span class="linenr">24: </span>ax3.set_title(<span style="color: #ffa07a;">'sigma'</span>)
+<span class="linenr">25: </span>ax3.hist(sdraw)
+<span class="linenr">26: </span>
+<span class="linenr">27: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">plt.rcParams['font.size'] = 5</span>
+<span class="linenr">28: </span>plt.tight_layout()
+<span class="linenr">29: </span>
+<span class="linenr">30: </span><span style="color: #eedd82;">fname</span> = <span style="color: #ffa07a;">'model4-5_param_hist_py.png'</span>
+<span class="linenr">31: </span>fig.show()
+<span class="linenr">32: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_hist_py.png" alt="Stan04-model4-5_param_hist_py.png" /><br />
+</p>
+</div>
+
+<p>
+trace plot<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12486;&#12473;&#12488;&#12503;&#12525;&#12464;&#12521;&#12512;</span>
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 4: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 5: </span><span style="color: #00ffff;">from</span> scipy.stats <span style="color: #00ffff;">import</span> kde
+<span class="linenr"> 6: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 7: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr"> 8: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr"> 9: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr">10: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">13: </span><span style="color: #eedd82;">adraw</span> = la[<span style="color: #ffa07a;">'a'</span>]
+<span class="linenr">14: </span><span style="color: #eedd82;">xmax</span> = <span style="color: #b0c4de;">len</span>(adraw)
+<span class="linenr">15: </span><span style="color: #00ffff;">print</span>(xmax)
+<span class="linenr">16: </span><span style="color: #eedd82;">rng</span> = <span style="color: #b0c4de;">range</span>(0, xmax)
+<span class="linenr">17: </span><span style="color: #00ffff;">print</span>(<span style="color: #b0c4de;">len</span>(rng))
+</pre>
+</div>
+
+<pre class="example">
+4000
+4000
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 4: </span><span style="color: #00ffff;">from</span> scipy.stats <span style="color: #00ffff;">import</span> kde
+<span class="linenr"> 5: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 6: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr"> 7: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr"> 8: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr"> 9: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">12: </span><span style="color: #eedd82;">adraw</span> = la[<span style="color: #ffa07a;">'a'</span>]
+<span class="linenr">13: </span><span style="color: #eedd82;">bdraw</span> = la[<span style="color: #ffa07a;">'b'</span>]
+<span class="linenr">14: </span><span style="color: #eedd82;">sdraw</span> = la[<span style="color: #ffa07a;">'sigma'</span>]
+<span class="linenr">15: </span><span style="color: #eedd82;">x</span> = <span style="color: #b0c4de;">range</span>(0, <span style="color: #b0c4de;">len</span>(adraw))
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span style="color: #eedd82;">fig</span> = plt.figure(dpi=100, figsize=(7,3))
+<span class="linenr">18: </span><span style="color: #eedd82;">ax</span> = fig.add_subplot(1,3,1)
+<span class="linenr">19: </span>ax.set_title(<span style="color: #ffa07a;">'a'</span>)
+<span class="linenr">20: </span>ax.plot(x,adraw)
+<span class="linenr">21: </span><span style="color: #eedd82;">ax2</span> = fig.add_subplot(1,3,2)
+<span class="linenr">22: </span>ax2.set_title(<span style="color: #ffa07a;">'b'</span>)
+<span class="linenr">23: </span>ax2.plot(x,bdraw)
+<span class="linenr">24: </span><span style="color: #eedd82;">ax3</span> = fig.add_subplot(1,3,3)
+<span class="linenr">25: </span>ax3.set_title(<span style="color: #ffa07a;">'sigma'</span>)
+<span class="linenr">26: </span>ax3.plot(x,sdraw)
+<span class="linenr">27: </span>
+<span class="linenr">28: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">plt.rcParams['font.size'] = 5</span>
+<span class="linenr">29: </span>plt.tight_layout()
+<span class="linenr">30: </span>
+<span class="linenr">31: </span><span style="color: #eedd82;">fname</span> = <span style="color: #ffa07a;">'model4-5_param_trace_py.png'</span>
+<span class="linenr">32: </span>fig.show()
+<span class="linenr">33: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-model4-5_param_trace_py.png" alt="Stan04-model4-5_param_trace_py.png" /><br />
+</p>
+</div>
+
+<p>
+ベイズ信頼区間<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12486;&#12473;&#12488;&#12503;&#12525;&#12464;&#12521;&#12512;</span>
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 4: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 5: </span><span style="color: #00ffff;">import</span> pandas <span style="color: #00ffff;">as</span> pd
+<span class="linenr"> 6: </span><span style="color: #eedd82;">d</span> = pd.read_csv(<span style="color: #ffa07a;">"data-salary.txt"</span>,header=0)
+<span class="linenr"> 7: </span><span style="color: #00ffff;">print</span>(<span style="color: #b0c4de;">len</span>(d[<span style="color: #ffa07a;">'X'</span>]))
+<span class="linenr"> 8: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 9: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr">10: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr">11: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr">12: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">15: </span><span style="color: #ff7f24;">#</span><span style="color: #ff7f24;">print(type(la))   # dict</span>
+<span class="linenr">16: </span><span style="color: #eedd82;">ybase</span> = la[<span style="color: #ffa07a;">'y_base'</span>]
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #eedd82;">p</span> = np.percentile(ybase[:,0], q=[2.5, 25, 50, 75, 97.5]) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">[329.275975 382.54375  407.4335   432.47275  484.563225]</span>
+<span class="linenr">19: </span><span style="color: #ff7f24;">#</span><span style="color: #ff7f24;">print(p)</span>
+<span class="linenr">20: </span><span style="color: #eedd82;">df</span> = pd.DataFrame()
+<span class="linenr">21: </span><span style="color: #eedd82;">i</span> = 42
+<span class="linenr">22: </span><span style="color: #eedd82;">df</span>[23] = np.percentile(ybase[:,0], q=[2.5, 25, 50, 75, 97.5])
+<span class="linenr">23: </span><span style="color: #eedd82;">df</span>[i] = np.percentile(ybase[:,i-23], q=[2.5, 25, 50, 75, 97.5])
+<span class="linenr">24: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#36578;&#32622;</span>
+<span class="linenr">25: </span><span style="color: #eedd82;">df2</span> = df.T
+<span class="linenr">26: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#21015;&#21517;&#12398;&#35373;&#23450;</span>
+<span class="linenr">27: </span><span style="color: #eedd82;">df3</span> = df2.set_axis([<span style="color: #ffa07a;">'p2.5'</span>,<span style="color: #ffa07a;">'p25'</span>,<span style="color: #ffa07a;">'p50'</span>,<span style="color: #ffa07a;">'p75'</span>,<span style="color: #ffa07a;">'p97.5'</span>], axis=<span style="color: #ffa07a;">'columns'</span>)
+<span class="linenr">28: </span><span style="color: #00ffff;">print</span>(df3)
+</pre>
+</div>
+
+<pre class="example">
+20
+           p2.5         p25        p50         p75        p97.5
+23   329.275975   382.54375   407.4335   432.47275   484.563225
+42  1106.094250  1150.85000  1171.4100  1191.71000  1239.130500
+</pre>
+
+<p>
+<a href="https://note.nkmk.me/python-pandas-dataframe-rename/">pandas.DataFrameの行名・列名の変更 | note.nkmk.me</a><br />
+列名付け替え<br />
+  df.set_axis(['col1', 'col2'], axis='columns')<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&#12486;&#12473;&#12488;&#12503;&#12525;&#12464;&#12521;&#12512;2</span>
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 4: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 5: </span><span style="color: #00ffff;">import</span> pandas <span style="color: #00ffff;">as</span> pd
+<span class="linenr"> 6: </span><span style="color: #eedd82;">d</span> = pd.read_csv(<span style="color: #ffa07a;">"data-salary.txt"</span>,header=0)
+<span class="linenr"> 7: </span><span style="color: #eedd82;">X</span> = d[<span style="color: #ffa07a;">'X'</span>]
+<span class="linenr"> 8: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 9: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr">10: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr">11: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr">12: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">15: </span><span style="color: #eedd82;">ybase</span> = la[<span style="color: #ffa07a;">'y_base'</span>]
+<span class="linenr">16: </span><span style="color: #eedd82;">df</span> = pd.DataFrame()
+<span class="linenr">17: </span><span style="color: #00ffff;">for</span> i <span style="color: #00ffff;">in</span> <span style="color: #b0c4de;">range</span>(0,<span style="color: #b0c4de;">len</span>(X)):
+<span class="linenr">18: </span>    <span style="color: #eedd82;">df</span>[i] = np.percentile(ybase[:,i], q=[2.5, 25, 50, 75, 97.5])
+<span class="linenr">19: </span><span style="color: #eedd82;">df2</span> = df.T
+<span class="linenr">20: </span><span style="color: #eedd82;">df3</span> = df2.set_axis([<span style="color: #ffa07a;">'p2.5'</span>,<span style="color: #ffa07a;">'p25'</span>,<span style="color: #ffa07a;">'p50'</span>,<span style="color: #ffa07a;">'p75'</span>,<span style="color: #ffa07a;">'p97.5'</span>], axis=<span style="color: #ffa07a;">'columns'</span>)
+<span class="linenr">21: </span><span style="color: #00ffff;">print</span>(df3)
+</pre>
+</div>
+
+<pre class="example">
+           p2.5         p25        p50         p75        p97.5
+0    329.275975   382.54375   407.4335   432.47275   484.563225
+1    329.275975   382.54375   407.4335   432.47275   484.563225
+2    379.150450   428.25850   451.3160   474.11425   522.375525
+3    526.263225   564.34250   581.7540   599.98400   638.039400
+4    550.385900   586.78125   603.2995   621.00875   657.497800
+5    598.459200   631.78200   647.2970   663.10925   696.845625
+6    670.206100   699.27075   713.0220   726.92225   755.416825
+7    716.318075   743.69250   756.7530   769.93875   796.053550
+8    716.318075   743.69250   756.7530   769.93875   796.053550
+9    782.588625   809.31350   822.2360   834.73925   860.563200
+10   782.588625   809.31350   822.2360   834.73925   860.563200
+11   804.537575   831.35400   844.0335   856.57175   882.364875
+12   889.549775   918.08100   931.0180   944.99675   974.112375
+13   970.801500  1003.26750  1018.6000  1033.78250  1068.110500
+14  1048.405500  1087.87750  1105.8150  1124.20000  1165.291000
+15  1048.405500  1087.87750  1105.8150  1124.20000  1165.291000
+16  1068.381250  1108.75000  1127.7300  1146.72250  1190.291000
+17  1086.878250  1129.85000  1149.6500  1169.22750  1214.831250
+18  1106.094250  1150.85000  1171.4100  1191.71000  1239.130500
+19  1106.094250  1150.85000  1171.4100  1191.71000  1239.130500
+</pre>
+
+<p>
+<a href="http://nolinknolife.livedoor.blog/archives/16513660.html">pythonでグラフ上に白抜き○をプロットする : No Link No Life</a><br />
+<a href="https://www.delftstack.com/ja/howto/matplotlib/how-to-set-marker-size-of-scatter-plot-in-matplotlib/">Matplotlib で散布図のマーカーサイズを設定する方法 | Delft スタック</a><br />
+  plt.scatter(x,y, marker='o', s=100, facecolor='None', edgecolor='black')  # s は丸のサイズ<br />
+<a href="https://salad-bowl-of-knowledge.github.io/hp/statistics/2019/02/11/confidence_band.html">Matplotlibのみで線形回帰の信頼区間を描画する | 知識のサラダボウル</a><br />
+  plt.fill_between(x, lower, upper, color='', alpha=0.4) こんな感じで描くことができそう<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 4: </span><span style="color: #00ffff;">import</span> pandas <span style="color: #00ffff;">as</span> pd
+<span class="linenr"> 5: </span><span style="color: #eedd82;">d</span> = pd.read_csv(<span style="color: #ffa07a;">"data-salary.txt"</span>,header=0)
+<span class="linenr"> 6: </span><span style="color: #eedd82;">X</span> = d[<span style="color: #ffa07a;">'X'</span>]
+<span class="linenr"> 7: </span><span style="color: #eedd82;">Y</span> = d[<span style="color: #ffa07a;">'Y'</span>]
+<span class="linenr"> 8: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 9: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr">10: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr">11: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr">12: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">15: </span><span style="color: #eedd82;">X_new</span> = <span style="color: #b0c4de;">range</span>(23,61)
+<span class="linenr">16: </span><span style="color: #eedd82;">ybase</span> = la[<span style="color: #ffa07a;">'y_base_new'</span>]
+<span class="linenr">17: </span><span style="color: #eedd82;">df</span> = pd.DataFrame()
+<span class="linenr">18: </span><span style="color: #00ffff;">for</span> i <span style="color: #00ffff;">in</span> <span style="color: #b0c4de;">range</span>(0,<span style="color: #b0c4de;">len</span>(X_new)):
+<span class="linenr">19: </span>    <span style="color: #eedd82;">df</span>[i] = np.percentile(ybase[:,i], q=[2.5, 25, 50, 75, 97.5])
+<span class="linenr">20: </span><span style="color: #eedd82;">df2</span> = df.T
+<span class="linenr">21: </span><span style="color: #eedd82;">df3</span> = df2.set_axis([<span style="color: #ffa07a;">'p2.5'</span>,<span style="color: #ffa07a;">'p25'</span>,<span style="color: #ffa07a;">'p50'</span>,<span style="color: #ffa07a;">'p75'</span>,<span style="color: #ffa07a;">'p97.5'</span>], axis=<span style="color: #ffa07a;">'columns'</span>)
+<span class="linenr">22: </span>
+<span class="linenr">23: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">d['X'] &#12392; df3 &#12434;&#20351;&#12358;</span>
+<span class="linenr">24: </span>
+<span class="linenr">25: </span><span style="color: #eedd82;">fig</span> = plt.figure(dpi=100, figsize=(5,5))
+<span class="linenr">26: </span><span style="color: #eedd82;">ax</span> = fig.add_subplot(1,1,1)
+<span class="linenr">27: </span>ax.scatter(X,Y, marker=<span style="color: #ffa07a;">'o'</span>, s=50, facecolor=<span style="color: #ffa07a;">'None'</span>, edgecolors=<span style="color: #ffa07a;">'black'</span>)
+<span class="linenr">28: </span>ax.fill_between(X_new, df3[<span style="color: #ffa07a;">'p2.5'</span>], df3[<span style="color: #ffa07a;">'p97.5'</span>], color=<span style="color: #ffa07a;">'gray'</span>,alpha=0.2)
+<span class="linenr">29: </span>ax.fill_between(X_new, df3[<span style="color: #ffa07a;">'p25'</span>], df3[<span style="color: #ffa07a;">'p75'</span>], color=<span style="color: #ffa07a;">'gray'</span>,alpha=0.5)
+<span class="linenr">30: </span>plt.tight_layout()
+<span class="linenr">31: </span>
+<span class="linenr">32: </span><span style="color: #eedd82;">fname</span> = <span style="color: #ffa07a;">'fig4-8-left_py.png'</span>
+<span class="linenr">33: </span>fig.show()
+<span class="linenr">34: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-8-left_py.png" alt="Stan04-fig4-8-left_py.png" /><br />
+</p>
+</div>
+
+<p>
+ベイズ予測区間<br />
+同様に作ればよいだろう.<br />
+まずはテスト(確認).<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 4: </span><span style="color: #00ffff;">import</span> pandas <span style="color: #00ffff;">as</span> pd
+<span class="linenr"> 5: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 6: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr"> 7: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr"> 8: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr"> 9: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">12: </span><span style="color: #eedd82;">X_new</span> = <span style="color: #b0c4de;">range</span>(23,61)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #eedd82;">y_new</span> = la[<span style="color: #ffa07a;">'y_new'</span>]
+<span class="linenr">15: </span><span style="color: #00ffff;">print</span>(<span style="color: #b0c4de;">type</span>(y_new))   <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">numpy.ndarray</span>
+<span class="linenr">16: </span><span style="color: #00ffff;">print</span>(<span style="color: #b0c4de;">len</span>(y_new))    <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">4000 &#21015; (&#27178;&#12395;&#20081;&#25968;&#12364;&#20006;&#12435;&#12391;&#12356;&#12427;&#24863;&#12376;)</span>
+<span class="linenr">17: </span><span style="color: #00ffff;">print</span>(<span style="color: #b0c4de;">len</span>(y_new[0])) <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">38 &#34892;</span>
+<span class="linenr">18: </span><span style="color: #eedd82;">df</span> = pd.DataFrame()
+<span class="linenr">19: </span><span style="color: #00ffff;">for</span> i <span style="color: #00ffff;">in</span> <span style="color: #b0c4de;">range</span>(0,<span style="color: #b0c4de;">len</span>(X_new)):
+<span class="linenr">20: </span>    <span style="color: #eedd82;">df</span>[i] = np.percentile(y_new[:,i], q=[2.5, 25, 50, 75, 97.5])
+<span class="linenr">21: </span><span style="color: #eedd82;">df2</span> = df.T
+<span class="linenr">22: </span><span style="color: #eedd82;">df3</span> = df2.set_axis([<span style="color: #ffa07a;">'p2.5'</span>,<span style="color: #ffa07a;">'p25'</span>,<span style="color: #ffa07a;">'p50'</span>,<span style="color: #ffa07a;">'p75'</span>,<span style="color: #ffa07a;">'p97.5'</span>], axis=<span style="color: #ffa07a;">'columns'</span>)
+<span class="linenr">23: </span><span style="color: #00ffff;">print</span>(df3.head(5))
+</pre>
+</div>
+
+<pre class="example">
+&lt;class 'numpy.ndarray'&gt;
+4000
+38
+         p2.5        p25       p50        p75       p97.5
+0  198.123700  326.81750  386.4070  447.93825  574.349600
+1  212.061950  346.84150  408.3980  470.50200  598.318850
+2  242.332525  367.20725  426.5785  487.02275  620.522400
+3  268.728025  388.85600  452.0190  511.67625  638.447125
+4  286.956400  411.82775  470.9350  533.02350  651.108675
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #00ffff;">import</span> numpy <span style="color: #00ffff;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #00ffff;">import</span> cmdstanpy
+<span class="linenr"> 3: </span><span style="color: #00ffff;">import</span> matplotlib.pyplot <span style="color: #00ffff;">as</span> plt
+<span class="linenr"> 4: </span><span style="color: #00ffff;">import</span> pandas <span style="color: #00ffff;">as</span> pd
+<span class="linenr"> 5: </span><span style="color: #eedd82;">d</span> = pd.read_csv(<span style="color: #ffa07a;">"data-salary.txt"</span>,header=0)
+<span class="linenr"> 6: </span><span style="color: #eedd82;">X</span> = d[<span style="color: #ffa07a;">'X'</span>]
+<span class="linenr"> 7: </span><span style="color: #eedd82;">Y</span> = d[<span style="color: #ffa07a;">'Y'</span>]
+<span class="linenr"> 8: </span><span style="color: #eedd82;">files</span>=[<span style="color: #ffa07a;">'model4-4-20220331192118_1.csv'</span>,
+<span class="linenr"> 9: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_2.csv'</span>,
+<span class="linenr">10: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_3.csv'</span>,
+<span class="linenr">11: </span>       <span style="color: #ffa07a;">'model4-4-20220331192118_4.csv'</span>]
+<span class="linenr">12: </span><span style="color: #eedd82;">fit</span> = cmdstanpy.from_csv(path=files, method=<span style="color: #ffa07a;">'sample'</span>)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #eedd82;">la</span> = fit.stan_variables()  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">{ a:[...], b:[...], y_base:[[....],[....],....] }</span>
+<span class="linenr">15: </span><span style="color: #eedd82;">X_new</span> = <span style="color: #b0c4de;">range</span>(23,61)
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span style="color: #eedd82;">y_new</span> = la[<span style="color: #ffa07a;">'y_new'</span>]
+<span class="linenr">18: </span><span style="color: #eedd82;">df</span> = pd.DataFrame()
+<span class="linenr">19: </span><span style="color: #00ffff;">for</span> i <span style="color: #00ffff;">in</span> <span style="color: #b0c4de;">range</span>(0,<span style="color: #b0c4de;">len</span>(X_new)):
+<span class="linenr">20: </span>    <span style="color: #eedd82;">df</span>[i] = np.percentile(y_new[:,i], q=[2.5, 25, 50, 75, 97.5])
+<span class="linenr">21: </span><span style="color: #eedd82;">df2</span> = df.T
+<span class="linenr">22: </span><span style="color: #eedd82;">df3</span> = df2.set_axis([<span style="color: #ffa07a;">'p2.5'</span>,<span style="color: #ffa07a;">'p25'</span>,<span style="color: #ffa07a;">'p50'</span>,<span style="color: #ffa07a;">'p75'</span>,<span style="color: #ffa07a;">'p97.5'</span>], axis=<span style="color: #ffa07a;">'columns'</span>)
+<span class="linenr">23: </span>
+<span class="linenr">24: </span><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">X_new &#12392; df3 &#12434;&#20351;&#12358;</span>
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #eedd82;">fig</span> = plt.figure(dpi=100, figsize=(5,5))
+<span class="linenr">27: </span><span style="color: #eedd82;">ax</span> = fig.add_subplot(1,1,1)
+<span class="linenr">28: </span>ax.scatter(X,Y, marker=<span style="color: #ffa07a;">'o'</span>, s=50, facecolor=<span style="color: #ffa07a;">'None'</span>, edgecolors=<span style="color: #ffa07a;">'black'</span>)
+<span class="linenr">29: </span>ax.fill_between(X_new, df3[<span style="color: #ffa07a;">'p2.5'</span>], df3[<span style="color: #ffa07a;">'p97.5'</span>], color=<span style="color: #ffa07a;">'gray'</span>,alpha=0.2)
+<span class="linenr">30: </span>ax.fill_between(X_new, df3[<span style="color: #ffa07a;">'p25'</span>], df3[<span style="color: #ffa07a;">'p75'</span>],    color=<span style="color: #ffa07a;">'gray'</span>,alpha=0.5)
+<span class="linenr">31: </span>plt.tight_layout()
+<span class="linenr">32: </span>
+<span class="linenr">33: </span><span style="color: #eedd82;">fname</span> = <span style="color: #ffa07a;">'fig4-8-right_py.png'</span>
+<span class="linenr">34: </span>fig.show()
+<span class="linenr">35: </span>fig.savefig(fname)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="dat/img/Stan04-fig4-8-right_py.png" alt="Stan04-fig4-8-right_py.png" /><br />
+</p>
+</div>
+</div>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+</feed>

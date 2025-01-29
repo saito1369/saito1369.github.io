@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CHARMM-GUI 使い方まとめ - easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/blog/2018-11-05-201433.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/blog/2018-11-05-201433.html">
+  <meta property="og:title" content="CHARMM-GUI 使い方まとめ - easy cure">
+  
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-11-05T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-11-05 (Mon)</time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io">Comments</a>
+        
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        CHARMM-GUI 使い方まとめ
+        
+    </h1>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/md/'>md</a> <a class='category label label-primary' href='/blog/categories/perl/'>perl</a>
+  
+</span>
+
+
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a>
+<ul>
+<li><a href="#sec-1-1">1.1. maestro/desmond</a></li>
+<li><a href="#sec-1-2">1.2. gromacs</a></li>
+<li><a href="#sec-1-3">1.3. やりたいこと</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. この文書の目的</a></li>
+<li><a href="#sec-3">3. CHARMM-GUI の使い方</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 表紙</a></li>
+<li><a href="#sec-3-2">3.2. Input Generator</a></li>
+<li><a href="#sec-3-3">3.3. Quick MD Simulator</a></li>
+<li><a href="#sec-3-4">3.4. Model/Chain Selection</a></li>
+<li><a href="#sec-3-5">3.5. Manipulate PDB</a></li>
+<li><a href="#sec-3-6">3.6. Computed Energy</a></li>
+<li><a href="#sec-3-7">3.7. Waterbox Size Options</a></li>
+<li><a href="#sec-3-8">3.8. Add ions</a></li>
+<li><a href="#sec-3-9">3.9. System Size</a></li>
+<li><a href="#sec-3-10">3.10. Force Field Options</a></li>
+<li><a href="#sec-3-11">3.11. Input Generation Options</a></li>
+<li><a href="#sec-3-12">3.12. Equilibration Input Generation Options</a></li>
+<li><a href="#sec-3-13">3.13. Dynamics Input Generation Options</a></li>
+<li><a href="#sec-3-14">3.14. download</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. MD 計算の実行(production run)</a>
+<ul>
+<li><a href="#sec-4-1">4.1. gromacs2018</a></li>
+<li><a href="#sec-4-2">4.2. desmond</a></li>
+<li><a href="#sec-4-3">4.3. namd</a></li>
+<li><a href="#sec-4-4">4.4. amber</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-05 Mon 20:14&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-07-04 Thu 15:44&gt;</span></span><br  />
+</p>
+<p>
+CHARMM-GUI を使って MD 計算用の構造をさくっと作る.<br  />
+</p>
+
+<p>
+<!-- more --><br  />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+MD (Molecular Dynamics) 計算を行うプログラムの主なもの(自分が知ってるもの).<br  />
+</p>
+<ul class="org-ul">
+<li>maestro/desmond (Academic Free)<br  />
+</li>
+<li>gromacs<br  />
+</li>
+<li>namd<br  />
+</li>
+<li>amber (free 版では CPU のみ)<br  />
+</li>
+<li>cosgene<br  />
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> maestro/desmond</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+今の一押しは  <a href="https://www.deshawresearch.com/resources_desmond.html">maestro/desmond</a> .<br  />
+maestro は PDB データの準備から MD 計算用の構造の作成(水素付加したりとか, 周りに水入れたりとか, 足りない部分補ったりとか),<br  />
+望みの MD 計算を行うまでの支援を行ってくれる GUI 部分.<br  />
+desmond は MD 計算を実際に行うエンジン部分.<br  />
+GUI で構造を作っていけるのでわかりやすくてよい.<br  />
+手順どおりにやってけばいいので割と簡単.<br  />
+手順を script に書いて自動で計算させる事もできる.<br  />
+GPU を使えば計算はめちゃくちゃ速い. 速すぎてほんとに出来たのかよと思うほどである.<br  />
+糖鎖とかリガンドとか色々ついてても基本自動でよしなにやってくれる.<br  />
+素晴らしすぎる.<br  />
+</p>
+
+<p>
+しかしこれは academic free なのである. そして free 版では使えない機能が結構あったりする.<br  />
+商用版と free 版では使える力場も異なる.<br  />
+マニュアルにこの機能は使えないって明示的に書いてないこともある.<br  />
+やってみてエラーが出てはじめて使えないってわかったりもする.<br  />
+その辺微妙に不親切な感じ.<br  />
+</p>
+
+<p>
+純粋な academic 研究ならこれを使うのがいいと思う.<br  />
+どれくらい五月蝿く言われるのかわからないがお金が絡むような場合は避けるのが無難か.<br  />
+</p>
+
+<p>
+もしくは <a href="https://www.schrodinger.com/jp/desmond">Schrodinger 社</a> から一式を購入するか.<br  />
+</p>
+
+<p>
+買い方よくわかんないけど&#x2026;<br  />
+日本語の HP が表紙しかないようだ.<br  />
+login するために request new password を何度か申請してみたが返事がなかった.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> gromacs</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+次のおすすめは <a href="http://www.gromacs.org/">gromacs</a> である.<br  />
+</p>
+
+<p>
+gromacs は蛋白質だけの計算をするんであれば全く問題なく使える.<br  />
+</p>
+
+<p>
+ligand がある場合は <a href="https://www.ccpn.ac.uk/v2-software/software/ACPYPE-folder">acpype</a> を使えばよい.<br  />
+</p>
+
+<p>
+amber で amber 力場でのファイルを作成して acpype で gromacs に <a href="http://ambermd.org/tutorials/pengfei/index.htm">変換</a> でもいい.<br  />
+</p>
+
+<p>
+計算速度は, desmond よりは 3 倍位遅い印象(GPU 使用時).<br  />
+もうちょっと速くなってくれればなぁと思う今日このごろである.<br  />
+</p>
+
+<p>
+リガンド的な化合物がある場合は acpype を使えばいいけど, 糖鎖とかがある場合(糖鎖がアミノ酸に共有結合してる)は色々と難しいようだ.<br  />
+量子化学計算のプログラムが無いと出来ないっぽい. 例えば Gaussian とか. お金が無いので使ったことないけど <a href="http://blog.livedoor.jp/ag_plusplus/archives/68324049.html">何かムズかしそう</a>.<br  />
+GAMESS とか Firefly とかいう freeware をインストールして使ってみたり, <a href="http://upjv.q4md-forcefieldtools.org/REDServer-Development/upload-log.php">R.E.D. Server</a> で計算させてみたり,<br  />
+aspype で出来ないかなと思って頑張ってやってみたこともあったが結局よくわかんなかった.<br  />
+</p>
+
+<p>
+gromacs 上で糖鎖入れた状態で MD 計算をさくっと出来ないもんかなぁ.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> やりたいこと</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+ここでやりたいことは以下である:<br  />
+gromacs(及びそのほかの MD 計算プログラム)で使う構造ファイルの作成を出来るだけ簡単に行いたい.<br  />
+特に糖鎖のようなアミノ酸じゃない化合物が本体の蛋白質に共有結合してるような場合でも何とか簡単に出来ないもんだろうか.<br  />
+</p>
+
+<p>
+色々調べてたら<br  />
+<a href="http://bit.ly/2yE89EK">How can I generate input files for MD simulations, performed in Gromacs, Namd and Charmm?</a><br  />
+というサイトから<br  />
+<a href="http://www.charmm-gui.org/">CHARMM-GUI</a> とかいうめちゃ便利そうなサイトを見つけた.<br  />
+</p>
+
+<p>
+色々と自動でやってくれるっぽい？ 求めてるのはこれかも？<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> この文書の目的</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>CHARMM-GUI の使い方を自分が後で思い出せるように解説しておくこと.<br  />
+</li>
+<li>すぐに使えるように script を整備しておくこと.<br  />
+</li>
+<li>各々の MD プログラムで, production run までの注意点/修正点等を記録しておくこと.<br  />
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> CHARMM-GUI の使い方</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+基本的には書いてある通りにやればいい.<br  />
+準備しておくのは, MD simulation を行いたい系の PDB ファイル(あるいは PDB ID)のみである.<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 表紙</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+表紙は以下のような感じである(2018/11/15 現在)<br  />
+<a href="http://www.charmm-gui.org/">http://www.charmm-gui.org/</a><br  />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-01index_html.png" alt="2018-11-05-201433-01index_html.png" /><br  />
+</p>
+</div>
+
+<p>
+左側の Input Generator をクリックして次へ行く.<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Input Generator</h3>
+<div class="outline-text-3" id="text-3-2">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-02input_generator.png" alt="2018-11-05-201433-02input_generator.png" /><br  />
+</p>
+</div>
+
+<p>
+左側の Quick MD Simulator をクリックして次へ行く.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Quick MD Simulator</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">[2019-07-04 Thu]</span></span> 追記 Solvation Builder という名前に変わってる. Solvator + Quick MD Simulator =&gt; Solvation Builder?<br  />
+基本的なやり方は同じようだ.<br  />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-03qmd_simulator01.png" alt="2018-11-05-201433-03qmd_simulator01.png" /><br  />
+</p>
+</div>
+
+<p>
+下の方に PDB ID や PDB ファイルを入れるところがある.<br  />
+</p>
+
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-04qmd_simulator02.png" alt="2018-11-05-201433-04qmd_simulator02.png" /><br  />
+</p>
+</div>
+
+<p>
+ここで使う PDB ファイルをアップロードする.<br  />
+水素はなくても良い(default では付け直すので <span class="timestamp-wrapper"><span class="timestamp">[2019-02-13 Wed]</span></span> 追記: 水素が無いと化合物の自動同定が難しくなるのでやっぱつけといたほうがいい).<br  />
+wild type でいい(mutation を設定するところがあるので).<br  />
+</p>
+
+<p>
+Nest Step: Select Model/Chain をクリックして次へ行く.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Model/Chain Selection</h3>
+<div class="outline-text-3" id="text-3-4">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-05manu_pdb.png" alt="2018-11-05-201433-05manu_pdb.png" /><br  />
+</p>
+</div>
+
+<p>
+PDB ファイルの解析結果が示される. どの部分構造を使うかチェックを入れる. default では全部使う.<br  />
+</p>
+
+<p>
+Nest Step: Manipulate PDB をクリックして次へ.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> Manipulate PDB</h3>
+<div class="outline-text-3" id="text-3-5">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-06generate_pdb.png" alt="2018-11-05-201433-06generate_pdb.png" /><br  />
+</p>
+</div>
+
+<p>
+default では元々ついてる CAP(ACE など), 水素とかは一旦外されるっぽい(？)<br  />
+アップロードした PDB ファイルについてる(自分でつけておいた)水素を使いたければ Preserve hydrogen coordinates にチェックを入れるとよい.<br  />
+Terminal group patching には default でチェックがついてる. 外さなくていいかと思う.<br  />
+Protonation, Disulfide Bonds, Mutation 等はチェックを入れれば選択肢が出てくる.<br  />
+Disulfide Bonds は指定しなくてもある程度は自動で認識してくれてるようだ.<br  />
+</p>
+
+<p>
+これらの設定をした後 PDB ファイルを作成し直す.<br  />
+Next Step: Generate PDB をクリック.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> Computed Energy</h3>
+<div class="outline-text-3" id="text-3-6">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-07solvate.png" alt="2018-11-05-201433-07solvate.png" /><br  />
+</p>
+</div>
+
+<p>
+計算結果を確認する. たまに Energy にありえん値が入ってることがあるので注意.<br  />
+結果が変であれば最初からやり直す.<br  />
+</p>
+
+<p>
+遭遇した変な計算結果の例:<br  />
+</p>
+<pre class="example">
+ENER ENR:  Eval#     ENERgy      Delta-E         GRMS
+ENER INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+ENER CROSS:           CMAPs        PMF1D        PMF2D        PRIMO
+ENER EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+ENER IMAGES:        IMNBvdw       IMELec       IMHBnd       RXNField    EXTElec
+ ----------       ---------    ---------    ---------    ---------    ---------
+ENER&gt;        0  0.34485E+67  0.00000E+00  0.50297E+04
+ENER INTERN&gt;    11447.85374   1251.81849    848.71042   3924.08889      7.92236
+ENER CROSS&gt;        41.52221      0.00000      0.00000      0.00000
+ENER EXTERN&gt;    0.34485E+67  0.24339E+08  0.00000E+00  0.00000E+00  0.00000E+00
+ENER IMAGES&gt;   202108.80212   -624.50570      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+</pre>
+
+<p>
+0.34485E+67 とか.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> Waterbox Size Options</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+基本 default で良いかと思う.<br  />
+Rectaugular 以外にも選択肢がいくつかある.<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-8" class="outline-3">
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> Add ions</h3>
+<div class="outline-text-3" id="text-3-8">
+<p>
+default で問題ないと思うが自分は KCl -&gt; NaCl に変更してる.<br  />
+</p>
+
+<p>
+ここまで設定が終わったら Next Step: Solvate Molecule をクリックする.<br  />
+しばらく(結構)時間がかかる.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-9" class="outline-3">
+<h3 id="sec-3-9"><span class="section-number-3">3.9</span> System Size</h3>
+<div class="outline-text-3" id="text-3-9">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-08pboundary.png" alt="2018-11-05-201433-08pboundary.png" /><br  />
+</p>
+</div>
+
+<p>
+そのまま次に行こう.<br  />
+Next Step: Setup Periodic Boundary Condition<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-10" class="outline-3">
+<h3 id="sec-3-10"><span class="section-number-3">3.10</span> Force Field Options</h3>
+<div class="outline-text-3" id="text-3-10">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-09makeinputs.png" alt="2018-11-05-201433-09makeinputs.png" /><br  />
+</p>
+</div>
+
+<p>
+CHARMM36 と CHARMM36m の２つの選択肢がある.<br  />
+default の CHARMM36m でいいだろう.<br  />
+</p>
+
+<p>
+注: 力場について<br  />
+ default は CHARMM36m である.<br  />
+ CHARMM-GUI で選択出来る力場に関する論文は以下にある.<br  />
+   <a href="https://www.ncbi.nlm.nih.gov/pubmed/23832629">CHARMM36 all-atom additive protein force field: validation based on comparison to NMR data</a><br  />
+   <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5199616/">CHARMM36m: An Improved Force Field for Folded and Intrinsically Disorderd Proteins</a><br  />
+ ざっと見ると, C36 は左巻き helix ができやすくて NMR のデータと合ってないと書いてある.<br  />
+ 改良してるんだから C36m の方でいいのかな.<br  />
+</p>
+
+<p>
+cosgene の設計書に, CHARMMm 力場での相互作用計算について, Amber 力場との比較が書いてある.<br  />
+どんな関数を計算してるかがめちゃわかりやすく書いてあり超参考になる.<br  />
+  <a href="http://www.jbic.or.jp/activity/st_pr_pj/mypresto/files2/cosgene_design6.pdf">cosgene_design6</a><br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-11" class="outline-3">
+<h3 id="sec-3-11"><span class="section-number-3">3.11</span> Input Generation Options</h3>
+<div class="outline-text-3" id="text-3-11">
+<p>
+使いたい MD engine をチェックする.<br  />
+実際自分が使うのは Gromacs, Amber, Desmond くらいか.<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-12" class="outline-3">
+<h3 id="sec-3-12"><span class="section-number-3">3.12</span> Equilibration Input Generation Options</h3>
+<div class="outline-text-3" id="text-3-12">
+<p>
+NVT Ensemble でよい<br  />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-13" class="outline-3">
+<h3 id="sec-3-13"><span class="section-number-3">3.13</span> Dynamics Input Generation Options</h3>
+<div class="outline-text-3" id="text-3-13">
+<p>
+NPT Ensemble (default) でよい.<br  />
+</p>
+
+<p>
+ここまで設定が終わったら Next Step: Generate Equilibration and Dynamics Inputs をクリックして終了である.<br  />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-14" class="outline-3">
+<h3 id="sec-3-14"><span class="section-number-3">3.14</span> download</h3>
+<div class="outline-text-3" id="text-3-14">
+
+<div class="figure">
+<p><img src="dat/img/2018-11-05-201433-10download.png" alt="2018-11-05-201433-10download.png" /><br  />
+</p>
+</div>
+
+<p>
+download.tgz をクリックすれば計算結果のダウンロードが始まる.<br  />
+charmm-gui.tgz という名前のファイルがダウンロードされる.<br  />
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> MD 計算の実行(production run)</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+各々の MD engine での起動方法<br  />
+charmm-gui.tgz を展開するとそれぞれの MD engine ごとに使用する構造ファイル及びパラメータファイル(の雛形)が出来ているのでそれを使えばよい.<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> gromacs2018</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+step5_production.mdp 内の nsteps=500000 = (1ns) 等パラメータをいくつか変更する.<br  />
+</p>
+
+<p>
+step5_production.mdp の変更例は以下:<br  />
+</p>
+<pre class="example">
+dt        = 0.002     # 変えない. 2(fs) 0.002*500(step) =1(ps) 500steps = 1ps
+nsteps    = 50000000  # 例: 100(ns)
+nstlog    = 5000      # log ファイル書き出す頻度
+nstxout   = 25000     # trr ファイルに構造書き出す頻度
+nstvout   = 25000     # trr ファイル  速度
+nstfout   = 25000     # trr ファイル  力
+nstcalcenergy = 100   # ここは変えなくていい?
+nstenergy = 5000      # edr ファイルに energy を書き出す頻度 every 10(ps)
+</pre>
+
+<p>
+<span class="timestamp-wrapper"><span class="timestamp">[2019-07-04 Thu]</span></span> 追記:<br  />
+  step4.0_minimization.mdp  の nsteps=50000  (&lt;- 5000)  に変更.<br  />
+  step4.1_equilibration.mdp の nsteps=250000 (&lt;- 25000) に変更.<br  />
+</p>
+
+<p>
+以下の script 経由で実行できる.<br  />
+shell script でいいけど自分は perl が一番わかり易いので perl で書いてみた.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">CHARMM-GUI Quick MD Simulator &#12391;&#20316;&#12425;&#12428;&#12383;&#12501;&#12449;&#12452;&#12523;&#12398;&#23455;&#34892; script</span>
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">gromacs2018 &#29256;</span>
+<span class="linenr"> 8: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">"/usr/local/gromacs2018.gpu/bin/gmx"</span>;
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$pdb</span>  =<span style="color: #ffa07a;">"step3_charmm2gmx.pdb"</span>;
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$top</span>  =<span style="color: #ffa07a;">"topol.top"</span>;
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$idx</span>  =<span style="color: #ffa07a;">"index.ndx"</span>;
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">1. &#27083;&#36896;&#26368;&#36969;&#21270;</span>
+<span class="linenr">16: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.0</span>
+<span class="linenr">17: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$mdp40</span>=<span style="color: #ffa07a;">"step4.0_minimization.mdp"</span>;
+<span class="linenr">18: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr40</span>=<span style="color: #ffa07a;">"step4.0_minimization.tpr"</span>;
+<span class="linenr">19: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd40</span>=<span style="color: #ffa07a;">"$cmd grompp -f $mdp40 -o $tpr40 -c $pdb -p $top -r $pdb"</span>;
+<span class="linenr">20: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md40</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -deffnm step4.0_minimization"</span>;
+<span class="linenr">21: </span><span style="color: #ff83fa;">print</span> $cmd40.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">22: </span><span style="color: #9370db;">system</span>($cmd40);
+<span class="linenr">23: </span><span style="color: #ff83fa;">print</span> $md40.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">24: </span><span style="color: #9370db;">system</span>($md40);
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">2. &#24179;&#34913;&#21270; MD</span>
+<span class="linenr">27: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.1</span>
+<span class="linenr">28: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$gro41</span>=<span style="color: #ffa07a;">"step4.0_minimization.gro"</span>;
+<span class="linenr">29: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$mdp41</span>=<span style="color: #ffa07a;">"step4.1_equilibration.mdp"</span>;
+<span class="linenr">30: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr41</span>=<span style="color: #ffa07a;">"step4.1_equilibration.tpr"</span>;
+<span class="linenr">31: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd41</span>=<span style="color: #ffa07a;">"$cmd grompp -f $mdp41 -o $tpr41 -c $gro41 -r $pdb -n $idx -p $top"</span>;
+<span class="linenr">32: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md41</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -deffnm step4.1_equilibration"</span>;
+<span class="linenr">33: </span><span style="color: #ff83fa;">print</span> $cmd41.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">34: </span><span style="color: #9370db;">system</span>($cmd41);
+<span class="linenr">35: </span><span style="color: #ff83fa;">print</span> $md41.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">36: </span><span style="color: #9370db;">system</span>($md41);
+<span class="linenr">37: </span>
+<span class="linenr">38: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">3. Production Run</span>
+<span class="linenr">39: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step5</span>
+<span class="linenr">40: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$gro50</span>=<span style="color: #ffa07a;">"step4.1_equilibration.gro"</span>;
+<span class="linenr">41: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$mdp50</span>=<span style="color: #ffa07a;">"step5_production.mdp"</span>;      <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26360;&#12365;&#25563;&#12360;&#12427;</span>
+<span class="linenr">42: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr50</span>=<span style="color: #ffa07a;">"step5_0.tpr"</span>;
+<span class="linenr">43: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd50</span>=<span style="color: #ffa07a;">"$cmd grompp -f $mdp50 -o $tpr50 -c $gro50 -n $idx -p $top -r $gro50"</span>;
+<span class="linenr">44: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md50</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -deffnm step5_0"</span>;
+<span class="linenr">45: </span><span style="color: #ff83fa;">print</span> $cmd50.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">46: </span><span style="color: #9370db;">system</span>($cmd50);
+<span class="linenr">47: </span><span style="color: #ff83fa;">print</span> $md50.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">48: </span><span style="color: #9370db;">system</span>($md50);
+<span class="linenr">49: </span>
+<span class="linenr">50: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">$ex(ps) &#12378;&#12388;&#36861;&#21152;&#35336;&#31639;&#12377;&#12427;&#22580;&#21512;(&#24517;&#35201;&#12394;&#12425;&#12400;)</span>
+<span class="linenr">51: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">extend 1000(ps)</span>
+<span class="linenr">52: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ex</span>=1000; <span style="color: #cd853f;"># </span><span style="color: #cd853f;">ps</span>
+<span class="linenr">53: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$max</span>=2;
+<span class="linenr">54: </span><span style="color: #20b2aa; font-weight: bold;">for</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$p</span> (0 .. $max) {
+<span class="linenr">55: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$n</span>=$p+1;
+<span class="linenr">56: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cpi</span>  =<span style="color: #ffa07a;">"step5_"</span>.$p.<span style="color: #ffa07a;">".cpt"</span>;
+<span class="linenr">57: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr5p</span>=<span style="color: #ffa07a;">"step5_"</span>.$p.<span style="color: #ffa07a;">".tpr"</span>;
+<span class="linenr">58: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$tpr5n</span>=<span style="color: #ffa07a;">"step5_"</span>.$n.<span style="color: #ffa07a;">".tpr"</span>;
+<span class="linenr">59: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$deff</span> =<span style="color: #ffa07a;">"step5_"</span>.$n;
+<span class="linenr">60: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd5x</span>=<span style="color: #ffa07a;">"$cmd convert-tpr -s $tpr5p -o $tpr5n -extend $ex"</span>;   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">-f -e &#12399;&#24259;&#27490;</span>
+<span class="linenr">61: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md5x</span> =<span style="color: #ffa07a;">"$cmd mdrun -v -s $tpr5n -deffnm $deff -cpi $cpi -noappend"</span>;
+<span class="linenr">62: </span>  <span style="color: #ff83fa;">print</span> $cmd5x.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">63: </span>  <span style="color: #9370db;">system</span>($cmd5x);
+<span class="linenr">64: </span>  <span style="color: #ff83fa;">print</span> $md5x.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">65: </span>  <span style="color: #9370db;">system</span>($md5x);
+<span class="linenr">66: </span>}
+</pre>
+</div>
+
+
+<p>
+手動でやるならば以下のコマンドを順に起動すればよい.<br  />
+最適化計算:<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx grompp -f step4.0_minimization.mdp -o step4.0_minization.tpr -c step3_chamm2gmx.pdb -p topol.top -r step3_charmm2gmx.pdb
+gmx mdrun -v -deffnm step4.0_minimization
+</pre>
+</div>
+
+<p>
+平衡化MD:<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx grompp -f step4.1_equilibration.mdp -o step4.1_equilibration.tpr -c step4.0_minimization.gro -r step3_charmm2gmx.pdb -n index.ndx -p topol.top
+gmx mdrun -v -deffnm step4.1_equilibration
+</pre>
+</div>
+
+<p>
+MD 計算:<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx grompp -f step5_production.mdp -o step5_0.tpr -c step4.1_equilibration.gro -n index.ndx -p topol.top -r step4.1_equilibration.gro
+gmx mdrun -v -deffnm step5_0
+</pre>
+</div>
+
+<p>
+extend(必要ならば):<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gmx convert-tpr -s step5_0.tpr -o step5_1.tpr -extend 1000             <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20197;&#21069;&#12398;&#35336;&#31639;&#12398;&#26368;&#32066;&#12363;&#12425; 1000 (ps) &#12384;&#12369;&#35336;&#31639;&#12434;&#36914;&#12417;&#12427;</span>
+gmx mdrun -v -s step5_1.tpr -deffnm step5_1 -cpi step5_0.cpt -noappend <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#26032;&#12375;&#12356;&#12501;&#12449;&#12452;&#12523;&#12395;&#26360;&#12365;&#20986;&#12375;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> desmond</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+このままでは動かなかったのでファイルを修正する.<br  />
+</p>
+
+<p>
+4.0_equilibration の計算において<br  />
+</p>
+<ol class="org-ol">
+<li>cfg ファイルを以下のように修正する:<br  />
+1.1. list = [status &#x2026; simbox_output maeff_output &#x2026;.] の simbox_output, maeff_output を削除<br  />
+1.2. trajectory { name = hogehoge_trj &#x2026;} のように名前の最後に "_trj" をつける<br  />
+</li>
+<li>cms ファイルを以下のように修正する:<br  />
+2.1. 残基名が 4 文字以上のものがあればうまく読み込めないので 4 文字以下に修正する.<br  />
+</li>
+</ol>
+
+<p>
+step5_production.cfg ファイルの time=1000 (1ns) を修正する.<br  />
+</p>
+
+<p>
+以下で desmond を起動する.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">'/opt/schrodinger2018-1/desmond'</span>;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s4</span>=<span style="color: #ffa07a;">'step4.0_minimization.cfg'</span>;
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$eq</span>=<span style="color: #ffa07a;">'step4.1_equilibration.cfg'</span>;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s5</span>=<span style="color: #ffa07a;">'step5_production.cfg'</span>;
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$min</span>=<span style="color: #ffa07a;">"$cmd -c $s4 -WAIT"</span>;
+<span class="linenr">12: </span><span style="color: #ff83fa;">print</span> $min.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">13: </span><span style="color: #9370db;">system</span>($min);
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$equ</span>=<span style="color: #ffa07a;">"$cmd -c $eq -WAIT -gpu"</span>;
+<span class="linenr">16: </span><span style="color: #ff83fa;">print</span> $equ.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">17: </span><span style="color: #9370db;">system</span>($equ);
+<span class="linenr">18: </span>
+<span class="linenr">19: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$pro</span>=<span style="color: #ffa07a;">"$cmd -c $s5 -WAIT -gpu"</span>;
+<span class="linenr">20: </span><span style="color: #ff83fa;">print</span> $pro.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">21: </span><span style="color: #9370db;">system</span>($pro);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> namd</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+step5_production.inp の run = 500000 (1ns) を書き換えてから<br  />
+以下のように起動出来る<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">'/usr/local/bin/namd2'</span>;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s4</span>=<span style="color: #ffa07a;">'step4_equilibration.inp'</span>;
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$l4</span>=<span style="color: #ffa07a;">'step4.log'</span>;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s5</span>=<span style="color: #ffa07a;">'step5_production.inp'</span>;
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$l5</span>=<span style="color: #ffa07a;">'step5.log'</span>;
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md4</span>=<span style="color: #ffa07a;">"$cmd +p10 $s4 &gt; $l4"</span>;
+<span class="linenr">14: </span><span style="color: #ff83fa;">print</span> $md4.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">15: </span><span style="color: #9370db;">system</span>($md4);
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">18: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$md5</span>=<span style="color: #ffa07a;">"$cmd +p10 $s5 &gt; $l5"</span>;
+<span class="linenr">19: </span><span style="color: #ff83fa;">print</span> $md5.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">20: </span><span style="color: #9370db;">system</span>($md5);
+<span class="linenr">21: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'end : '</span>.<span style="color: #ffa07a;">`date`</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> amber</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+step5_production.mdin nstlim=500000 (=1ns) を修正して<br  />
+以下の script で起動する.<br  />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">!/usr/bin/env perl</span>
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">charmm-gui &#12391;&#24471;&#12383;&#12497;&#12521;&#12513;&#12540;&#12479;&#12434;&#29992;&#12356;&#12383; amber(sander) MD &#35336;&#31639;</span><span style="text-decoration: underline;"> </span>
+<span class="linenr"> 7: </span><span style="color: #cd853f;">#</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd</span>=<span style="color: #ffa07a;">"/usr/local/bin/sander"</span>;
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27083;&#36896;&#26368;&#36969;&#21270;</span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.0</span>
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s3</span>=<span style="color: #ffa07a;">'step3_charmm2amber'</span>;
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s4</span>=<span style="color: #ffa07a;">'step4.0_minimization'</span>;
+<span class="linenr">15: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd40</span>=<span style="color: #ffa07a;">"$cmd -O -i $s4.mdin -p $s3.parm7 -c $s3.rst7 -o $s4.mdout -r $s4.rst7 -inf $s4.mdinfo -ref $s3.rst7"</span>;
+<span class="linenr">16: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.0 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">17: </span><span style="color: #ff83fa;">print</span> $cmd40.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">18: </span><span style="color: #9370db;">system</span>($cmd40);
+<span class="linenr">19: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.0 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">20: </span>
+<span class="linenr">21: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24179;&#34913;&#21270;</span>
+<span class="linenr">22: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step4.1</span>
+<span class="linenr">23: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$eq</span>=<span style="color: #ffa07a;">'step4.1_equilibration'</span>;
+<span class="linenr">24: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd41</span>=<span style="color: #ffa07a;">"$cmd -O -i $eq.mdin -p $s3.parm7 -c $s4.rst7 -o $eq.mdout -r $eq.rst7 -inf $eq.mdinfo -ref $s3.rst7 -x $eq.nc"</span>;
+<span class="linenr">25: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.1 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">26: </span><span style="color: #ff83fa;">print</span> $cmd41.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">27: </span><span style="color: #9370db;">system</span>($cmd41);
+<span class="linenr">28: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step4.1 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">29: </span>
+<span class="linenr">30: </span>
+<span class="linenr">31: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">Production Run</span>
+<span class="linenr">32: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">step5</span>
+<span class="linenr">33: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$s5</span>=<span style="color: #ffa07a;">'step5_production'</span>;
+<span class="linenr">34: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$st</span>=<span style="color: #ffa07a;">'step5_0'</span>;
+<span class="linenr">35: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd50</span>=<span style="color: #ffa07a;">"$cmd -O -i $s5.mdin -p $s3.parm7 -c $eq.rst7 -o $st.mdout -r $st.rst7 -inf $st.mdinfo -x $st.nc"</span>;
+<span class="linenr">36: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.0 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">37: </span><span style="color: #ff83fa;">print</span> $cmd50.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">38: </span><span style="color: #9370db;">system</span>($cmd50);
+<span class="linenr">39: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.0 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">40: </span>
+<span class="linenr">41: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">Extend</span>
+<span class="linenr">42: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$max</span>=2;   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22793;&#26356;</span>
+<span class="linenr">43: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.1 stt: '</span>.<span style="color: #ffa07a;">`date`</span>;
+<span class="linenr">44: </span><span style="color: #20b2aa; font-weight: bold;">for</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$p</span> (0 .. $max) {
+<span class="linenr">45: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$n</span>=$p+1;
+<span class="linenr">46: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$pt</span>=<span style="color: #ffa07a;">'step5_'</span>.$p;
+<span class="linenr">47: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$st</span>=<span style="color: #ffa07a;">'step5_'</span>.$n;
+<span class="linenr">48: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cmd51</span>=<span style="color: #ffa07a;">"$cmd -O -i $s5.mdin -p $s3.parm7 -c $pt.rst7 -o $st.mdout -r $st.rst7 -inf $st.mdinfo -x $st.nc"</span>;
+<span class="linenr">49: </span>  <span style="color: #ff83fa;">print</span> $cmd51.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">50: </span>  <span style="color: #9370db;">system</span>($cmd51);
+<span class="linenr">51: </span>}
+<span class="linenr">52: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">'step5.1 end: '</span>.<span style="color: #ffa07a;">`date`</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">saito1369</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-11-05T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-11-05 (Mon)</time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/md/'>md</a> <a class='category label label-primary' href='/blog/categories/perl/'>perl</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://saito1369.github.io/blog/2018-11-05-201433.html" data-via="saito1369" data-counturl="http://saito1369.github.io/blog/2018-11-05-201433.html" >Tweet</a>
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2018-10-17-172030.html" title="Previous Post: desmond/maestro による MD 計算準備の自動化">&laquo; desmond/maestro による MD 計算準備の自動化</a></li>
+            
+            
+            <li class="next"><a href="/blog/2019-03-22-141849.html" title="Next Post: diary-float による org-mode の日付作成 (2)">diary-float による org-mode の日付作成 (2) &raquo;</a></li>
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h2>Comments</h2>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saito1369.github.io/blog/2018-11-05-201433.html';
+        var disqus_url = 'http://saito1369.github.io/blog/2018-11-05-201433.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

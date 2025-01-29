@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>easy cure</title>
+  <meta name="author" content="saito1369">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saito1369.github.io/index.html">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="easy cure" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://saito1369.github.io/index.html">
+  <meta property="og:title" content="easy cure">
+  <meta property="og:description" content="memo">
+
+  <script src="/javascripts/libs/jquery/jquery-2.1.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+  <body   >
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">easy cure</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="saito1369.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9">
+    <div class="blog-index" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="easy cure" />
+    <meta itemprop="description" content="memo" />
+    <meta itemprop="url" content="http://saito1369.github.io" />
+      
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2022-09-09T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2022-09-09 (Fri)</time>
+        
+           | <a href="/blog/2022-09-09-Mix_C.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2022-09-09-Mix_C.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2022-09-09-Mix_C.html" itemprop="url">混合二項分布の推定</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a> <a class='category label label-primary' href='/blog/categories/stan/'>stan</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 二項分布</a></li>
+<li><a href="#sec-2">2. 混合二項分布の推定</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 混合二項分布の式</a></li>
+<li><a href="#sec-2-2">2.2. 混合二項分布の例</a></li>
+<li><a href="#sec-2-3">2.3. Stan による MCMC 計算</a></li>
+<li><a href="#sec-2-4">2.4. Stan 計算結果の表示(1) 結果 summary</a></li>
+<li><a href="#sec-2-5">2.5. Stan 計算結果の表示(2) 図示 bayesplot</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2022-09-09 Fri 18:54&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 12:51&gt;</span></span><br  />
+</p>
+<p>
+混合二項分布の解析を通じて, cmdstanr の簡単な使い方をまとめておく.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2022-09-09-Mix_C.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2022-03-18T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2022-03-18 (Fri)</time>
+        
+           | <a href="/blog/2022-03-18-Stan04.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2022-03-18-Stan04.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2022-03-18-Stan04.html" itemprop="url">Stan と R でベイズ統計モデリング 第四章</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a> <a class='category label label-primary' href='/blog/categories/stan/'>stan</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Stan の基本的文法</a>
+<ul>
+<li><a href="#sec-1-1">1.1. ブロック構成</a></li>
+<li><a href="#sec-1-2">1.2. コーディング規約</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Stan の lp__ と target</a></li>
+<li><a href="#sec-3">3. 単回帰</a>
+<ul>
+<li><a href="#sec-3-1">3.1. データの図示</a></li>
+<li><a href="#sec-3-2">3.2. 単回帰(lm)</a></li>
+<li><a href="#sec-3-3">3.3. Stan で実装 (1) cmdstanr</a></li>
+<li><a href="#sec-3-4">3.4. Stan 結果解析</a></li>
+<li><a href="#sec-3-5">3.5. ベイズ信頼区間</a></li>
+<li><a href="#sec-3-6">3.6. ベイズ予測区間</a></li>
+<li><a href="#sec-3-7">3.7. transformed parametes 及び generated quantities ブロック</a></li>
+<li><a href="#sec-3-8">3.8. Stan で実装(2) cmdstanpy</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2022-03-18 Fri 17:42&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 12:57&gt;</span></span><br  />
+</p>
+<p>
+<a href="https://amzn.to/3eLjQip">Stan と R でベイズ統計モデリング</a> (第四章)の学習記録<br  />
+</p>
+
+<p>
+この本は素晴らしい. めちゃんこ賢い人が書いた本って感じがする.<br  />
+疑問に思いそうなところをちゃんと先回りしてわかりやすく解説してくれているし,<br  />
+書き方に統一感があって, 読み進めていくうちに自然に身につくような構成となっている.<br  />
+</p>
+
+<p>
+この本では RStan を使った解説が行われているが,<br  />
+これからは cmdstanr/cmdstanpy らしい( <a href="https://www.slideshare.net/simizu706/cmdstanrreducesum">Cmdstanr入門とreduce_sum()解説</a> ) のでこれらを用いて書き直してみる.<br  />
+</p>
+
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2022-03-18-Stan04.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2021-05-03T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2021-05-03 (Mon)</time>
+        
+           | <a href="/blog/2021-05-03-DataFrame2021.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2021-05-03-DataFrame2021.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2021-05-03-DataFrame2021.html" itemprop="url">dataframe の取り扱い [2021 版]</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/julia/'>julia</a> <a class='category label label-primary' href='/blog/categories/python/'>python</a> <a class='category label label-primary' href='/blog/categories/r/'>r</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 環境</a></li>
+<li><a href="#sec-2">2. はじめに</a></li>
+<li><a href="#sec-3">3. データ加工</a>
+<ul>
+<li><a href="#sec-3-1">3.1. R</a></li>
+<li><a href="#sec-3-2">3.2. dataframe</a></li>
+<li><a href="#sec-3-3">3.3. tidyverse</a></li>
+<li><a href="#sec-3-4">3.4. Python</a></li>
+<li><a href="#sec-3-5">3.5. pandas</a></li>
+<li><a href="#sec-3-6">3.6. Julia</a></li>
+<li><a href="#sec-3-7">3.7. DataFrams</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. グラフ化</a>
+<ul>
+<li><a href="#sec-4-1">4.1. R</a></li>
+<li><a href="#sec-4-2">4.2. ggplot2(基礎)</a></li>
+<li><a href="#sec-4-3">4.3. ggplot2 による時系列グラフの作成</a></li>
+<li><a href="#sec-4-4">4.4. Python</a></li>
+<li><a href="#sec-4-5">4.5. matplotlib(基礎)</a></li>
+<li><a href="#sec-4-6">4.6. matplotlib による時系列グラフの作成</a></li>
+<li><a href="#sec-4-7">4.7. plotline による時系列グラフの作成</a></li>
+<li><a href="#sec-4-8">4.8. Julia</a></li>
+<li><a href="#sec-4-9">4.9. PyPlot(基礎)</a></li>
+<li><a href="#sec-4-10">4.10. PyPlotによる時系列グラフの作成</a></li>
+<li><a href="#sec-4-11">4.11. RCall(ggplot2)による時系列グラフの作成</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2021-05-03 Mon 19:03&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2021-09-21 Tue 16:52&gt;</span></span><br  />
+</p>
+<p>
+dataframe の取り扱いについて.<br  />
+以前もほとんど同じことやったけど, version が上がって変わった部分もあったりすっかり忘れてる部分もあったりするのでもう一度改めてやってみよう.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2021-05-03-DataFrame2021.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2019-04-08T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2019-04-08 (Mon)</time>
+        
+           | <a href="/blog/2019-04-08-161532.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2019-04-08-161532.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2019-04-08-161532.html" itemprop="url">diary-float による org-mode の日付作成 (3)</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/org-mode/'>org-mode</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. これまでのあらすじ</a></li>
+<li><a href="#sec-2">2. はじめに</a></li>
+<li><a href="#sec-3">3. 問題点</a></li>
+<li><a href="#sec-4">4. 解決策</a></li>
+<li><a href="#sec-5">5. 結果</a></li>
+<li><a href="#sec-6">6. その他</a></li>
+<li><a href="#sec-7">7. 参考URL</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-08 Mon 16:15&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-04-08 Mon 19:14&gt;</span></span><br  />
+</p>
+<p>
+このメモは, <a href="http://saito1369.github.io/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a> の続きである.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2019-04-08-161532.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2019-03-22T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2019-03-22 (Fri)</time>
+        
+           | <a href="/blog/2019-03-22-141849.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2019-03-22-141849.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2019-03-22-141849.html" itemprop="url">diary-float による org-mode の日付作成 (2)</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/org-mode/'>org-mode</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. これまでのあらすじ</a></li>
+<li><a href="#sec-2">2. はじめに</a></li>
+<li><a href="#sec-3">3. 問題点</a></li>
+<li><a href="#sec-4">4. 解決策</a></li>
+<li><a href="#sec-5">5. 結果</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-03-22 Fri 14:18&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-03-22 Fri 18:46&gt;</span></span><br  />
+</p>
+<p>
+このメモは, <a href="http://saito1369.github.io/blog/2017-05-18-diary_float.html">diary-float による org-mode の日付作成</a> の続きである.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2019-03-22-141849.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-11-05T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-11-05 (Mon)</time>
+        
+           | <a href="/blog/2018-11-05-201433.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2018-11-05-201433.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2018-11-05-201433.html" itemprop="url">CHARMM-GUI 使い方まとめ</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/md/'>md</a> <a class='category label label-primary' href='/blog/categories/perl/'>perl</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a>
+<ul>
+<li><a href="#sec-1-1">1.1. maestro/desmond</a></li>
+<li><a href="#sec-1-2">1.2. gromacs</a></li>
+<li><a href="#sec-1-3">1.3. やりたいこと</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. この文書の目的</a></li>
+<li><a href="#sec-3">3. CHARMM-GUI の使い方</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 表紙</a></li>
+<li><a href="#sec-3-2">3.2. Input Generator</a></li>
+<li><a href="#sec-3-3">3.3. Quick MD Simulator</a></li>
+<li><a href="#sec-3-4">3.4. Model/Chain Selection</a></li>
+<li><a href="#sec-3-5">3.5. Manipulate PDB</a></li>
+<li><a href="#sec-3-6">3.6. Computed Energy</a></li>
+<li><a href="#sec-3-7">3.7. Waterbox Size Options</a></li>
+<li><a href="#sec-3-8">3.8. Add ions</a></li>
+<li><a href="#sec-3-9">3.9. System Size</a></li>
+<li><a href="#sec-3-10">3.10. Force Field Options</a></li>
+<li><a href="#sec-3-11">3.11. Input Generation Options</a></li>
+<li><a href="#sec-3-12">3.12. Equilibration Input Generation Options</a></li>
+<li><a href="#sec-3-13">3.13. Dynamics Input Generation Options</a></li>
+<li><a href="#sec-3-14">3.14. download</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. MD 計算の実行(production run)</a>
+<ul>
+<li><a href="#sec-4-1">4.1. gromacs2018</a></li>
+<li><a href="#sec-4-2">4.2. desmond</a></li>
+<li><a href="#sec-4-3">4.3. namd</a></li>
+<li><a href="#sec-4-4">4.4. amber</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-05 Mon 20:14&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-07-04 Thu 15:44&gt;</span></span><br  />
+</p>
+<p>
+CHARMM-GUI を使って MD 計算用の構造をさくっと作る.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2018-11-05-201433.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-10-17T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-10-17 (Wed)</time>
+        
+           | <a href="/blog/2018-10-17-172030.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2018-10-17-172030.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2018-10-17-172030.html" itemprop="url">desmond/maestro による MD 計算準備の自動化</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/md/'>md</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. Protein Preparation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. PDB ファイルの読み込み</a></li>
+<li><a href="#sec-2-2">2.2. 水素付加</a></li>
+<li><a href="#sec-2-3">2.3. 化合物の削除</a></li>
+<li><a href="#sec-2-4">2.4. 変異体の作成</a></li>
+<li><a href="#sec-2-5">2.5. mae ファイルへの変換</a></li>
+<li><a href="#sec-2-6">2.6. 水素位置の optimize</a></li>
+<li><a href="#sec-2-7">2.7. fake X server</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. System Setup(multisim)</a></li>
+<li><a href="#sec-4">4. Molecular Dynamics</a></li>
+<li><a href="#sec-5">5. 手順まとめ</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-10-17 Wed 17:20&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-02-13 Wed 19:06&gt;</span></span><br  />
+</p>
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2018-10-17-172030.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2018-03-09T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2018-03-09 (Fri)</time>
+        
+           | <a href="/blog/2018-03-09-layout.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2018-03-09-layout.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2018-03-09-layout.html" itemprop="url">教材 ppt のレイアウト半自動作成</a></h2>
+    
+    
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. やりたいこと(目的)</a></li>
+<li><a href="#sec-3">3. 調査</a></li>
+<li><a href="#sec-4">4. やったこと</a></li>
+<li><a href="#sec-5">5. 仕様とつかいかた</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 一枚いちまいのスライドに, progress bar をつける</a></li>
+<li><a href="#sec-5-2">5.2. 現在のページ数/全体のページ数  としてページ数を追加する</a></li>
+<li><a href="#sec-5-3">5.3. gray out した目次を自動で作成して挿入する</a></li>
+<li><a href="#sec-5-4">5.4. 階層の情報を各スライドに表示する</a></li>
+<li><a href="#sec-5-5">5.5. 章ごとに分割して作成したスライドを統合する</a></li>
+<li><a href="#sec-5-6">5.6. 学生用の資料を自動で作成する</a></li>
+<li><a href="#sec-5-7">5.7. 教師用の資料を作成</a></li>
+<li><a href="#sec-5-8">5.8. そのほか</a>
+<ul>
+<li><a href="#sec-5-8-1">5.8.1. 目次スライドを消去した新しいスライドを作成する</a></li>
+<li><a href="#sec-5-8-2">5.8.2. 目次のフォント大きさを変更</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-6">6. 使用例</a></li>
+<li><a href="#sec-7">7. そのほか注意事項</a></li>
+<li><a href="#sec-8">8. 追記 <span class="timestamp-wrapper"><span class="timestamp">[2019-02-15 Fri]</span></span></a>
+<ul>
+<li><a href="#sec-8-1">8.1. hash へのアクセス(Scripting.Dictionary)</a></li>
+<li><a href="#sec-8-2">8.2. Sgn(array)=0 の件</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-06-01 Mon 10:55&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-02-16 Sat 16:03&gt;</span></span><br  />
+</p>
+<p>
+ここで紹介した機能をもつプログラムは以下に置かれている.<br  />
+<a href="https://github.com/saito1369/work-lib-Basic">https://github.com/saito1369/work-lib-Basic</a><br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2018-03-09-layout.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-09-04T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-09-04 (Mon)</time>
+        
+           | <a href="/blog/2017-09-04-164431.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2017-09-04-164431.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2017-09-04-164431.html" itemprop="url">isearch の改良</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/elisp/'>elisp</a> <a class='category label label-primary' href='/blog/categories/emacs/'>emacs</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. 問題点</a></li>
+<li><a href="#sec-3">3. elisp プログラムの作成</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 作成ほうしん</a></li>
+<li><a href="#sec-3-2">3.2. パラメータ</a></li>
+<li><a href="#sec-3-3">3.3. isearch-mode-hook</a></li>
+<li><a href="#sec-3-4">3.4. isearch-mode-end-hook</a></li>
+<li><a href="#sec-3-5">3.5. defadvice</a></li>
+<li><a href="#sec-3-6">3.6. idive&#x2013;get-dive-file</a></li>
+<li><a href="#sec-3-7">3.7. プログラム全体</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 反省点</a></li>
+<li><a href="#sec-5">5. 参考文献</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-09-04 Mon 16:44&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-02-21 Wed 20:12&gt;</span></span><br  />
+</p>
+<p>
+emacs でメモを検索する isearch (Ctrl-s/Ctrl-r) にちょっと機能をついかしてみた.<br  />
+elisp の書き方はよくわかってないけど, 不安定ながらも動くものができたのでその記録を書いておく.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2017-09-04-164431.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2017-07-26T00:00:00+09:00"  data-updated="true" itemprop="datePublished dateCreated">2017-07-26 (Wed)</time>
+        
+           | <a href="/blog/2017-07-26-003653.html#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://saito1369.github.io/blog/2017-07-26-003653.html">Comments</a>
+        
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2017-07-26-003653.html" itemprop="url">主成分分析の学習</a></h2>
+    
+    
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category label label-primary' href='/blog/categories/math/'>math</a>
+  
+</span>
+
+
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 参考 URL</a></li>
+<li><a href="#sec-2">2. データ</a></li>
+<li><a href="#sec-3">3. 求めたいもの</a></li>
+<li><a href="#sec-4">4. 主成分軸の計算</a></li>
+<li><a href="#sec-5">5. 第一主成分</a></li>
+<li><a href="#sec-6">6. 寄与率(proportion)</a></li>
+<li><a href="#sec-7">7. 因子負荷量(factor loading)</a></li>
+<li><a href="#sec-8">8. まとめ</a>
+<ul>
+<li><a href="#sec-8-1">8.1. 主成分分析</a></li>
+<li><a href="#sec-8-2">8.2. 主成分得点</a></li>
+<li><a href="#sec-8-3">8.3. 寄与率</a></li>
+<li><a href="#sec-8-4">8.4. 因子負荷量</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2010-03-24 Wed 00:36&gt;</span></span><br  />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-10-15 Tue 13:02&gt;</span></span><br  />
+</p>
+<p>
+主成分分析の学習のきろく.<br  />
+</p>
+
+<p>
+</div>
+  
+  
+    <footer>
+      <a class="read-more btn btn-default" href="/blog/2017-07-26-003653.html">Read on &rarr;</a>
+    </footer>
+  
+
+
+        </article>
+      
+    </div>
+
+    <ul class="pager">
+      
+        <li class="previous"><a href="/posts/2">&larr;&nbsp;Older</a></li>
+      
+      <li><a href="/blog/archives">Blog Archives</a></li>
+      
+        <li class="next disabled"><a href="#">Newer&nbsp;&rarr;</a></li>
+      
+    </ul>
+  </div>
+
+  
+    <aside class="sidebar col-md-3">
+      
+        <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2022-09-09-Mix_C.html">混合二項分布の推定</a>
+    
+    <a class="list-group-item " href="/blog/2022-03-18-Stan04.html">Stan と R でベイズ統計モデリング 第四章</a>
+    
+    <a class="list-group-item " href="/blog/2021-05-03-DataFrame2021.html">dataframe の取り扱い [2021 版]</a>
+    
+    <a class="list-group-item " href="/blog/2019-04-08-161532.html">diary-float による org-mode の日付作成 (3)</a>
+    
+    <a class="list-group-item " href="/blog/2019-03-22-141849.html">diary-float による org-mode の日付作成 (2)</a>
+    
+  </div>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Categories</h3>
+  </div>
+  <div class="list-group">
+    
+    
+    <a class="list-group-item " href="/blog/categories/misc/index.html">
+        <span class="badge">1</span>
+        misc
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/python/index.html">
+        <span class="badge">6</span>
+        python
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/r/index.html">
+        <span class="badge">7</span>
+        r
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/julia/index.html">
+        <span class="badge">5</span>
+        julia
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/perl/index.html">
+        <span class="badge">4</span>
+        perl
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/ruby/index.html">
+        <span class="badge">3</span>
+        ruby
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/javascript/index.html">
+        <span class="badge">1</span>
+        javascript
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/java/index.html">
+        <span class="badge">1</span>
+        java
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/org-mode/index.html">
+        <span class="badge">3</span>
+        org-mode
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/elisp/index.html">
+        <span class="badge">5</span>
+        elisp
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/clmemo/index.html">
+        <span class="badge">1</span>
+        clmemo
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/math/index.html">
+        <span class="badge">4</span>
+        math
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/emacs/index.html">
+        <span class="badge">1</span>
+        emacs
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/md/index.html">
+        <span class="badge">2</span>
+        md
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/stan/index.html">
+        <span class="badge">2</span>
+        stan
+      </a>
+    
+  </div>
+</section>
+
+      
+    </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2025 - saito1369<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> and <a href="http://orgmode.org/">Org mode</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'saito1369';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr.js"></script>
+
+
+  </body>
+</html>

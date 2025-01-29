@@ -1,0 +1,3589 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ruby | easy cure]]></title>
+  <link href="http://saito1369.github.io/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://saito1369.github.io/"/>
+  <updated>2025-01-29T16:44:35+09:00</updated>
+  <id>http://saito1369.github.io/</id>
+  <author>
+    <name><![CDATA[saito1369]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[tab 区切りファイルの読込み]]></title>
+    <link href="http://saito1369.github.io/blog/2017-05-04-fread.html"/>
+    <updated>2017-05-04T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/fread</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. はじめに</a></li>
+<li><a href="#sec-2">2. Perl</a></li>
+<li><a href="#sec-3">3. Python</a></li>
+<li><a href="#sec-4">4. Julia</a></li>
+<li><a href="#sec-5">5. Ruby</a></li>
+<li><a href="#sec-6">6. R</a></li>
+<li><a href="#sec-7">7. Java</a></li>
+<li><a href="#sec-8">8. かんそう</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2016-07-16 Sat 13:44&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-21 Wed 20:51&gt;</span></span><br />
+</p>
+<p>
+tab 区切りファイル読込み/書込みの各言語でのやりかたの違いを整理する.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<p>
+参考:<br />
+配列操作の比較表: Ruby, Python, JavaScript, Perl, C++ - bkブログ<br />
+<a href="http://0xcc.net/blog/archives/000043.html">http://0xcc.net/blog/archives/000043.html</a><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> はじめに</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+私は普段の生活においては perl でプログラムを書いている.<br />
+ささっと書いて捨てちゃうことが多いが,<br />
+そのようなプログラムで最も多いぱたーんは以下のようなものである:<br />
+</p>
+
+<ol class="org-ol">
+<li>何か(tab 区切りとかの)ファイルを読込む.<br />
+</li>
+<li>何かやる(読み込んだデータを加工したり計算したりする).<br />
+</li>
+<li>別のファイルに結果等を書き出す.<br />
+</li>
+</ol>
+
+<p>
+Python を始めとした色んな言語をこれから学んでいくにあたって,<br />
+上記操作のやり方の違いををまずは見ていくのが自分にとっては一番しっくり来るかなぁと思ったのでまとめておく.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Perl</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+これが基準<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ifile</span>=<span style="color: #ffa07a;">'input.txt'</span>;
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ofile</span>=<span style="color: #ffa07a;">'output.perl.txt'</span>;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">input</span>
+<span class="linenr"> 8: </span><span style="color: #9370db;">open</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$fh</span>,<span style="color: #ffa07a;">"&lt;"</span>,$ifile;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$cnt</span>=0;
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@head</span>;
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$data</span>;
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">while</span>(&lt;$fh&gt;) {
+<span class="linenr">13: </span>  <span style="color: #ff83fa;">chomp</span>;
+<span class="linenr">14: </span>  <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@bf</span>=<span style="color: #ff83fa;">split</span>(<span style="color: #1e90ff;">/</span><span style="color: #76ee00;">\</span><span style="color: #9370db;">t</span><span style="color: #1e90ff;">/</span>,$_);
+<span class="linenr">15: </span>  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27096;&#12293;&#12394;&#29366;&#27841;&#12395;&#23550;&#24540;&#12391;&#12365;&#12427;&#12424;&#12358;&#12395;</span>
+<span class="linenr">16: </span>  <span style="color: #20b2aa; font-weight: bold;">unless</span>($cnt) { <span style="color: #cd853f;"># </span><span style="color: #cd853f;">header</span>
+<span class="linenr">17: </span>    <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@head</span>=<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@bf</span>;
+<span class="linenr">18: </span>  }<span style="color: #20b2aa; font-weight: bold;">else</span> {        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">data</span>
+<span class="linenr">19: </span>    <span style="color: #ff83fa;">push</span>(@{$data},\<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@bf</span>);
+<span class="linenr">20: </span>  }
+<span class="linenr">21: </span>  $cnt++;
+<span class="linenr">22: </span>}
+<span class="linenr">23: </span><span style="color: #9370db;">close</span> $fh;
+<span class="linenr">24: </span>
+<span class="linenr">25: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">output</span>
+<span class="linenr">26: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$prnt</span>;
+<span class="linenr">27: </span>$prnt=<span style="color: #9370db;">join</span>(<span style="color: #ffa07a;">"\t"</span>,<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@head</span>).<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">28: </span><span style="color: #20b2aa; font-weight: bold;">for</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$d</span> (@{$data}) {
+<span class="linenr">29: </span>  $prnt.=<span style="color: #9370db;">join</span>(<span style="color: #ffa07a;">"\t"</span>,@{$d}).<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">30: </span>}
+<span class="linenr">31: </span><span style="color: #9370db;">open</span> <span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$ofh</span>,<span style="color: #ffa07a;">"&gt;"</span>,$ofile;
+<span class="linenr">32: </span><span style="color: #ff83fa;">print</span> $ofh $prnt;
+<span class="linenr">33: </span><span style="color: #9370db;">close</span> $ofh;
+<span class="linenr">34: </span>
+<span class="linenr">35: </span><span style="color: #ff83fa;">print</span> $prnt; <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#27161;&#28310;&#20986;&#21147;&#12395;&#12418;&#26360;&#12365;&#20986;&#12377;&#22580;&#21512;</span>
+</pre>
+</div>
+
+<pre class="example">
+name  age origin  gender  idata fdata type
+foo 10  jpn M 50  0.25  X
+bar 30  usa F 25  0.38  P
+hoge  10  jpn F 4 1 P
+fuga  40  eng M     X
+fuga  35    F 9 0.1 X
+</pre>
+
+<p>
+header の名前を key にして hash の配列にしてもよい.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Python</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+python での注意点と参考 URL:<br />
+</p>
+
+<ul class="org-ul">
+<li>タブ区切りのファイルを読む<br />
+<ul class="org-ul">
+<li>Python でファイルを読む<br />
+<a href="http://osksn2.hep.sci.osaka-u.ac.jp/~taku/osx/python/readfile.html">http://osksn2.hep.sci.osaka-u.ac.jp/~taku/osx/python/readfile.html</a><br />
+</li>
+</ul>
+</li>
+<li>unless の代わりに not を使う<br />
+<ul class="org-ul">
+<li>【python】unlessがないのでnotを使う | chat-blog<br />
+<a href="http://chat-rate.com/it/255">http://chat-rate.com/it/255</a><br />
+</li>
+</ul>
+</li>
+<li>文字列を数値に変換する(めんどくさいなぁ&#x2026;)<br />
+<ul class="org-ul">
+<li>Pythonメモ: 文字列を数値に変換する<br />
+<a href="http://yoshi-python.blogspot.jp/2009/09/blog-post_4656.html">http://yoshi-python.blogspot.jp/2009/09/blog-post_4656.html</a><br />
+</li>
+</ul>
+</li>
+<li>辞書オブジェクトの使い方<br />
+<ul class="org-ul">
+<li>Python - 辞書（ディクショナリ）の使い方 - ざっくりん雑記<br />
+<a href="http://azuuun-memorandum.hatenablog.com/entry/2015/05/01/075000">http://azuuun-memorandum.hatenablog.com/entry/2015/05/01/075000</a><br />
+</li>
+</ul>
+</li>
+<li>ファイルに書き込み<br />
+<ul class="org-ul">
+<li>Python: テキストファイルに書き込み – write()、writelines()メソッド<br />
+<a href="http://www.yukun.info/blog/2008/09/python-file-write-writelines.html">http://www.yukun.info/blog/2008/09/python-file-write-writelines.html</a><br />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> sys
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span style="color: #9acd32;">ifile</span>=<span style="color: #ffa07a;">'input.txt'</span>
+<span class="linenr"> 4: </span><span style="color: #9acd32;">ofile</span>=<span style="color: #ffa07a;">'output.python.txt'</span>
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span style="color: #9acd32;">fh</span>=<span style="color: #76ee00;">open</span>(ifile,<span style="color: #ffa07a;">'r'</span>)
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">lines=fh.readlines() # &#20840;&#37096;&#35501;&#12415;&#36796;&#12435;&#12391; lines &#12395;&#20837;&#12428;&#12427;&#22580;&#21512;.</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">input</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">perl &#12392;&#21516;&#12376;&#24863;&#12376;&#12391;&#12363;&#12356;&#12390;&#12415;&#12427;.</span>
+<span class="linenr">11: </span><span style="color: #9acd32;">cnt</span>=0
+<span class="linenr">12: </span><span style="color: #9acd32;">head</span>=[]
+<span class="linenr">13: </span><span style="color: #9acd32;">data</span>=[]
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">for</span> li <span style="color: #20b2aa; font-weight: bold;">in</span> fh:   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">li &#12395; 1 &#34892;&#27598;(&#25913;&#34892;&#21547;&#12416;)&#12364;&#20837;&#12387;&#12390;&#12367;&#12427;</span>
+<span class="linenr">15: </span>  <span style="color: #9acd32;">bf</span> = li[:-1].split(<span style="color: #ffa07a;">"\t"</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429;&#12398;&#25913;&#34892;&#12434;&#21462;&#12426;&#38500;&#12356;&#12390;(li[:-1]) split</span>
+<span class="linenr">16: </span>  <span style="color: #20b2aa; font-weight: bold;">if</span> <span style="color: #20b2aa; font-weight: bold;">not</span> cnt:
+<span class="linenr">17: </span>     <span style="color: #9acd32;">head</span>=bf
+<span class="linenr">18: </span>  <span style="color: #20b2aa; font-weight: bold;">else</span>:
+<span class="linenr">19: </span>     data.append(bf)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">push &#12391;&#12399;&#12394;&#12367; append</span>
+<span class="linenr">20: </span>  <span style="color: #9acd32;">cnt</span>+=1
+<span class="linenr">21: </span>fh.close
+<span class="linenr">22: </span>
+<span class="linenr">23: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25991;&#23383;&#21015;&#12392;&#12375;&#12390;&#20837;&#12387;&#12390;&#12427;&#12371;&#12392;&#12434;&#30906;&#35469;&#12377;&#12427;.</span>
+<span class="linenr">24: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(head)</span>
+<span class="linenr">25: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(data)</span>
+<span class="linenr">26: </span>
+<span class="linenr">27: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hash &#12398;&#37197;&#21015;&#12392;&#12375;&#12390;&#20837;&#12428;&#12390;&#12415;&#12427;</span>
+<span class="linenr">28: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hashs[0]['name'] &#12371;&#12435;&#12394;&#24863;&#12376;&#12391;&#21508;&#12293;&#12398;&#35201;&#32032;&#12395;&#12450;&#12463;&#12475;&#12473;&#12377;&#12427;.</span>
+<span class="linenr">29: </span><span style="color: #9acd32;">hashs</span>=[]
+<span class="linenr">30: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dr <span style="color: #20b2aa; font-weight: bold;">in</span> data:
+<span class="linenr">31: </span>  <span style="color: #76ee00;">hash</span>={}
+<span class="linenr">32: </span>  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">print(dr)</span>
+<span class="linenr">33: </span>  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">sys.exit(0) # &#12371;&#12371;&#12391;&#32066;&#12431;&#12427;&#26178;(for debug)</span>
+<span class="linenr">34: </span>  <span style="color: #20b2aa; font-weight: bold;">for</span> j,d <span style="color: #20b2aa; font-weight: bold;">in</span> <span style="color: #76ee00;">enumerate</span>(dr):
+<span class="linenr">35: </span>     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">j &#12364; 1 &#12363; 4 &#12398;&#12392;&#12365;&#12399;, &#25972;&#25968;&#12392;&#12375;&#12390;&#20837;&#12428;&#12427;</span>
+<span class="linenr">36: </span>     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">j &#12364; 5      &#12398;&#12392;&#12365;&#12399;, &#28014;&#21205;&#23567;&#25968;&#28857;&#12392;&#12375;&#12390;&#20837;&#12428;&#12427;. &#38754;&#20498;...</span>
+<span class="linenr">37: </span>     <span style="color: #9acd32;">dk</span> = d
+<span class="linenr">38: </span>     <span style="color: #20b2aa; font-weight: bold;">if</span> <span style="color: #20b2aa; font-weight: bold;">not</span> d==<span style="color: #ffa07a;">''</span>:
+<span class="linenr">39: </span>       <span style="color: #20b2aa; font-weight: bold;">if</span> j==1 <span style="color: #20b2aa; font-weight: bold;">or</span> j==4:
+<span class="linenr">40: </span>         <span style="color: #9acd32;">dk</span> = <span style="color: #76ee00;">int</span>(d)
+<span class="linenr">41: </span>       <span style="color: #20b2aa; font-weight: bold;">elif</span> j==5:         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">elsif &#12391;&#12399;&#12394;&#12367; elif</span>
+<span class="linenr">42: </span>         <span style="color: #9acd32;">dk</span> = <span style="color: #76ee00;">float</span>(d)
+<span class="linenr">43: </span>     <span style="color: #76ee00;">hash</span>[head[j]]=dk
+<span class="linenr">44: </span>  hashs.append(<span style="color: #76ee00;">hash</span>)
+<span class="linenr">45: </span>
+<span class="linenr">46: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(hashs)</span>
+<span class="linenr">47: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(hashs[0]['name'])</span>
+<span class="linenr">48: </span>
+<span class="linenr">49: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">output</span>
+<span class="linenr">50: </span><span style="color: #9acd32;">ofh</span>=<span style="color: #76ee00;">open</span>(ofile,<span style="color: #ffa07a;">'w'</span>)
+<span class="linenr">51: </span><span style="color: #9acd32;">prnt</span>=<span style="color: #ffa07a;">"\t"</span>.join(head)+<span style="color: #ffa07a;">"\n"</span>
+<span class="linenr">52: </span><span style="color: #20b2aa; font-weight: bold;">for</span> d <span style="color: #20b2aa; font-weight: bold;">in</span> data:
+<span class="linenr">53: </span>  <span style="color: #9acd32;">prnt</span>+=<span style="color: #ffa07a;">"\t"</span>.join(d)+<span style="color: #ffa07a;">"\n"</span>
+<span class="linenr">54: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(prnt)
+<span class="linenr">55: </span>ofh.write(prnt)
+<span class="linenr">56: </span>ofh.close()
+</pre>
+</div>
+
+<pre class="example">
+name  age origin  gender  idata fdata type
+foo 10  jpn M 50  0.25  X
+bar 30  usa F 25  0.38  P
+hoge  10  jpn F 4 1 P
+fuga  40  eng M     X
+fuga  35    F 9 0.1 X
+</pre>
+
+<p>
+dataframe とか使う場合はまた別でまとめようと思うが, 一応書いておく.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> pandas <span style="color: #20b2aa; font-weight: bold;">as</span> pd
+<span style="color: #9acd32;">ifile</span>=<span style="color: #ffa07a;">'input.txt'</span>
+<span style="color: #9acd32;">ofile</span>=<span style="color: #ffa07a;">'output.pandas.txt'</span>
+
+<span style="color: #9acd32;">df</span> = pd.read_csv(ifile,sep=<span style="color: #ffa07a;">"\t"</span>,header=0)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20309;&#12363;&#12420;&#12427;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">0 &#34892;&#30446;&#12398; 'name' &#21015;&#12434;&#26360;&#12365;&#25563;&#12360;</span>
+<span style="color: #9acd32;">df.ix</span>[0,<span style="color: #ffa07a;">'name'</span>] = <span style="color: #ffa07a;">'foo2'</span>
+df.to_csv(ofile,sep=<span style="color: #ffa07a;">"\t"</span>,index=<span style="color: #1e90ff;">False</span>)
+
+<span style="color: #20b2aa; font-weight: bold;">print</span>(df)
+</pre>
+</div>
+
+<pre class="example">
+   name  age origin gender  idata  fdata type
+0  foo2   10    jpn      M   50.0   0.25    X
+1   bar   30    usa      F   25.0   0.38    P
+2  hoge   10    jpn      F    4.0   1.00    P
+3  fuga   40    eng      M    NaN    NaN    X
+4  fuga   35    NaN      F    9.0   0.10    X
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Julia</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Julia での注意点と参考 URL:<br />
+</p>
+
+<p>
+全般的に, 型を意識する必要がある(? 全部 Any でいいのかなぁ)のでちょっと面倒くさい印象.<br />
+文字列は '' ではなく "" で囲わないといけない(Java と同じ)<br />
+and, or は &amp;&amp; || (これも Java と同じ)<br />
+if 文は, if .. elseif .. end という感じで書く.<br />
+関数は function hoge(x) &#x2026; end という感じで書く.<br />
+配列の添字は 1 から始まる.<br />
+二次元配列は arr[1,2] (1行2列目), 配列の配列は arr<br />
+hash の宣言: Dict{keyの型, value の型}()<br />
+主な型指定: Int64, Float64, ASCIIString, Any(何を入れてもいい型)<br />
+文字列連結は "." でも "+" でもなく, 何と "*" を使うらしい. 何で?<br />
+</p>
+
+<ul class="org-ul">
+<li>基本<br />
+<ul class="org-ul">
+<li>Juliaことはじめ - 0x00 nullbyte blog<br />
+<a href="http://nullbyte.hatenablog.com/entry/2015/05/27/013949">http://nullbyte.hatenablog.com/entry/2015/05/27/013949</a><br />
+</li>
+<li>Julia Language Programming (Julia の基礎知識)<br />
+<a href="http://www.geocities.jp/m_hiroi/light/julia01.html#abc02">http://www.geocities.jp/m_hiroi/light/julia01.html#abc02</a><br />
+</li>
+</ul>
+</li>
+<li>ファイルの開き方など<br />
+<ul class="org-ul">
+<li>Introducing Julia/Working with text files - Wikibooks, open books for an open world<br />
+<a href="https://en.wikibooks.org/wiki/Introducing_Julia/Working_with_text_files">https://en.wikibooks.org/wiki/Introducing_Julia/Working_with_text_files</a><br />
+</li>
+<li>Juliaでファイル操作 | mwSoft<br />
+<a href="http://www.mwsoft.jp/programming/julia/file.html">http://www.mwsoft.jp/programming/julia/file.html</a><br />
+</li>
+<li>Julia でデータのセーブとロード - yomichi's blog<br />
+<a href="http://yomichi.hateblo.jp/entry/2015/12/19/014201">http://yomichi.hateblo.jp/entry/2015/12/19/014201</a><br />
+</li>
+<li>＜紙＞さんＬｏＧ Julia 学習：ファイル入出力<br />
+<a href="http://jn1inl.blog77.fc2.com/blog-entry-2209.html">http://jn1inl.blog77.fc2.com/blog-entry-2209.html</a><br />
+</li>
+</ul>
+</li>
+<li>型について<br />
+<ul class="org-ul">
+<li>Julia カテゴリーの記事一覧 - 0x00 nullbyte blog<br />
+<a href="http://nullbyte.hatenablog.com/archive/category/Julia">http://nullbyte.hatenablog.com/archive/category/Julia</a><br />
+</li>
+</ul>
+</li>
+<li>配列など<br />
+<ul class="org-ul">
+<li>Learn Julia in Y Minutes<br />
+<a href="https://learnxinyminutes.com/docs/julia/">https://learnxinyminutes.com/docs/julia/</a><br />
+</li>
+<li>Julia入門 配列 - 0x00 nullbyte blog<br />
+<a href="http://nullbyte.hatenablog.com/entry/2015/05/30/001107">http://nullbyte.hatenablog.com/entry/2015/05/30/001107</a><br />
+</li>
+<li>Julia の超入門（配列編） - 中野智文<br />
+<a href="http://blog.goo.ne.jp/nakano-tomofumi/e/135ed54502fd7a23d4b53fc3340240d2">http://blog.goo.ne.jp/nakano-tomofumi/e/135ed54502fd7a23d4b53fc3340240d2</a><br />
+</li>
+<li>光学設計者の学習メモ: Julia Array操作の基本をメモ。<br />
+<a href="http://retrofocus28.blogspot.jp/2014/11/julia-array.html">http://retrofocus28.blogspot.jp/2014/11/julia-array.html</a><br />
+</li>
+</ul>
+</li>
+<li>ハッシュ等<br />
+<ul class="org-ul">
+<li>Julia入門 辞書（ハッシュテーブル）、Set型について - 0x00 nullbyte blog<br />
+<a href="http://nullbyte.hatenablog.com/entry/2015/06/03/000106">http://nullbyte.hatenablog.com/entry/2015/06/03/000106</a><br />
+</li>
+</ul>
+</li>
+<li>join<br />
+<ul class="org-ul">
+<li>配列から文字列、文字列から配列への変換 (convert array to string, string to array) - MATLAB移民のためのJulia tips<br />
+<a href="http://julia.hatenablog.jp/entry/2016/04/17/144129">http://julia.hatenablog.jp/entry/2016/04/17/144129</a><br />
+</li>
+</ul>
+</li>
+<li>文字列連結<br />
+<ul class="org-ul">
+<li>Julia の文字列結合演算が積 (*) である理由（他言語との比較） - Moriturus te saluto<br />
+<a href="http://dsng.hatenablog.com/entry/2014/07/03/214526">http://dsng.hatenablog.com/entry/2014/07/03/214526</a><br />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span>ifile=<span style="color: #ffa07a;">"input.txt"</span>
+<span class="linenr"> 2: </span>ofile=<span style="color: #ffa07a;">"output.julia.txt"</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">fh=open(ifile,"r")</span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">str=readall(fh)  # &#19968;&#27671;&#12395;&#35501;&#12415;&#36796;&#12416;&#22580;&#21512;&#12399;&#12371;&#12358;&#12377;&#12427;.</span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(str)</span>
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>head=[]  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">head=Array{Any,1}()</span>
+<span class="linenr"> 9: </span>data=<span style="color: #9370db;">Array</span>{<span style="color: #9370db;">Array</span>{<span style="color: #9370db;">Any</span>,1},1}()  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1x1 &#12398;, &#37197;&#21015;&#12398;&#37197;&#21015;&#12434;&#20316;&#12387;&#12390;&#12362;&#12367;.</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">data=[][] &#12371;&#12428;&#12376;&#12419;&#12480;&#12513;&#12425;&#12375;&#12356;.</span>
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">filehandle &#12399;&#20197;&#19979;&#12398;&#12424;&#12358;&#12395;&#26360;&#12367;&#12398;&#12364;&#26222;&#36890;&#12398;&#12424;&#12358;&#12384;</span>
+<span class="linenr">13: </span>open(ifile,<span style="color: #ffa07a;">"r"</span>) <span style="color: #20b2aa; font-weight: bold;">do</span> fh
+<span class="linenr">14: </span>    cnt=0
+<span class="linenr">15: </span>    <span style="color: #20b2aa; font-weight: bold;">for</span> li <span style="color: #20b2aa; font-weight: bold;">in</span> eachline(fh)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#34892;&#12378;&#12388;&#35501;&#12435;&#12391;&#12356;&#12367;</span>
+<span class="linenr">16: </span>        <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(li)</span>
+<span class="linenr">17: </span>        li = chomp(li)          <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25913;&#34892;&#12434;&#21462;&#12426;&#38500;&#12367;</span>
+<span class="linenr">18: </span>        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">li = rstrip(li,'\n')  # &#25913;&#34892;&#21066;&#38500;&#12399;&#12371;&#12428;&#12391;&#12418;&#12356;&#12356;</span>
+<span class="linenr">19: </span>        bf = split(li,<span style="color: #ffa07a;">"\t"</span>)     <span style="color: #cd853f;"># </span><span style="color: #cd853f;">\t &#12391; split</span>
+<span class="linenr">20: </span>        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">println(bf)</span>
+<span class="linenr">21: </span>        <span style="color: #20b2aa; font-weight: bold;">if</span> cnt == 0             <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#34892;&#30446;(header)</span>
+<span class="linenr">22: </span>            append!(head,bf)       <span style="color: #cd853f;"># </span><span style="color: #cd853f;">head=bf &#12391;&#12399;&#12456;&#12521;&#12540;&#12392;&#12394;&#12427;. append! &#12434;&#20351;&#12358;</span>
+<span class="linenr">23: </span>            <span style="color: #cd853f;">#</span><span style="color: #cd853f;">for i in 1:length(bf)</span>
+<span class="linenr">24: </span>            <span style="color: #cd853f;">#   </span><span style="color: #cd853f;">push!(head,bf[i])</span>
+<span class="linenr">25: </span>            <span style="color: #cd853f;">#</span><span style="color: #cd853f;">end</span>
+<span class="linenr">26: </span>        <span style="color: #20b2aa; font-weight: bold;">else</span>                    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">2 &#34892;&#30446;&#20197;&#38477;(&#12391;&#12540;&#12383;)</span>
+<span class="linenr">27: </span>            push!(data,bf)
+<span class="linenr">28: </span>        <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">29: </span>        cnt+=1
+<span class="linenr">30: </span>    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">31: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">32: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">close(fh) # &#33258;&#21205;&#12391;&#38281;&#12376;&#12427;&#12398;&#12391;&#26360;&#12363;&#12394;&#12367;&#12390;&#12418;&#12356;&#12356;&#12387;&#12413;&#12356;.</span>
+<span class="linenr">33: </span>
+<span class="linenr">34: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">data[][] &#12434; hash &#12398;&#37197;&#21015;&#12395;&#12375;&#12390;&#12415;&#12427;.</span>
+<span class="linenr">35: </span>hashs=[]
+<span class="linenr">36: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dt <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">37: </span>    hash = <span style="color: #9370db;">Dict</span>{<span style="color: #9370db;">Any</span>,<span style="color: #9370db;">Any</span>}()
+<span class="linenr">38: </span>     <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:length(dt)
+<span class="linenr">39: </span>        hash[head[i]]=dt[i]
+<span class="linenr">40: </span>     <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">41: </span>    push!(hashs,hash)
+<span class="linenr">42: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">43: </span>
+<span class="linenr">44: </span>println(head)
+<span class="linenr">45: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">println(data)</span>
+<span class="linenr">46: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">println(data[1][1])</span>
+<span class="linenr">47: </span>
+<span class="linenr">48: </span>println(head[1])
+<span class="linenr">49: </span>println(hashs[1][<span style="color: #ffa07a;">"fdata"</span>])
+<span class="linenr">50: </span>println(hashs[2][<span style="color: #ffa07a;">"fdata"</span>])
+<span class="linenr">51: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">exit() &#12503;&#12525;&#12464;&#12521;&#12512;&#12434;&#32066;&#12431;&#12425;&#12379;&#12427;&#12392;&#12365;</span>
+<span class="linenr">52: </span>
+<span class="linenr">53: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22411;&#12461;&#12515;&#12473;&#12488;&#30340;&#12394;&#12371;&#12392;&#12399;, parse(type,str) &#12434;&#29992;&#12356;&#12427;</span>
+<span class="linenr">54: </span>itx = parse(<span style="color: #9370db;">Float64</span>,hashs[1][<span style="color: #ffa07a;">"fdata"</span>]) + parse(<span style="color: #9370db;">Float64</span>,hashs[2][<span style="color: #ffa07a;">"fdata"</span>])
+<span class="linenr">55: </span>println(itx)
+<span class="linenr">56: </span>
+<span class="linenr">57: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#26360;&#12365;&#36796;&#12415;</span>
+<span class="linenr">58: </span>open(ofile,<span style="color: #ffa07a;">"w"</span>) <span style="color: #20b2aa; font-weight: bold;">do</span> fp
+<span class="linenr">59: </span>   write(fp,join(head,<span style="color: #ffa07a;">"\t"</span>)*<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">60: </span>   <span style="color: #20b2aa; font-weight: bold;">for</span> d <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">61: </span>      write(fp,join(d,<span style="color: #ffa07a;">"\t"</span>)*<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">62: </span>   <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">63: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+Any["name","age","origin","gender","idata","fdata","type"]
+name
+0.25
+0.38
+0.63
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Ruby</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Ruby での注意点と参考 URL:<br />
+</p>
+<ul class="org-ul">
+<li>基本<br />
+<ul class="org-ul">
+<li>逆引きRuby - ファイルアクセス<br />
+<a href="http://bit.ly/2am8jkn">http://bit.ly/2am8jkn</a><br />
+</li>
+<li>【Ruby】表示メソッドについて（print,puts,p） - TASK NOTES<br />
+<a href="http://www.task-notes.com/entry/20141109/1415520719">http://www.task-notes.com/entry/20141109/1415520719</a><br />
+</li>
+</ul>
+</li>
+<li>hash<br />
+<ul class="org-ul">
+<li>【Ruby】配列とハッシュの基本的な使い方 - TASK NOTES<br />
+<a href="http://www.task-notes.com/entry/20141115/1416045573">http://www.task-notes.com/entry/20141115/1416045573</a><br />
+</li>
+</ul>
+</li>
+<li>型キャスト(to_f)<br />
+<ul class="org-ul">
+<li>数値クラスを変換する - 数値(Numeric)クラス - Ruby入門<br />
+<a href="http://www.rubylife.jp/ini/numeric_class/index2.html">http://www.rubylife.jp/ini/numeric_class/index2.html</a><br />
+</li>
+</ul>
+</li>
+<li>each_with_index (python の enumerate に相当)<br />
+<ul class="org-ul">
+<li>Python's enumerate in Ruby? - Stack Overflow<br />
+<a href="http://stackoverflow.com/questions/13936922/pythons-enumerate-in-ruby">http://stackoverflow.com/questions/13936922/pythons-enumerate-in-ruby</a><br />
+</li>
+</ul>
+</li>
+<li>join 等(文字列連結)<br />
+ruby の文字列連結は "+" あるいは "&lt;&lt;"<br />
+<ul class="org-ul">
+<li>Rubyの文字列連結に関して知っておくべきこと - Qiita<br />
+<a href="http://qiita.com/Kta-M/items/c7c2fb0b61b11d3a2c48">http://qiita.com/Kta-M/items/c7c2fb0b61b11d3a2c48</a><br />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr"> 1: </span>ifile=<span style="color: #ffa07a;">'input.txt'</span>
+<span class="linenr"> 2: </span>ofile=<span style="color: #ffa07a;">'output.ruby.txt'</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>fh=<span style="color: #76ee00;">open</span>(ifile,<span style="color: #ffa07a;">"r"</span>)
+<span class="linenr"> 5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">str=fh.read     # &#19968;&#27671;&#12395;&#20840;&#37096;&#35501;&#12415;&#36796;&#12416;&#22580;&#21512;</span>
+<span class="linenr"> 6: </span>cnt=0
+<span class="linenr"> 7: </span>head=[]    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">head=Array.new &#12391;&#12418;&#33391;&#12356;</span>
+<span class="linenr"> 8: </span>data=[]
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">while</span> li = fh.gets
+<span class="linenr">10: </span>  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print li</span>
+<span class="linenr">11: </span>  li=li.chomp         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25913;&#34892;&#21462;&#12426;&#38500;&#12365;</span>
+<span class="linenr">12: </span>  bf=li.split(<span style="color: #ffa07a;">"\t"</span>)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">tab &#12391; split</span>
+<span class="linenr">13: </span>  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(bf)</span>
+<span class="linenr">14: </span>  <span style="color: #cd853f;">#</span><span style="color: #cd853f;">exit</span>
+<span class="linenr">15: </span>  <span style="color: #20b2aa; font-weight: bold;">if</span> cnt==0
+<span class="linenr">16: </span>    head=bf
+<span class="linenr">17: </span>  <span style="color: #20b2aa; font-weight: bold;">else</span>
+<span class="linenr">18: </span>    data.push(bf)
+<span class="linenr">19: </span>  <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">20: </span>  cnt+=1
+<span class="linenr">21: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">22: </span>fh.close
+<span class="linenr">23: </span>
+<span class="linenr">24: </span><span style="color: #76ee00;">print</span>(head)
+<span class="linenr">25: </span><span style="color: #76ee00;">print</span>(<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">26: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">print(data[0])</span>
+<span class="linenr">27: </span><span style="color: #cd853f;">#</span><span style="color: #cd853f;">exit   &#12371;&#12371;&#12391;&#32066;&#12431;&#12427;&#12392;&#12365; (for debug)</span>
+<span class="linenr">28: </span>
+<span class="linenr">29: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hash &#12398;&#37197;&#21015;&#12395;&#12375;&#12390;&#12415;&#12427;.</span>
+<span class="linenr">30: </span>hashs=[]
+<span class="linenr">31: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dr <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">32: </span>  hash={}
+<span class="linenr">33: </span>  dr.each_with_index <span style="color: #20b2aa; font-weight: bold;">do</span> |d,j|   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">enumerate</span>
+<span class="linenr">34: </span>    dk=d
+<span class="linenr">35: </span>    <span style="color: #20b2aa; font-weight: bold;">if</span> <span style="color: #20b2aa; font-weight: bold;">not</span> d==<span style="color: #ffa07a;">''</span>
+<span class="linenr">36: </span>       <span style="color: #20b2aa; font-weight: bold;">if</span> j==1 <span style="color: #20b2aa; font-weight: bold;">or</span> j==4
+<span class="linenr">37: </span>         dk=d.to_i         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25972;&#25968;&#22411;&#12408;&#12461;&#12515;&#12473;&#12488;</span>
+<span class="linenr">38: </span>       <span style="color: #20b2aa; font-weight: bold;">elsif</span> j==5
+<span class="linenr">39: </span>         dk=d.to_f         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#28014;&#21205;&#23567;&#25968;&#28857;&#22411;&#12408;&#12461;&#12515;&#12473;&#12488;</span>
+<span class="linenr">40: </span>       <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">41: </span>    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">42: </span>    hash[head[j]]=dk
+<span class="linenr">43: </span>  <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">44: </span>  hashs.push(hash)
+<span class="linenr">45: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">46: </span>
+<span class="linenr">47: </span><span style="color: #76ee00;">print</span>(hashs[0])
+<span class="linenr">48: </span><span style="color: #76ee00;">print</span>(<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">49: </span>
+<span class="linenr">50: </span>itx = hashs[0][<span style="color: #ffa07a;">"fdata"</span>] + hashs[1][<span style="color: #ffa07a;">"fdata"</span>]
+<span class="linenr">51: </span><span style="color: #76ee00;">puts</span>(itx)
+<span class="linenr">52: </span>
+<span class="linenr">53: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">file &#26360;&#12365;&#20986;&#12375;</span>
+<span class="linenr">54: </span>ofh=<span style="color: #76ee00;">open</span>(ofile,<span style="color: #ffa07a;">"w"</span>)
+<span class="linenr">55: </span>ofh.write(head.join(<span style="color: #ffa07a;">"\t"</span>)+<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">56: </span><span style="color: #20b2aa; font-weight: bold;">for</span> dt <span style="color: #20b2aa; font-weight: bold;">in</span> data
+<span class="linenr">57: </span>   str=dt.join(<span style="color: #ffa07a;">"\t"</span>)
+<span class="linenr">58: </span>   ofh.write(str+<span style="color: #ffa07a;">"\n"</span>)
+<span class="linenr">59: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">60: </span>ofh.close
+</pre>
+</div>
+
+<pre class="example">
+["name", "age", "origin", "gender", "idata", "fdata", "type"]
+{"name"=&gt;"foo", "age"=&gt;10, "origin"=&gt;"jpn", "gender"=&gt;"M", "idata"=&gt;50, "fdata"=&gt;0.25, "type"=&gt;"X"}
+0.63
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> R</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+おまけ(1)<br />
+read.table でファイルを読むプログラムを一応作っておく.<br />
+</p>
+
+<p>
+R での注意点と参考 URL:<br />
+</p>
+<ul class="org-ul">
+<li>read.table()<br />
+<ul class="org-ul">
+<li>R-Source 40. ファイルからデータを読み込む<br />
+<a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/40.html">http://cse.naro.affrc.go.jp/takezawa/r-tips/r/40.html</a><br />
+</li>
+</ul>
+</li>
+<li>write.table() のパラメータ<br />
+<ul class="org-ul">
+<li>R: データ出力<br />
+<a href="http://www.is.titech.ac.jp/~mase/mase/html.jp/temp/write.table.jp.html">http://www.is.titech.ac.jp/~mase/mase/html.jp/temp/write.table.jp.html</a><br />
+</li>
+<li>R-Source 45. ファイルへのデータ出力<br />
+<a href="http://cse.naro.affrc.go.jp/takezawa/r-tips/r/45.html">http://cse.naro.affrc.go.jp/takezawa/r-tips/r/45.html</a><br />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>ifile <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">'input.txt'</span>
+<span class="linenr"> 2: </span>ofile <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">'output.R.txt'</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>data <span style="color: #1e90ff;">&lt;-</span> read.table(ifile,sep=<span style="color: #ffa07a;">"\t"</span>,head=T)
+<span class="linenr"> 5: </span>data
+<span class="linenr"> 6: </span>names(data)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">header &#12398;&#21517;&#21069;</span>
+<span class="linenr"> 7: </span>data[<span style="color: #ffa07a;">'name'</span>]   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12398;&#21462;&#24471;</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">quote=F  : "" &#12434;&#20184;&#12369;&#12394;&#12356;</span>
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">append=F : &#19978;&#26360;&#12365;</span>
+<span class="linenr">11: </span>write.table(data,ofile,quote=F,sep=<span style="color: #ffa07a;">"\t"</span>,col.names=T,row.names=F,append=F,na=<span style="color: #ffa07a;">""</span>)
+</pre>
+</div>
+
+<pre class="example">
+  name age origin gender idata fdata type
+1  foo  10    jpn      M    50  0.25    X
+2  bar  30    usa      F    25  0.38    P
+3 hoge  10    jpn      F     4  1.00    P
+4 fuga  40    eng      M    NA    NA    X
+5 fuga  35             F     9  0.10    X
+[1] "name"   "age"    "origin" "gender" "idata"  "fdata"  "type"  
+  name
+1  foo
+2  bar
+3 hoge
+4 fuga
+5 fuga
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Java</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+おまけ(2)<br />
+</p>
+
+<p>
+Java での注意点と参考 URL:<br />
+</p>
+<ul class="org-ul">
+<li>join(Java8)<br />
+<ul class="org-ul">
+<li>あなたのJavaコードをスッキリさせる、地味に便利な新API 10選（前編） - Taste of Tech Topics<br />
+<a href="http://acro-engineer.hatenablog.com/entry/2014/03/12/112402">http://acro-engineer.hatenablog.com/entry/2014/03/12/112402</a><br />
+</li>
+</ul>
+</li>
+<li>可変長の配列は List(ArrayList), hash は Map(HashMap) を用いるが何か面倒<br />
+push するために List という配列の拡張を使ったが, 何かイマイチな感じ.<br />
+<ul class="org-ul">
+<li>【Java】配列・リスト・マップの使い方についての基本 - TASK NOTES<br />
+<a href="http://www.task-notes.com/entry/20140923/1411477102">http://www.task-notes.com/entry/20140923/1411477102</a><br />
+</li>
+<li>ArrayListクラス - コレクション(ArrayList) - Java入門<br />
+<a href="http://www.javadrive.jp/start/arraylist/index1.html">http://www.javadrive.jp/start/arraylist/index1.html</a><br />
+</li>
+</ul>
+</li>
+<li>ファイル書き出し<br />
+<ul class="org-ul">
+<li>便利な書き込み用クラス - テキストファイルの入出力 - Java入門<br />
+<a href="http://www.javadrive.jp/start/stream/index7.html">http://www.javadrive.jp/start/stream/index7.html</a><br />
+</li>
+</ul>
+</li>
+<li>trim()<br />
+<ul class="org-ul">
+<li>先頭又は最後の空白を取り除く(trim) - Stringクラス<br />
+<a href="http://www.javadrive.jp/start/string_class/index4.html">http://www.javadrive.jp/start/string_class/index4.html</a><br />
+</li>
+</ul>
+</li>
+<li>拡張 for 文<br />
+<ul class="org-ul">
+<li>【Java】for文と拡張for文の違い - Qiita<br />
+<a href="http://qiita.com/Mocacamo/items/290457f9d378ad80ddba">http://qiita.com/Mocacamo/items/290457f9d378ad80ddba</a><br />
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-java"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">File</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">FileReader</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">BufferedReader</span>;
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">HashMap</span>;
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">Map</span>;
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">List</span>;
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">util</span>.<span style="color: #9370db;">ArrayList</span>;
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">FileWriter</span>;
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">BufferedWriter</span>;
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">import</span> <span style="color: #1e90ff;">java</span>.<span style="color: #1e90ff;">io</span>.<span style="color: #9370db;">PrintWriter</span>;
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">public</span> <span style="color: #20b2aa; font-weight: bold;">class</span> <span style="color: #9370db;">fread</span> {
+<span class="linenr">12: </span>  <span style="color: #20b2aa; font-weight: bold;">public</span> <span style="color: #20b2aa; font-weight: bold;">static</span> <span style="color: #9370db;">void</span> <span style="color: #00ff7f;">main</span>(<span style="color: #9370db;">String</span>[] <span style="color: #9acd32;">args</span>) {
+<span class="linenr">13: </span>    <span style="color: #9370db;">String</span> <span style="color: #9acd32;">ifile</span>=<span style="color: #ffa07a;">"input.txt"</span>;
+<span class="linenr">14: </span>    <span style="color: #9370db;">String</span> <span style="color: #9acd32;">ofile</span>=<span style="color: #ffa07a;">"output.java.txt"</span>;
+<span class="linenr">15: </span>
+<span class="linenr">16: </span>    <span style="color: #9370db;">List</span>&lt;<span style="color: #9370db;">Map</span>&gt; <span style="color: #9acd32;">data</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">ArrayList</span>();<span style="color: #4682b4; text-decoration: underline;"> </span>
+<span class="linenr">17: </span>    <span style="color: #9370db;">List</span>&lt;<span style="color: #9370db;">String</span>&gt; <span style="color: #9acd32;">head</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">ArrayList</span>();
+<span class="linenr">18: </span>    <span style="color: #20b2aa; font-weight: bold;">try</span> {
+<span class="linenr">19: </span>      <span style="color: #9370db;">File</span> <span style="color: #9acd32;">file</span>=<span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">File</span>(ifile);
+<span class="linenr">20: </span>      <span style="color: #9370db;">BufferedReader</span> <span style="color: #9acd32;">br</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">BufferedReader</span>(<span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">FileReader</span>(file));
+<span class="linenr">21: </span>      <span style="color: #9370db;">int</span> <span style="color: #9acd32;">cnt</span>=0;
+<span class="linenr">22: </span>      <span style="color: #9370db;">String</span> <span style="color: #9acd32;">str</span>;
+<span class="linenr">23: </span>      <span style="color: #20b2aa; font-weight: bold;">while</span>((str=br.readLine())!=<span style="color: #1e90ff;">null</span>) {
+<span class="linenr">24: </span>        <span style="color: #9370db;">String</span> [] <span style="color: #9acd32;">row</span>=str.split(<span style="color: #ffa07a;">"\t"</span>);
+<span class="linenr">25: </span>        <span style="color: #20b2aa; font-weight: bold;">if</span>(cnt==0) {
+<span class="linenr">26: </span>          <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">String</span> <span style="color: #9acd32;">s</span> : row) { <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#20309;&#12363;&#27671;&#25345;&#12385;&#24746;&#12356;&#12369;&#12393;</span>
+<span class="linenr">27: </span>             head.add(s);
+<span class="linenr">28: </span>          }
+<span class="linenr">29: </span>        }<span style="color: #20b2aa; font-weight: bold;">else</span> {
+<span class="linenr">30: </span>          <span style="color: #9370db;">Map</span>&lt;<span style="color: #9370db;">String</span>,<span style="color: #9370db;">String</span>&gt; <span style="color: #9acd32;">hash</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">HashMap</span>();
+<span class="linenr">31: </span>          <span style="color: #9370db;">int</span> <span style="color: #9acd32;">i</span>=0;
+<span class="linenr">32: </span>          <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">String</span> <span style="color: #9acd32;">s</span> : head) {
+<span class="linenr">33: </span>             hash.put(s,row[i++]);
+<span class="linenr">34: </span>          }
+<span class="linenr">35: </span>          data.add(hash);
+<span class="linenr">36: </span>        }
+<span class="linenr">37: </span>        cnt++;
+<span class="linenr">38: </span>      }
+<span class="linenr">39: </span>    }<span style="color: #20b2aa; font-weight: bold;">catch</span>(<span style="color: #9370db;">Exception</span> <span style="color: #9acd32;">e</span>) {
+<span class="linenr">40: </span>      System.out.println(e);
+<span class="linenr">41: </span>    }
+<span class="linenr">42: </span>    System.out.println(String.join(<span style="color: #ffa07a;">"\t"</span>,head));
+<span class="linenr">43: </span>    System.out.println(data.get(0).get(<span style="color: #ffa07a;">"name"</span>));
+<span class="linenr">44: </span>    <span style="color: #cd853f;">// </span><span style="color: #cd853f;">System.exit(0);  // &#32066;&#12431;&#12427;&#12392;&#12365;</span>
+<span class="linenr">45: </span>
+<span class="linenr">46: </span>    <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#12501;&#12449;&#12452;&#12523;&#26360;&#12365;&#20986;&#12375;</span>
+<span class="linenr">47: </span>    <span style="color: #20b2aa; font-weight: bold;">try</span> {
+<span class="linenr">48: </span>      <span style="color: #9370db;">File</span> <span style="color: #9acd32;">ofh</span>          = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">File</span>(ofile);
+<span class="linenr">49: </span>      <span style="color: #9370db;">FileWriter</span> <span style="color: #9acd32;">fw</span>     = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">FileWriter</span>(ofh);
+<span class="linenr">50: </span>      <span style="color: #9370db;">BufferedWriter</span> <span style="color: #9acd32;">bw</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">BufferedWriter</span>(fw);
+<span class="linenr">51: </span>      <span style="color: #9370db;">PrintWriter</span> <span style="color: #9acd32;">pw</span>    = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">PrintWriter</span>(bw);
+<span class="linenr">52: </span>      <span style="color: #9370db;">String</span> <span style="color: #9acd32;">prnt</span>=String.join(<span style="color: #ffa07a;">"\t"</span>,head)+<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">53: </span>      <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">Map</span> <span style="color: #9acd32;">mp</span> : data) {       <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#25313;&#24373; for</span>
+<span class="linenr">54: </span>        <span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #9370db;">String</span> <span style="color: #9acd32;">s</span> : head) {   <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#33510;&#32905;&#12398;&#31574;</span>
+<span class="linenr">55: </span>          prnt+=mp.get(s)+<span style="color: #ffa07a;">"\t"</span>;
+<span class="linenr">56: </span>        }
+<span class="linenr">57: </span>        prnt.trim();  <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#20808;&#38957;, &#26368;&#24460;&#12398;&#31354;&#30333;&#12434;&#21462;&#12426;&#38500;&#12367;</span>
+<span class="linenr">58: </span>        prnt+=<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">59: </span>      }
+<span class="linenr">60: </span>      System.out.print(prnt);
+<span class="linenr">61: </span>      pw.print(prnt);
+<span class="linenr">62: </span>      pw.close();
+<span class="linenr">63: </span>    }<span style="color: #20b2aa; font-weight: bold;">catch</span>(<span style="color: #9370db;">Exception</span> <span style="color: #9acd32;">e</span>) {
+<span class="linenr">64: </span>      System.out.println(e);
+<span class="linenr">65: </span>    }
+<span class="linenr">66: </span>  }
+<span class="linenr">67: </span>}
+</pre>
+</div>
+
+<pre class="example">
+name  age origin  gender  idata fdata type
+foo
+name  age origin  gender  idata fdata type
+foo 10  jpn M 50  0.25  X 
+bar 30  usa F 25  0.38  P 
+hoge  10  jpn F 4 1 P 
+fuga  40  eng M     X 
+fuga  35    F 9 0.1 X
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> かんそう</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+perl, python, ruby は似たような感じ.<br />
+ruby は書きやすかった. きっちりしてる感じ.<br />
+ruby に比べると python はやっぱり何か, 開きっぱなしで閉じてない感じがいまんとこしっくりこないんだけどなぁ.<br />
+常に何か忘れてるような, そんな一抹の不安を覚えたりします. 慣れればなんともないんでしょーか.<br />
+変数のスコープもよくわかんないし&#x2026;<br />
+Julia も上記の言語と同じような感じでいけるのかなぁと思っていたのですが, 何かいちいち勝手が違う感じ.<br />
+こんな感じでうまくいくかな, という適当さが全然通用しなかった. python, ruby は適当にやっても何とかなったんだけど&#x2026;<br />
+色々と調べることが多かった.<br />
+つーか文字列の連結が "*" って意味わかんないような&#x2026; こういうの検索とかで探しにくいから困るんだよなぁ.<br />
+"." か "+" か, 最悪 "&amp;" とか, わかりやすい感じにして欲しいなぁ&#x2026; あるいは concat とか.<br />
+R, Java はおまけでやってみましたが, いまいちうまく比較できなかったのでやらなくてもよかったかも.<br />
+</p>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Julia Essentials のまとめ]]></title>
+    <link href="http://saito1369.github.io/blog/2017-03-18-0103_Julia_Essentials.html"/>
+    <updated>2017-03-18T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/0103_Julia_Essentials</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Common Data Types</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 真偽値</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. julia</a></li>
+<li><a href="#sec-1-1-2">1.1.2. perl</a></li>
+<li><a href="#sec-1-1-3">1.1.3. python</a></li>
+<li><a href="#sec-1-1-4">1.1.4. R</a></li>
+<li><a href="#sec-1-1-5">1.1.5. Ruby</a></li>
+<li><a href="#sec-1-1-6">1.1.6. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 整数及び浮動小数点</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. julia</a></li>
+<li><a href="#sec-1-2-2">1.2.2. perl</a></li>
+<li><a href="#sec-1-2-3">1.2.3. python</a></li>
+<li><a href="#sec-1-2-4">1.2.4. R</a></li>
+<li><a href="#sec-1-2-5">1.2.5. ruby</a></li>
+<li><a href="#sec-1-2-6">1.2.6. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. 文字列</a></li>
+<li><a href="#sec-1-4">1.4. タプル</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. julia</a></li>
+<li><a href="#sec-1-4-2">1.4.2. python</a></li>
+<li><a href="#sec-1-4-3">1.4.3. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. 配列</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. julia</a></li>
+<li><a href="#sec-1-5-2">1.5.2. perl</a></li>
+<li><a href="#sec-1-5-3">1.5.3. python</a></li>
+<li><a href="#sec-1-5-4">1.5.4. R</a></li>
+<li><a href="#sec-1-5-5">1.5.5. ruby</a></li>
+<li><a href="#sec-1-5-6">1.5.6. numpy</a></li>
+<li><a href="#sec-1-5-7">1.5.7. まとめ</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-6">1.6. 辞書(hash)</a>
+<ul>
+<li><a href="#sec-1-6-1">1.6.1. julia</a></li>
+<li><a href="#sec-1-6-2">1.6.2. perl</a></li>
+<li><a href="#sec-1-6-3">1.6.3. python</a></li>
+<li><a href="#sec-1-6-4">1.6.4. ruby</a></li>
+<li><a href="#sec-1-6-5">1.6.5. js</a></li>
+<li><a href="#sec-1-6-6">1.6.6. まとめ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Basic file I/O</a></li>
+<li><a href="#sec-3">3. 繰り返し</a>
+<ul>
+<li><a href="#sec-3-1">3.1. julia</a></li>
+<li><a href="#sec-3-2">3.2. perl</a></li>
+<li><a href="#sec-3-3">3.3. python</a></li>
+<li><a href="#sec-3-4">3.4. ruby</a></li>
+<li><a href="#sec-3-5">3.5. R</a></li>
+<li><a href="#sec-3-6">3.6. js</a></li>
+<li><a href="#sec-3-7">3.7. まとめ</a></li>
+<li><a href="#sec-3-8">3.8. 内包表記</a>
+<ul>
+<li><a href="#sec-3-8-1">3.8.1. julia</a></li>
+<li><a href="#sec-3-8-2">3.8.2. python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 比較</a>
+<ul>
+<li><a href="#sec-4-1">4.1. julia</a></li>
+<li><a href="#sec-4-2">4.2. perl</a></li>
+<li><a href="#sec-4-3">4.3. python</a></li>
+<li><a href="#sec-4-4">4.4. ruby</a></li>
+<li><a href="#sec-4-5">4.5. R</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 関数</a>
+<ul>
+<li><a href="#sec-5-1">5.1. julia</a></li>
+<li><a href="#sec-5-2">5.2. まとめ</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-03-18 Sat 15:18&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-02-21 Wed 19:19&gt;</span></span><br />
+</p>
+<p>
+<a href="https://lectures.quantecon.org/jl/julia_essentials.html">https://lectures.quantecon.org/jl/julia_essentials.html</a><br />
+をもとにして, julia 言語での書き方を見てみたのでその記録.<br />
+混乱は忘却の素ともいうので, 自分がちょっとだけ知ってる他の言語での書き方との違いを比較しながらみていこうと思う.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Common Data Types</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+まずは基本的な型についてみていく.<br />
+Julia は他の script 言語とひかくして<br />
+型の取扱いがちょっとめんどくさい印象.<br />
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 真偽値</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+true, false は言語によって微妙に取扱いがことなる.<br />
+0 を true/false どちらに入れるかとか?<br />
+各言語でどーなってるのか比較.<br />
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> julia</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+typeof: Bool<br />
+値:   true, false<br />
+</p>
+
+<p>
+julia では Boolian 値は true, false (全部小文字)<br />
+0, 1 は自動で Bool に直してくれない(java と同じ).<br />
+いちいち convert(型, 値) としないといけないようです.<br />
+</p>
+
+<p>
+<a href="http://docs.julialang.org/en/release-0.4/manual/conversion-and-promotion/">http://docs.julialang.org/en/release-0.4/manual/conversion-and-promotion/</a><br />
+julia のこの型指定, これからも色々と出て来るみたいだけどちょっと面倒なかんじ.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">true, false &#12364;&#20104;&#32004;&#35486;(&#23567;&#25991;&#23383;&#12391;&#26360;&#12367;)</span>
+x=<span style="color: #1e90ff;">true</span>
+println(x)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22411;&#12399; Bool &#22411;</span>
+println(typeof(x))
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12435;&#12394;&#24863;&#12376;&#12391;&#12363;&#12369;&#12427;.</span>
+y= 1 &gt; 2
+println(y)
+
+<span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"T+F = %d\n"</span>,<span style="color: #1e90ff;">true</span> + <span style="color: #1e90ff;">false</span>)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25968;&#20516;&#12395;&#30452;&#12377;&#12392; true &#12399; 1, false &#12399; 0</span>
+<span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"sum=%d\n"</span>,sum([<span style="color: #1e90ff;">true</span>,<span style="color: #1e90ff;">false</span>,<span style="color: #1e90ff;">false</span>,<span style="color: #1e90ff;">true</span>]))
+
+<span style="color: #cd853f;">#</span><span style="color: #cd853f;">if(1) &#12392;&#12363;&#12420;&#12427;&#12392;  error &#12392;&#12394;&#12427;. &#20197;&#19979;&#12398;&#27096;&#12395;&#26360;&#12367;&#24517;&#35201;&#12364;&#12354;&#12427;.</span>
+<span style="color: #20b2aa; font-weight: bold;">if</span>(convert(<span style="color: #9370db;">Bool</span>,1))
+    println(<span style="color: #ffa07a;">"1 is true"</span>)
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+
+<span style="color: #cd853f;">#</span><span style="color: #cd853f;">if(0) &#12392;&#12363;&#26360;&#12367;&#12392;&#12371;&#12428;&#12418; error &#12392;&#12394;&#12427;</span>
+<span style="color: #20b2aa; font-weight: bold;">if</span>(convert(<span style="color: #9370db;">Bool</span>,0))
+    println(<span style="color: #ffa07a;">"pass"</span>)
+<span style="color: #20b2aa; font-weight: bold;">else</span>
+    println(<span style="color: #ffa07a;">"0 is false"</span>)
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+true
+Bool
+false
+T+F = 1
+sum=2
+1 is true
+0 is false
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> perl</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+perl には, true, false に相当する語句がない?<br />
+0, '0', undef, '', (), ('') は false<br />
+それ以外は                     true<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr">3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21442;&#29031;:</span>
+<span class="linenr">4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">http://stackoverflow.com/questions/1036347/how-do-i-use-boolean-variables-in-perl</span>
+<span class="linenr">5: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">"true\n"</span>  <span style="color: #20b2aa; font-weight: bold;">if</span>(1);
+<span class="linenr">6: </span><span style="color: #ff83fa;">print</span> <span style="color: #ffa07a;">"false\n"</span> <span style="color: #20b2aa; font-weight: bold;">unless</span>(0);
+</pre>
+</div>
+
+<pre class="example">
+true
+false
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> python</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+python は, True, False(一文字目が大文字)<br />
+1 は True. 0 は False<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #1e90ff;">True</span>):
+<span class="linenr"> 2: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"True"</span>)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #1e90ff;">False</span>):
+<span class="linenr"> 5: </span>    <span style="color: #20b2aa; font-weight: bold;">pass</span>
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">else</span>:
+<span class="linenr"> 7: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"False"</span>)
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(1):
+<span class="linenr">10: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"1 is True"</span>)
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(0):
+<span class="linenr">13: </span>    <span style="color: #20b2aa; font-weight: bold;">pass</span>
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">else</span>:
+<span class="linenr">15: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"0 is False"</span>)
+</pre>
+</div>
+
+<pre class="example">
+True
+False
+1 is True
+0 is False
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> R</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+R は TRUE, FALSE (全部大文字)<br />
+1 は TRUE, 0 は FALSE<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #9370db;">TRUE</span>) {
+<span class="linenr"> 2: </span>    print(<span style="color: #ffa07a;">"TRUE"</span>)
+<span class="linenr"> 3: </span>}
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #9370db;">FALSE</span>) {
+<span class="linenr"> 5: </span>    print(<span style="color: #ffa07a;">"pass"</span>)
+<span class="linenr"> 6: </span>} <span style="color: #20b2aa; font-weight: bold;">else</span> {
+<span class="linenr"> 7: </span>    print(<span style="color: #ffa07a;">"FALSE"</span>)
+<span class="linenr"> 8: </span>}
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(1) {
+<span class="linenr">10: </span>    print(<span style="color: #ffa07a;">"1 is TRUE"</span>)
+<span class="linenr">11: </span>}
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(0) {
+<span class="linenr">13: </span>    print(<span style="color: #ffa07a;">"pass"</span>)
+<span class="linenr">14: </span>}<span style="color: #20b2aa; font-weight: bold;">else</span> {
+<span class="linenr">15: </span>    print(<span style="color: #ffa07a;">"0 is FALSE"</span>)
+<span class="linenr">16: </span>}
+</pre>
+</div>
+
+<pre class="example">
+[1] "TRUE"
+[1] "FALSE"
+[1] "1 is TRUE"
+[1] "0 is FALSE"
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-5" class="outline-4">
+<h4 id="sec-1-1-5"><span class="section-number-4">1.1.5</span> Ruby</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<p>
+Ruby は true/TRUE どっちでもいいのか?<br />
+他の言語と違い 0 は true!! (何かやな感じ)<br />
+false と nil 以外は true として扱われる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #9370db;">TRUE</span>)
+<span class="linenr"> 2: </span>    <span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"TRUE"</span>)
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #1e90ff;">true</span>)
+<span class="linenr"> 6: </span>    <span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"true"</span>)
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(<span style="color: #1e90ff;">false</span>)
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">else</span>
+<span class="linenr">11: </span>    <span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"false"</span>)
+<span class="linenr">12: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"FALSE"</span>)        <span style="color: #20b2aa; font-weight: bold;">unless</span>(<span style="color: #9370db;">FALSE</span>)
+<span class="linenr">15: </span><span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"nil is FALSE"</span>) <span style="color: #20b2aa; font-weight: bold;">unless</span>(<span style="color: #1e90ff;">nil</span>)
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(0)
+<span class="linenr">18: </span>   <span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"0 is true!!"</span>)
+<span class="linenr">19: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+TRUE
+true
+false
+FALSE
+nil is FALSE
+0 is true!!
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-6" class="outline-4">
+<h4 id="sec-1-1-6"><span class="section-number-4">1.1.6</span> まとめ</h4>
+<div class="outline-text-4" id="text-1-1-6">
+<p>
+微妙に違ってて間違えそう.<br />
+表でまとめておく.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">言語</th>
+<th scope="col" class="left">true を示すもじ</th>
+<th scope="col" class="left">0 の扱い</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">true</td>
+<td class="left">false (convert(Bool,0)</td>
+</tr>
+
+<tr>
+<td class="left">perl</td>
+<td class="left">1</td>
+<td class="left">false</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">True</td>
+<td class="left">false</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">TRUE</td>
+<td class="left">false</td>
+</tr>
+
+<tr>
+<td class="left">ruby</td>
+<td class="left">true/TRUE</td>
+<td class="left">true</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+もう既にまとめがあったのでこっちを参照した方がよいでしょう.<br />
+<a href="http://blog.mirakui.com/entry/20090604/truefalse">http://blog.mirakui.com/entry/20090604/truefalse</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 整数及び浮動小数点</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> julia</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+typeof: Int64, Float64<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">1.0 &#12392;&#26360;&#12367;&#12392;&#33258;&#21205;&#12391; Float64</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">1   &#12392;&#26360;&#12367;&#12392;&#33258;&#21205;&#12391; Int64</span>
+println(<span style="color: #ffa07a;">"type of 1.0="</span>,typeof(1.0))
+println(<span style="color: #ffa07a;">"type of 1  ="</span>,typeof(1))
+
+x=2
+y=1.0
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#33258;&#21205;&#12391;&#22411;&#12434; Float64 &#12395;&#12375;&#12390;&#12367;&#12428;&#12427;.</span>
+println(<span style="color: #ffa07a;">"x*y="</span>,x*y)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#32047;&#20055;&#12399; ^ &#12391;&#26360;&#12367;(** &#12391;&#12399;&#12394;&#12356;. LaTeX &#25968;&#24335;)</span>
+println(<span style="color: #ffa07a;">"x^2="</span>,x^2)
+println(<span style="color: #ffa07a;">"y/x="</span>,y/x)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">2*x &#12399; 2x &#12392;&#26360;&#12369;&#12427;(&#24517;&#35201;&#12354;&#12427;&#12398;&#12363;&#12394;...)</span>
+println(<span style="color: #ffa07a;">"2x-3y="</span>,2x-3y)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">+, * &#12434;&#38306;&#25968;&#12392;&#12415;&#12394;&#12375;&#12390;&#24460;&#12429;&#12395;&#24341;&#25968;, &#30340;&#12394;&#26360;&#12365;&#26041;&#12418;&#12391;&#12365;&#12427;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12394;&#12427;&#12411;&#12393;. &#19968;&#36011;&#12375;&#12390;&#12390;&#12356;&#12356;&#12424;&#12358;&#12394;.</span>
+println(<span style="color: #ffa07a;">"10+20="</span>,+(10,20))
+println(<span style="color: #ffa07a;">"10*20="</span>,*(10,20))
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#35079;&#32032;&#25968; im</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12354;&#12435;&#12414;&#12426;&#20351;&#12431;&#12394;&#12356;&#12392;&#24605;&#12358;&#12369;&#12393;&#12392;&#12426;&#12354;&#12360;&#12378;&#26360;&#12356;&#12390;&#12362;&#12367;.</span>
+x=1+2im
+println(<span style="color: #ffa07a;">"1+2i="</span>,x)
+y=1-2im
+println(<span style="color: #ffa07a;">"1-2i="</span>,y)
+x*y
+println(<span style="color: #ffa07a;">"x*y="</span>,x*y)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">"" &#12398;&#20013;&#12391;&#22793;&#25968;&#12434;&#26360;&#12363;&#12379;&#12383;&#12356;&#12392;&#12365;&#12399;, $&#22793;&#25968; &#12392;&#26360;&#12367;&#12392;&#12424;&#12356;.</span>
+println(<span style="color: #ffa07a;">"x=$x"</span>)
+println(<span style="color: #ffa07a;">"x+y=$(x+y)"</span>)
+</pre>
+</div>
+
+<pre class="example">
+type of 1.0=Float64
+type of 1  =Int64
+x*y=2.0
+x^2=4
+y/x=0.5
+2x-3y=1.0
+10+20=30
+10*20=200
+1+2i=1 + 2im
+1-2i=1 - 2im
+x*y=5 + 0im
+x=1 + 2im
+x+y=2 + 0im
+</pre>
+
+<p>
+julia が他のと違うのは, 2x 的な表現で書けること位.<br />
+何か気持ち悪いので多分使わないと思うけど&#x2026;<br />
+</p>
+
+<p>
+以下別の言語でどーかくのか.<br />
+累乗だけ書いておきます.<br />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> perl</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$x</span>=10;
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$y</span>=$x**3;
+<span style="color: #ff83fa;">print</span> $y.<span style="color: #ffa07a;">"\n"</span>;
+</pre>
+</div>
+
+<pre class="example">
+1000
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> python</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #9acd32;">x</span>=10
+<span style="color: #9acd32;">y</span>=x**3
+<span style="color: #20b2aa; font-weight: bold;">print</span>(y)
+</pre>
+</div>
+
+<pre class="example">
+1000
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> R</h4>
+<div class="outline-text-4" id="text-1-2-4">
+<div class="org-src-container">
+
+<pre class="src src-R">x <span style="color: #1e90ff;">&lt;-</span> 10
+y <span style="color: #1e90ff;">&lt;-</span> x**3
+y
+z <span style="color: #1e90ff;">&lt;-</span> x^3  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12428;&#12418;&#12356;&#12369;&#12427;&#65281;&#65281;</span>
+z
+</pre>
+</div>
+
+<pre class="example">
+[1] 1000
+[1] 1000
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-5" class="outline-4">
+<h4 id="sec-1-2-5"><span class="section-number-4">1.2.5</span> ruby</h4>
+<div class="outline-text-4" id="text-1-2-5">
+<div class="org-src-container">
+
+<pre class="src src-ruby">x = 10
+y = x**3
+<span style="color: #76ee00;">puts</span> y
+</pre>
+</div>
+
+<pre class="example">
+1000
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-6" class="outline-4">
+<h4 id="sec-1-2-6"><span class="section-number-4">1.2.6</span> まとめ</h4>
+<div class="outline-text-4" id="text-1-2-6">
+<p>
+一応まとめておきます.<br />
+julia だけ累乗は 2^3 みたいに書くらしい.<br />
+こういうオリジナリティいらないんだけどなー(注: R でも同じように書けるっぽい).<br />
+ついつい 2**3 って書いてしまいそう.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">言語</th>
+<th scope="col" class="left">累乗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">2^3</td>
+</tr>
+
+<tr>
+<td class="left">perl</td>
+<td class="left">2**3</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">2**3</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">2**3</td>
+</tr>
+
+<tr>
+<td class="left">ruby</td>
+<td class="left">2**3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> 文字列</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+typeof: String<br />
+</p>
+
+<p>
+文字列操作は自分の場合 perl でやったほうが早そう.<br />
+なので julia での書き方だけさらっと見ておく.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25991;&#23383;&#21015;&#12398;&#36899;&#32080;&#12395;&#12399;, &#20309;&#12392; "*" &#12434;&#20351;&#12358;.</span>
+<span class="linenr"> 2: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20309;&#12391;&#12371;&#12398;&#35352;&#21495;&#12394;&#12398;&#12363;...</span>
+<span class="linenr"> 3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12431;&#12363;&#12425;&#12435;&#12369;&#12393;&#20309;&#12363;&#28145;&#12356;&#29702;&#30001;&#12364;&#12354;&#12427;&#12435;&#12384;&#12429;&#12358;.</span>
+<span class="linenr"> 4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12388;&#12540;&#12363; perl &#12392;&#21516;&#12376; "." &#12392;&#12363; python, Java &#12398; "+" &#12391;&#12356;&#12356;&#12424;&#12358;&#12394;...</span>
+<span class="linenr"> 5: </span>fb = <span style="color: #ffa07a;">"foo"</span> * <span style="color: #ffa07a;">"bar"</span>
+<span class="linenr"> 6: </span>println(<span style="color: #ffa07a;">"concat foo and  bar = foo * bar: "</span>,fb)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>s=<span style="color: #ffa07a;">"Charlie don't surf"</span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">perl &#12391;&#12418;&#12362;&#12394;&#12376;&#12415;&#12398; split &#38306;&#25968;</span>
+<span class="linenr">10: </span>println(split(s))
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25991;&#23383;&#21015;&#12398;&#32622;&#25563;</span>
+<span class="linenr">13: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12398;&#36794;&#12399;&#23455;&#38555;&#12395;&#20351;&#12358;&#12424;&#12358;&#12395;&#12394;&#12387;&#12390;&#12363;&#12425;&#35443;&#12375;&#12367;&#35519;&#12409;&#12424;&#12358;</span>
+<span class="linenr">14: </span>println(replace(s,<span style="color: #ffa07a;">"surf"</span>,<span style="color: #ffa07a;">"ski"</span>))
+<span class="linenr">15: </span>
+<span class="linenr">16: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">split(&#25991;&#23383;&#21015;,&#20998;&#21106;&#25991;&#23383;)</span>
+<span class="linenr">17: </span>println(split(<span style="color: #ffa07a;">"fee,fi,fo"</span>,<span style="color: #ffa07a;">","</span>))
+<span class="linenr">18: </span>
+<span class="linenr">19: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">trim</span>
+<span class="linenr">20: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21069;&#24460;&#12398;&#31354;&#30333;&#21462;&#12426;&#38500;&#12365;&#12395;&#12399; strip &#12392;&#12356;&#12358;&#38306;&#25968;&#12364;&#12354;&#12427;.</span>
+<span class="linenr">21: </span>println(strip(<span style="color: #ffa07a;">" foobar "</span>))
+<span class="linenr">22: </span>
+<span class="linenr">23: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25991;&#23383;&#21015;&#12398;&#20013;&#12363;&#12425;&#25968;&#20516;&#12434;&#12415;&#12388;&#12369;&#12427;.</span>
+<span class="linenr">24: </span>println(match(r<span style="color: #ffa07a;">"(\d+)"</span>,<span style="color: #ffa07a;">"Top 10"</span>))
+</pre>
+</div>
+
+<pre class="example">
+concat foo and  bar = foo * bar: foobar
+SubString{String}["Charlie","don't","surf"]
+Charlie don't ski
+SubString{String}["fee","fi","fo"]
+foobar
+RegexMatch("10", 1="10")
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> タプル</h3>
+<div class="outline-text-3" id="text-1-4">
+</div><div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> julia</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<p>
+typeof: Tuple, Array<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">tuple &#12398;&#23459;&#35328;</span>
+<span class="linenr">2: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x = ("foo","bar") &#12391;&#12418;&#12424;&#12356;.</span>
+<span class="linenr">3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x = "foo", "bar"  &#12391;&#12418;&#12424;&#12356;.</span>
+<span class="linenr">4: </span>x=tuple(<span style="color: #ffa07a;">"foo"</span>,<span style="color: #ffa07a;">"bar"</span>)
+<span class="linenr">5: </span>println(x)
+<span class="linenr">6: </span>println(typeof(x))
+<span class="linenr">7: </span>w1, w2 = x
+<span class="linenr">8: </span>println(w1)
+<span class="linenr">9: </span>print(length(x))
+</pre>
+</div>
+
+<pre class="example">
+("foo","bar")
+Tuple{String,String}
+foo
+2
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-2" class="outline-4">
+<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> python</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<p>
+python での宣言<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #9acd32;">x</span>=<span style="color: #76ee00;">tuple</span>([1,2,3])
+<span style="color: #9acd32;">y</span>=(2,3,4)
+<span style="color: #9acd32;">z</span>=x+y
+<span style="color: #20b2aa; font-weight: bold;">print</span>(z)
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">type</span>(z))
+<span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">len</span>(z))
+<span style="color: #20b2aa; font-weight: bold;">for</span> p <span style="color: #20b2aa; font-weight: bold;">in</span> z:
+    <span style="color: #20b2aa; font-weight: bold;">print</span>(p)
+</pre>
+</div>
+
+<pre class="example">
+(1, 2, 3, 2, 3, 4)
+&lt;class 'tuple'&gt;
+6
+1
+2
+3
+2
+3
+4
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-3" class="outline-4">
+<h4 id="sec-1-4-3"><span class="section-number-4">1.4.3</span> まとめ</h4>
+<div class="outline-text-4" id="text-1-4-3">
+<p>
+まとめ表です.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">言語</th>
+<th scope="col" class="left">宣言</th>
+<th scope="col" class="left">長さ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">tuple(1,2,3)</td>
+<td class="left">length(x)</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">tuple([1,2,3])</td>
+<td class="left">len(x)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> 配列</h3>
+<div class="outline-text-3" id="text-1-5">
+</div><div id="outline-container-sec-1-5-1" class="outline-4">
+<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> julia</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<p>
+julia では配列の添字は 1 はじまり!!<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#21015;&#12398;&#23459;&#35328;</span>
+<span class="linenr">2: </span>x= [10,20,30,40]
+<span class="linenr">3: </span>println(x)
+<span class="linenr">4: </span>println(typeof(x))
+<span class="linenr">5: </span>println(<span style="color: #ffa07a;">"x[end  ]="</span>,x[<span style="color: #20b2aa; font-weight: bold;">end</span>])
+<span class="linenr">6: </span>println(<span style="color: #ffa07a;">"x[end-1]="</span>,x[<span style="color: #20b2aa; font-weight: bold;">end</span>-1])
+<span class="linenr">7: </span>println(<span style="color: #ffa07a;">"x[1:3]  ="</span>,x[1:3])
+<span class="linenr">8: </span>println(<span style="color: #ffa07a;">"x[2:end]="</span>,x[2:<span style="color: #20b2aa; font-weight: bold;">end</span>])
+</pre>
+</div>
+
+<pre class="example">
+[10,20,30,40]
+Array{Int64,1}
+x[end  ]=40
+x[end-1]=30
+x[1:3]  =[10,20,30]
+x[2:end]=[20,30,40]
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25991;&#23383;&#21015;&#12392;&#37197;&#21015;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37096;&#20998;&#25991;&#23383;&#21015;</span>
+println(<span style="color: #ffa07a;">"foobar"</span>[3:<span style="color: #20b2aa; font-weight: bold;">end</span>])
+</pre>
+</div>
+
+<pre class="example">
+obar
+</pre>
+
+<p>
+配列に関する書き方いろいろ.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#21015;&#12395;&#12388;&#12356;&#12390;</span>
+<span class="linenr"> 2: </span>a=[1,2,3]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12505;&#12463;&#12488;&#12523;</span>
+<span class="linenr"> 3: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"array a = %s\n"</span>, a)
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">"," &#12434;&#12388;&#12369;&#12394;&#12356;&#12391;&#12363;&#12367;&#12371;&#12392;&#12418;&#12391;&#12365;&#12427;.</span>
+<span class="linenr"> 6: </span>b=[1 2 3]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#12505;&#12463;&#12488;&#12523;&#12395;&#12394;&#12427;.</span>
+<span class="linenr"> 7: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"array b = %s\n"</span>, b)
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#21015;&#12399;&#20197;&#19979;&#12398;&#12424;&#12358;&#12395;&#23459;&#35328;</span>
+<span class="linenr">10: </span>mat=[1 4 7; 2 5 8; 3 6 9]
+<span class="linenr">11: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat[2,1]  =%d\n"</span>,mat[2,1]) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">2 &#34892; 1 &#21015;&#30446;</span>
+<span class="linenr">12: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat[1,3]  =%d\n"</span>,mat[1,3])
+<span class="linenr">13: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat[1,end]=%d\n"</span>,mat[1,<span style="color: #20b2aa; font-weight: bold;">end</span>])
+<span class="linenr">14: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat[4]    =%d\n"</span>,mat[4])
+<span class="linenr">15: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat[end]  =%d\n"</span>,mat[<span style="color: #20b2aa; font-weight: bold;">end</span>])
+<span class="linenr">16: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat=%s\n"</span>,mat)
+<span class="linenr">17: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat'=%s\n"</span>,mat')  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#36578;&#32622;&#34892;&#21015; &#12395;&#12399; ' &#12434;&#12388;&#12369;&#12427;</span>
+<span class="linenr">18: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mat'=%s\n"</span>,transpose(mat)) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">transpose &#38306;&#25968;&#12391;&#12418;&#12424;&#12356;</span>
+<span class="linenr">19: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">exit()</span>
+<span class="linenr">20: </span>
+<span class="linenr">21: </span>col=[1,2,3] <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21015;&#12505;&#12463;&#12488;&#12523;</span>
+<span class="linenr">22: </span>row=[1 2 3] <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#12505;&#12463;&#12488;&#12523;</span>
+<span class="linenr">23: </span>
+<span class="linenr">24: </span>inn=row*col <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#12388;&#12375;&#12363;&#35201;&#32032;&#12434;&#25345;&#12383;&#12394;&#12356;&#37197;&#21015;</span>
+<span class="linenr">25: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"inner product=%d\n"</span>,inn[1]) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#35201;&#32032;&#12399; 1 &#12363;&#12425;&#22987;&#12414;&#12427;.</span>
+<span class="linenr">26: </span>
+<span class="linenr">27: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22411;&#12398;&#34920;&#31034;</span>
+<span class="linenr">28: </span>println(typeof(inn))
+<span class="linenr">29: </span>
+<span class="linenr">30: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#21015;&#21021;&#26399;&#21270;</span>
+<span class="linenr">31: </span>xs = zeros(<span style="color: #9370db;">Float64</span>,5)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#37197;&#21015;&#12434; 0 &#12391;&#21021;&#26399;&#21270;</span>
+<span class="linenr">32: </span>print(<span style="color: #ffa07a;">"xs ="</span>)
+<span class="linenr">33: </span>println(xs)
+<span class="linenr">34: </span>
+<span class="linenr">35: </span>xs2=[0.0 <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:5] <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12522;&#12473;&#12488;&#20869;&#21253;&#34920;&#35352;</span>
+<span class="linenr">36: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"xs2=%s\n"</span>,xs2)
+<span class="linenr">37: </span>
+<span class="linenr">38: </span>x1=ones(<span style="color: #9370db;">Float64</span>,5) <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#12391;&#21021;&#26399;&#21270;</span>
+<span class="linenr">39: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x1=ones(5)       # Float64 &#12399;&#30465;&#30053;&#21487;&#33021;</span>
+<span class="linenr">40: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"x1=%s\n"</span>,x1)
+<span class="linenr">41: </span>
+<span class="linenr">42: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21336;&#20301;&#34892;&#21015;</span>
+<span class="linenr">43: </span>mt0=eye(<span style="color: #9370db;">Float64</span>,3)
+<span class="linenr">44: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"mt0=%s\n"</span>,mt0)
+<span class="linenr">45: </span>
+<span class="linenr">46: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">3x4 &#34892;&#21015;(&#21021;&#26399;&#21270;&#12394;&#12375;)</span>
+<span class="linenr">47: </span>m34=<span style="color: #9370db;">Array</span>(<span style="color: #9370db;">Float64</span>,(3,4))
+<span class="linenr">48: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#36969;&#24403;&#12394;&#20516;&#12364;&#20837;&#12387;&#12390;&#12427;</span>
+<span class="linenr">49: </span><span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"m34=%s\n"</span>,m34)
+</pre>
+</div>
+
+<pre class="example">
+array a = [1,2,3]
+array b = [1 2 3]
+mat[2,1]  =2
+mat[1,3]  =7
+mat[1,end]=7
+mat[4]    =4
+mat[end]  =9
+mat=[1 4 7; 2 5 8; 3 6 9]
+mat'=[1 2 3; 4 5 6; 7 8 9]
+mat'=[1 2 3; 4 5 6; 7 8 9]
+inner product=14
+Array{Int64,1}
+xs =[0.0,0.0,0.0,0.0,0.0]
+xs2=[0.0,0.0,0.0,0.0,0.0]
+x1=[1.0,1.0,1.0,1.0,1.0]
+mt0=[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]
+m34=[2.22637e-314 2.22637e-314 0.0 0.0; 2.22619e-314 2.22619e-314 0.0 0.0; 2.22619e-314 2.22619e-314 0.0 0.0]
+</pre>
+
+<p>
+他言語との比較用<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>ar = [ i*2 <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:9 ]
+<span class="linenr">2: </span>println(length(ar))
+<span class="linenr">3: </span>push!(ar,1)
+<span class="linenr">4: </span>unshift!(ar,2)
+<span class="linenr">5: </span>pop!(ar)
+<span class="linenr">6: </span>shift!(ar)
+<span class="linenr">7: </span>ax=[1,2]
+<span class="linenr">8: </span>append!(ar,ax)
+<span class="linenr">9: </span>println(ar)
+</pre>
+</div>
+
+<pre class="example">
+9
+[2,4,6,8,10,12,14,16,18,1,2]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-2" class="outline-4">
+<h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> perl</h4>
+<div class="outline-text-4" id="text-1-5-2">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">Data::Dumper</span>;
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$arr</span>=[1 .. 9];
+<span class="linenr"> 6: </span><span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span> = <span style="color: #ff83fa;">map</span> {$_*2} <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>;
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span style="color: #ff83fa;">print</span> <span style="color: #ff83fa;">scalar</span>(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>).<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr"> 9: </span><span style="color: #ff83fa;">push</span>(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>,1);            <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429; &#12367;&#12387;&#12388;&#12369;</span>
+<span class="linenr">10: </span><span style="color: #ff83fa;">unshift</span>(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>,1);         <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21069;   &#12367;&#12387;&#12388;&#12369;</span>
+<span class="linenr">11: </span><span style="color: #ff83fa;">pop</span>(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>);               <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429; &#21066;&#38500;</span>
+<span class="linenr">12: </span><span style="color: #ff83fa;">shift</span>(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>);             <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21069;   &#21066;&#38500;</span>
+<span class="linenr">13: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@ax</span>=(1,2);
+<span class="linenr">14: </span><span style="color: #ff83fa;">push</span>(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@</span><span style="color: #9acd32;">$arr</span>,<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@ax</span>);
+<span class="linenr">15: </span>
+<span class="linenr">16: </span><span style="color: #ff83fa;">print</span> Data::Dumper-&gt;Dump([$arr]);
+</pre>
+</div>
+
+<pre class="example">
+9
+$VAR1 = [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          1,
+          2
+        ];
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-3" class="outline-4">
+<h4 id="sec-1-5-3"><span class="section-number-4">1.5.3</span> python</h4>
+<div class="outline-text-4" id="text-1-5-3">
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #9acd32;">arr</span> = [ i*2 <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> <span style="color: #76ee00;">range</span>(1,10)]
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">len</span>(arr))  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#38263;&#12373;</span>
+<span class="linenr">3: </span>arr.append(1)    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429;&#12395;&#12367;&#12387;&#12388;&#12369;&#12427;</span>
+<span class="linenr">4: </span>arr.insert(0,2)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21069;(0 &#30058;&#30446;)&#12395;&#12367;&#12387;&#12388;&#12369;&#12427;</span>
+<span class="linenr">5: </span>arr.pop()        <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429;&#12434;&#21066;&#38500;</span>
+<span class="linenr">6: </span>arr.pop(0)       <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#21069;(0 &#30058;&#30446;)&#12434;&#21066;&#38500;</span>
+<span class="linenr">7: </span><span style="color: #9acd32;">ax</span> = [1,2]
+<span class="linenr">8: </span>arr.extend(ax)   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#24460;&#12429;&#12395;&#12367;&#12387;&#12388;&#12369;&#12427;</span>
+<span class="linenr">9: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(arr)
+</pre>
+</div>
+
+<pre class="example">
+9
+[2, 4, 6, 8, 10, 12, 14, 16, 18, 1, 2]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-4" class="outline-4">
+<h4 id="sec-1-5-4"><span class="section-number-4">1.5.4</span> R</h4>
+<div class="outline-text-4" id="text-1-5-4">
+<p>
+R も添え字は 1 からはじまります.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr"> 1: </span>ar <span style="color: #1e90ff;">&lt;-</span> 2*seq(1:9)
+<span class="linenr"> 2: </span>length(ar)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">push</span>
+<span class="linenr"> 5: </span>ar <span style="color: #1e90ff;">&lt;-</span> append(ar,1)
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">unshift</span>
+<span class="linenr"> 7: </span>ar <span style="color: #1e90ff;">&lt;-</span> append(ar,2,1)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">append(array,value,index)</span>
+<span class="linenr"> 8: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">pop</span>
+<span class="linenr"> 9: </span>ar <span style="color: #1e90ff;">&lt;-</span> ar[-length(ar)]
+<span class="linenr">10: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">shift</span>
+<span class="linenr">11: </span>ar <span style="color: #1e90ff;">&lt;-</span> ar[-1]
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">extend</span>
+<span class="linenr">13: </span>ax <span style="color: #1e90ff;">&lt;-</span>c(1,2)
+<span class="linenr">14: </span>ar <span style="color: #1e90ff;">&lt;-</span>append(ar,ax,length(ar))
+<span class="linenr">15: </span>ar
+</pre>
+</div>
+
+<pre class="example">
+[1] 9
+ [1]  2  4  6  8 10 12 14 16 18  1  2
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-5" class="outline-4">
+<h4 id="sec-1-5-5"><span class="section-number-4">1.5.5</span> ruby</h4>
+<div class="outline-text-4" id="text-1-5-5">
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr"> 1: </span>arr = [*1..9]
+<span class="linenr"> 2: </span>arr = arr.map {|i| i*2}
+<span class="linenr"> 3: </span><span style="color: #76ee00;">puts</span> arr.length
+<span class="linenr"> 4: </span>arr.push(1)
+<span class="linenr"> 5: </span>arr.unshift(2)
+<span class="linenr"> 6: </span>arr.pop
+<span class="linenr"> 7: </span>arr.shift
+<span class="linenr"> 8: </span>ax = [1,2]
+<span class="linenr"> 9: </span>arr.concat(ax)
+<span class="linenr">10: </span><span style="color: #76ee00;">print</span>(arr)
+</pre>
+</div>
+
+<pre class="example">
+9
+[2, 4, 6, 8, 10, 12, 14, 16, 18, 1, 2]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-6" class="outline-4">
+<h4 id="sec-1-5-6"><span class="section-number-4">1.5.6</span> numpy</h4>
+<div class="outline-text-4" id="text-1-5-6">
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">import</span> numpy <span style="color: #20b2aa; font-weight: bold;">as</span> np
+<span class="linenr"> 2: </span><span style="color: #9acd32;">ar</span> = np.array([ i*2 <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> <span style="color: #76ee00;">range</span>(1,10)])
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">len</span>(ar))
+<span class="linenr"> 4: </span><span style="color: #9acd32;">ar</span> = np.append(ar,1)
+<span class="linenr"> 5: </span><span style="color: #9acd32;">ar</span> = np.insert(ar,0,2)
+<span class="linenr"> 6: </span><span style="color: #9acd32;">ar</span> = np.delete(ar,-1)
+<span class="linenr"> 7: </span><span style="color: #9acd32;">ar</span> = np.delete(ar, 0)
+<span class="linenr"> 8: </span><span style="color: #9acd32;">ax</span> = [1,2]
+<span class="linenr"> 9: </span><span style="color: #9acd32;">ar</span> = np.append(ar,ax)
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(ar)
+</pre>
+</div>
+
+<pre class="example">
+9
+[ 2  4  6  8 10 12 14 16 18  1  2]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-7" class="outline-4">
+<h4 id="sec-1-5-7"><span class="section-number-4">1.5.7</span> まとめ</h4>
+<div class="outline-text-4" id="text-1-5-7">
+<p>
+書き方が似ててややこしいので以下にまとめておく.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">言語</th>
+<th scope="col" class="left">length</th>
+<th scope="col" class="left">push</th>
+<th scope="col" class="left">unshift</th>
+<th scope="col" class="left">pop</th>
+<th scope="col" class="left">shift</th>
+<th scope="col" class="left">extend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">length(a)</td>
+<td class="left">push!(a)</td>
+<td class="left">unshift!(a)</td>
+<td class="left">pop!(a)</td>
+<td class="left">shift!(a)</td>
+<td class="left">append!(a,x)</td>
+</tr>
+
+<tr>
+<td class="left">perl</td>
+<td class="left">length(@a)</td>
+<td class="left">push(@a,$x)</td>
+<td class="left">unshift(@a,$x)</td>
+<td class="left">pop(@a)</td>
+<td class="left">shift(@a)</td>
+<td class="left">push(@a,@x)</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">len(a)</td>
+<td class="left">a.append(x)</td>
+<td class="left">a.insert(0,x)</td>
+<td class="left">a.pop()</td>
+<td class="left">a.pop(0)</td>
+<td class="left">a.extend(x)</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">length(a)</td>
+<td class="left">append(a,1)</td>
+<td class="left">append(a,x,1)</td>
+<td class="left">a[-length(a)]</td>
+<td class="left">a[-1]</td>
+<td class="left">append(a,x,length(a))</td>
+</tr>
+
+<tr>
+<td class="left">ruby</td>
+<td class="left">a.length</td>
+<td class="left">a.push(x)</td>
+<td class="left">a.unshift(x)</td>
+<td class="left">a.pop</td>
+<td class="left">a.shift</td>
+<td class="left">a.concat(x)</td>
+</tr>
+
+<tr>
+<td class="left">numpy</td>
+<td class="left">len(a)</td>
+<td class="left">np.append(a,x)</td>
+<td class="left">np.insert(a,0,x)</td>
+<td class="left">np.delete(a,-1)</td>
+<td class="left">np.delete(a,0)</td>
+<td class="left">np.append(a,x)</td>
+</tr>
+
+<tr>
+<td class="left">js</td>
+<td class="left">a.length</td>
+<td class="left">a.push(x)</td>
+<td class="left">a.unshift(x)</td>
+<td class="left">a.pop()</td>
+<td class="left">a.shift()</td>
+<td class="left">a.concat(x)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6"><span class="section-number-3">1.6</span> 辞書(hash)</h3>
+<div class="outline-text-3" id="text-1-6">
+</div><div id="outline-container-sec-1-6-1" class="outline-4">
+<h4 id="sec-1-6-1"><span class="section-number-4">1.6.1</span> julia</h4>
+<div class="outline-text-4" id="text-1-6-1">
+<p>
+typeof: Dict<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">tuple &#12399;&#23567;&#25991;&#23383;&#12394;&#12398;&#12395; Dict &#12399;&#22823;&#25991;&#23383;. &#12362;&#12412;&#12360;&#12395;&#12367;&#12356;.</span>
+<span class="linenr">2: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">{} &#12391;&#12399;&#12394;&#12367; () &#12391;&#22258;&#12416;.</span>
+<span class="linenr">3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12450;&#12463;&#12475;&#12473;&#12399; hash["key"] &#12391;, &#37197;&#21015;&#12392;&#21516;&#12376;&#12424;&#12358;&#12394;&#26360;&#12365;&#26041;.</span>
+<span class="linenr">4: </span>hash = <span style="color: #9370db;">Dict</span>(<span style="color: #ffa07a;">"name"</span> =&gt; <span style="color: #ffa07a;">"Frodo"</span>, <span style="color: #ffa07a;">"age"</span>=&gt;33)
+<span class="linenr">5: </span>println(typeof(hash))
+<span class="linenr">6: </span>println(<span style="color: #ffa07a;">"hash="</span>,hash)
+<span class="linenr">7: </span>println(<span style="color: #ffa07a;">"name="</span>,hash[<span style="color: #ffa07a;">"name"</span>])
+<span class="linenr">8: </span>println(<span style="color: #ffa07a;">"age ="</span>,hash[<span style="color: #ffa07a;">"age"</span>])
+</pre>
+</div>
+
+<pre class="example">
+Dict{String,Any}
+hash=Dict{String,Any}(Pair{String,Any}("name","Frodo"),Pair{String,Any}("age",33))
+name=Frodo
+age =33
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6-2" class="outline-4">
+<h4 id="sec-1-6-2"><span class="section-number-4">1.6.2</span> perl</h4>
+<div class="outline-text-4" id="text-1-6-2">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">Data::Dumper</span>;
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$hash</span>={<span style="color: #ffa07a;">name</span>=&gt;<span style="color: #ffa07a;">'Frodo'</span>,<span style="color: #ffa07a;">age</span>=&gt;33};
+<span class="linenr"> 5: </span><span style="color: #ff83fa;">print</span> Data::Dumper-&gt;Dump([$hash]);
+<span class="linenr"> 6: </span><span style="color: #ff83fa;">print</span> $hash-&gt;{<span style="color: #ffa07a;">'name'</span>}.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr"> 7: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">print $hash-&gt;['name']."\n";  # &#12456;&#12521;&#12540;&#12392;&#12394;&#12427;.</span>
+<span class="linenr"> 8: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20197;&#19979;&#12398;&#12424;&#12358;&#12395;&#12418;&#26360;&#12369;&#12427;.</span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ff0000; background-color: #000080; font-weight: bold; font-style: italic;">%hash</span>=(<span style="color: #ffa07a;">name</span>=&gt;<span style="color: #ffa07a;">'Frodo'</span>, <span style="color: #ffa07a;">agen</span>=&gt;33);
+<span class="linenr">10: </span><span style="color: #ff83fa;">print</span> <span style="color: #ff0000; background-color: #000080; font-weight: bold; font-style: italic;">$hash</span>{<span style="color: #ffa07a;">name</span>}.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">print </span><span style="color: #ffff00; background-color: #000080; font-weight: bold;">$hash</span><span style="color: #cd853f;">['name']."\n";    # &#12371;&#12435;&#12394;&#12405;&#12358;&#12395;&#12399;&#26360;&#12369;&#12394;&#12356;.</span>
+</pre>
+</div>
+
+<pre class="example">
+$VAR1 = {
+          'name' =&gt; 'Frodo',
+          'age' =&gt; 33
+        };
+Frodo
+Frodo
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6-3" class="outline-4">
+<h4 id="sec-1-6-3"><span class="section-number-4">1.6.3</span> python</h4>
+<div class="outline-text-4" id="text-1-6-3">
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #76ee00;">hash</span>={<span style="color: #ffa07a;">'name'</span>:<span style="color: #ffa07a;">'Frodo'</span>,<span style="color: #ffa07a;">'age'</span>:33}
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">hash</span>)
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #76ee00;">hash</span>[<span style="color: #ffa07a;">'name'</span>])
+</pre>
+</div>
+
+<pre class="example">
+{'age': 33, 'name': 'Frodo'}
+Frodo
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6-4" class="outline-4">
+<h4 id="sec-1-6-4"><span class="section-number-4">1.6.4</span> ruby</h4>
+<div class="outline-text-4" id="text-1-6-4">
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr">1: </span>hash = {<span style="color: #ffa07a;">'name'</span>=&gt;<span style="color: #ffa07a;">'Frodo'</span>,<span style="color: #ffa07a;">'age'</span>=&gt;33}
+<span class="linenr">2: </span><span style="color: #76ee00;">puts</span> hash
+<span class="linenr">3: </span><span style="color: #76ee00;">puts</span> hash[<span style="color: #ffa07a;">'age'</span>]
+</pre>
+</div>
+
+<pre class="example">
+{"name"=&gt;"Frodo", "age"=&gt;33}
+33
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6-5" class="outline-4">
+<h4 id="sec-1-6-5"><span class="section-number-4">1.6.5</span> js</h4>
+<div class="outline-text-4" id="text-1-6-5">
+<div class="org-src-container">
+
+<pre class="src src-js"><span class="linenr">1: </span>hash = {<span style="color: #ffa07a;">'name'</span>:<span style="color: #ffa07a;">'Frodo'</span>,age:33}
+<span class="linenr">2: </span>console.log(hash)
+<span class="linenr">3: </span>console.log(hash[<span style="color: #ffa07a;">'name'</span>])
+</pre>
+</div>
+
+<pre class="example">
+{ name: 'Frodo', age: 33 }
+Frodo
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6-6" class="outline-4">
+<h4 id="sec-1-6-6"><span class="section-number-4">1.6.6</span> まとめ</h4>
+<div class="outline-text-4" id="text-1-6-6">
+<p>
+以下に書き方をまとめる.<br />
+R はパッケージをインストールしないとダメっぽいので省略.<br />
+その代わり JavaScript をいれてみた.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+
+<col class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">言語</th>
+<th scope="col" class="left">定義</th>
+<th scope="col" class="left">アクセス</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">Dict(key:value)</td>
+<td class="left">hash["key"]</td>
+</tr>
+
+<tr>
+<td class="left">perl</td>
+<td class="left">{key=&gt;value}</td>
+<td class="left">$hash-&gt;{key}</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">{key:value}</td>
+<td class="left">hash["key"]</td>
+</tr>
+
+<tr>
+<td class="left">ruby</td>
+<td class="left">{key=&gt;value}</td>
+<td class="left">hash["key"]</td>
+</tr>
+
+<tr>
+<td class="left">js</td>
+<td class="left">{key:value}</td>
+<td class="left">hash["key"]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Basic file I/O</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+ファイル書き込み<br />
+標準的な書き方でわかりやすい.<br />
+ファイルへの書き込みは print ではなく write<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>f=open(<span style="color: #ffa07a;">"newfile.txt"</span>, <span style="color: #ffa07a;">"w"</span>)
+<span class="linenr">2: </span>write(f,<span style="color: #ffa07a;">"testing\n"</span>)
+<span class="linenr">3: </span>write(f,<span style="color: #ffa07a;">"more testing\n"</span>)
+<span class="linenr">4: </span>close(f)
+</pre>
+</div>
+
+<p>
+ファイル読み込み<br />
+readall(f) でファイル中身を読み込み<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>f=open(<span style="color: #ffa07a;">"newfile.txt"</span>,<span style="color: #ffa07a;">"r"</span>)
+<span class="linenr">2: </span>x=readall(f)
+<span class="linenr">3: </span>print(x)
+<span class="linenr">4: </span>close(f)
+</pre>
+</div>
+
+<pre class="example">
+testing
+more testing
+</pre>
+
+<p>
+file 読み書きについてはまた別途.<br />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 繰り返し</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> julia</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+for 文は in を使って書く.<br />
+python みたいにいちいち ":" を使わなくてよい.<br />
+end で終わる ruby みたいな書き方.<br />
+終わりがはっきりしててわかりやすいとおもう.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>actions = [<span style="color: #ffa07a;">"surf"</span>,<span style="color: #ffa07a;">"ski"</span>]
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">for</span> act <span style="color: #20b2aa; font-weight: bold;">in</span> actions
+<span class="linenr">3: </span>    println(<span style="color: #ffa07a;">"Chalie don't $act"</span>)
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">5: </span>
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:3
+<span class="linenr">7: </span>    println(i)
+<span class="linenr">8: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+Chalie don't surf
+Chalie don't ski
+1
+2
+3
+</pre>
+
+<p>
+Dictionary(hash) についての繰り返しもできる.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>d = <span style="color: #9370db;">Dict</span>(<span style="color: #ffa07a;">"name"</span>=&gt;<span style="color: #ffa07a;">"Frodo"</span>,<span style="color: #ffa07a;">"age"</span>=&gt;33)
+<span class="linenr">2: </span>println(keys(d))
+<span class="linenr">3: </span>println(typeof(keys(d)))
+<span class="linenr">4: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">collect &#12391; Array &#12395;&#12377;&#12427;</span>
+<span class="linenr">5: </span>println(collect(keys(d)))
+<span class="linenr">6: </span>println(typeof(collect(keys(d))))
+</pre>
+</div>
+
+<pre class="example">
+String["name","age"]
+Base.KeyIterator{Dict{String,Any}}
+String["name","age"]
+Array{String,1}
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>d = <span style="color: #9370db;">Dict</span>(<span style="color: #ffa07a;">"name"</span>=&gt;<span style="color: #ffa07a;">"hoge"</span>,<span style="color: #ffa07a;">"age"</span>=&gt;32)
+<span class="linenr">2: </span>println(keys(d))
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">for</span> k <span style="color: #20b2aa; font-weight: bold;">in</span> keys(d)
+<span class="linenr">4: </span>    <span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"key=%s value=%s\n"</span>,k,d[k])
+<span class="linenr">5: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">6: </span>println(collect(keys(d)))
+<span class="linenr">7: </span><span style="color: #20b2aa; font-weight: bold;">for</span> k <span style="color: #20b2aa; font-weight: bold;">in</span> collect(keys(d))
+<span class="linenr">8: </span>    <span style="color: #6495ed;">@printf</span>(<span style="color: #ffa07a;">"key=%s value=%s\n"</span>,k,d[k])
+<span class="linenr">9: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+String["name","age"]
+key=name value=hoge
+key=age value=32
+String["name","age"]
+key=name value=hoge
+key=age value=32
+</pre>
+
+<p>
+どっちもけっかは一緒のようだ.<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>x_values=[1,2,3,4]
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">for</span> x <span style="color: #20b2aa; font-weight: bold;">in</span> x_values
+<span class="linenr">3: </span>    println(x*x)
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">5: </span>
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:length(x_values)
+<span class="linenr">7: </span>    println(x_values[i] * x_values[i])
+<span class="linenr">8: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+1
+4
+9
+16
+1
+4
+9
+16
+</pre>
+
+<p>
+二つの配列を同時に回すときは<br />
+zip という関数を使えばよいらしいです.<br />
+python の zip と同じ感じ.<br />
+便利.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>countries=(<span style="color: #ffa07a;">"Japan"</span>,<span style="color: #ffa07a;">"Korea"</span>,<span style="color: #ffa07a;">"China"</span>)
+<span class="linenr">2: </span>cities   =(<span style="color: #ffa07a;">"Tokyo"</span>,<span style="color: #ffa07a;">"Seoul"</span>,<span style="color: #ffa07a;">"Beijing"</span>)
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (cont,city) <span style="color: #20b2aa; font-weight: bold;">in</span> zip(countries,cities)
+<span class="linenr">4: </span>    println(<span style="color: #ffa07a;">"The capital of $cont is $city"</span>)
+<span class="linenr">5: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+The capital of Japan is Tokyo
+The capital of Korea is Seoul
+The capital of China is Beijing
+</pre>
+
+<p>
+python enumerate と同様な感じでも書けるみたい<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span>countries=(<span style="color: #ffa07a;">"Japan"</span>,<span style="color: #ffa07a;">"Korea"</span>,<span style="color: #ffa07a;">"China"</span>)
+<span class="linenr">2: </span>cities   =(<span style="color: #ffa07a;">"Tokyo"</span>,<span style="color: #ffa07a;">"Seoul"</span>,<span style="color: #ffa07a;">"Beijing"</span>)
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (i,cont) <span style="color: #20b2aa; font-weight: bold;">in</span> enumerate(countries)
+<span class="linenr">4: </span>    city = cities[i]
+<span class="linenr">5: </span>    println(<span style="color: #ffa07a;">"The capital of $cont is $city"</span>)
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+The capital of Japan is Tokyo
+The capital of Korea is Seoul
+The capital of China is Beijing
+</pre>
+
+<p>
+以下比較用のるーぷ<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:9
+<span class="linenr">2: </span>    println(i)
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> perl</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr">3: </span>
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@ar</span>=(1..9);
+<span class="linenr">5: </span><span style="color: #20b2aa; font-weight: bold;">for</span> (<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@ar</span>) {
+<span class="linenr">6: </span>  <span style="color: #ff83fa;">print</span> $_.<span style="color: #ffa07a;">"\n"</span>;
+<span class="linenr">7: </span>}
+</pre>
+</div>
+
+<pre class="example">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> python</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+range(1,10) と書くと 1 から 9 までな点にちゅういする.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> <span style="color: #76ee00;">range</span>(1,10):
+<span class="linenr">2: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(i)
+</pre>
+</div>
+
+<pre class="example">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> ruby</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1..9
+<span class="linenr">2: </span>  <span style="color: #76ee00;">puts</span> i
+<span class="linenr">3: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> R</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">for</span>(x <span style="color: #20b2aa; font-weight: bold;">in</span> 1:9) {
+<span class="linenr">2: </span>    print(x)
+<span class="linenr">3: </span>}
+</pre>
+</div>
+
+<pre class="example">
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> js</h3>
+<div class="outline-text-3" id="text-3-6">
+<div class="org-src-container">
+
+<pre class="src src-js"><span class="linenr">1: </span><span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">ar</span>=[]
+<span class="linenr">2: </span><span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">i</span>=1;i&lt;10;i++) {
+<span class="linenr">3: </span>  ar.push(i);
+<span class="linenr">4: </span>  <span style="color: #cd853f;">// </span><span style="color: #cd853f;">console.log(i)</span>
+<span class="linenr">5: </span>}
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">for</span>(<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">x</span> of ar) {
+<span class="linenr">7: </span>  console.log(x);
+<span class="linenr">8: </span>}
+<span class="linenr">9: </span>console.log(Array.from(<span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">Array</span>(9),(val,index)=&gt;index+1));
+</pre>
+</div>
+
+<pre class="example">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+[ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> まとめ</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+for 文のかきかたまとめ.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+
+<col class="right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">言語</th>
+<th scope="col" class="left">for 文</th>
+<th scope="col" class="right">range 1 から 9 まで</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">for x in ar &#x2026; end</td>
+<td class="right">1:9</td>
+</tr>
+
+<tr>
+<td class="left">perl</td>
+<td class="left">for (@ar) {}</td>
+<td class="right">(1..9)</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">for x in ar:</td>
+<td class="right">range(1,10)</td>
+</tr>
+
+<tr>
+<td class="left">ruby</td>
+<td class="left">for x in ar &#x2026; end</td>
+<td class="right">1..9</td>
+</tr>
+
+<tr>
+<td class="left">R</td>
+<td class="left">for(x in ar) {}</td>
+<td class="right">1:9</td>
+</tr>
+
+<tr>
+<td class="left">js</td>
+<td class="left">for(x of ar) {}</td>
+<td class="right">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-sec-3-8" class="outline-3">
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> 内包表記</h3>
+<div class="outline-text-3" id="text-3-8">
+</div><div id="outline-container-sec-3-8-1" class="outline-4">
+<h4 id="sec-3-8-1"><span class="section-number-4">3.8.1</span> julia</h4>
+<div class="outline-text-4" id="text-3-8-1">
+<p>
+julia でのリスト内包表記いろいろ<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">dbls = [2i <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:4]   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">2x &#30340;&#12394;&#26360;&#12365;&#26041;&#12434;&#12388;&#12363;&#12387;&#12390;&#12414;&#12377;</span>
+println(dbls)
+
+anmls = [<span style="color: #ffa07a;">"dog"</span>,<span style="color: #ffa07a;">"cat"</span>,<span style="color: #ffa07a;">"bird"</span>]
+pls   = [a * <span style="color: #ffa07a;">"s"</span> <span style="color: #20b2aa; font-weight: bold;">for</span> a <span style="color: #20b2aa; font-weight: bold;">in</span> anmls]  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">* &#12399;&#25991;&#23383;&#21015;&#36899;&#32080;&#12398;&#24847;&#21619;&#12391;&#12354;&#12427;&#12371;&#12392;&#12395;&#27880;&#24847;</span>
+println(pls)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20869;&#21253;&#34920;&#35352;&#12391;&#20108;&#27425;&#20803;&#37197;&#21015;&#12418;&#20316;&#12428;&#12427;</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">python &#12391;&#12418;&#20986;&#26469;&#12427;&#12435;&#12384;&#12429;&#12540;&#12363;?</span>
+p = [i+j <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:3, j <span style="color: #20b2aa; font-weight: bold;">in</span> 4:6]
+println(p)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#36766;&#26360;(hash) &#12418;&#12371;&#12428;&#12391;&#20316;&#12428;&#12427;</span>
+h = [<span style="color: #ffa07a;">"$i"</span> =&gt; i <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> 1:3]
+println(h)
+</pre>
+</div>
+
+<pre class="example">
+[2,4,6,8]
+String["dogs","cats","birds"]
+[5 6 7; 6 7 8; 7 8 9]
+Dict("1"=&gt;1,"2"=&gt;2,"3"=&gt;3)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-8-2" class="outline-4">
+<h4 id="sec-3-8-2"><span class="section-number-4">3.8.2</span> python</h4>
+<div class="outline-text-4" id="text-3-8-2">
+<p>
+python でのかきかた<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #9acd32;">dbls</span>=[ 2*i <span style="color: #20b2aa; font-weight: bold;">for</span> i <span style="color: #20b2aa; font-weight: bold;">in</span> <span style="color: #76ee00;">range</span>(1,5)]
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(dbls)
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #9acd32;">anmls</span> = [<span style="color: #ffa07a;">"dog"</span>,<span style="color: #ffa07a;">"cat"</span>,<span style="color: #ffa07a;">"bird"</span>]
+<span class="linenr"> 5: </span><span style="color: #9acd32;">pls</span>   = [ a + <span style="color: #ffa07a;">"s"</span> <span style="color: #20b2aa; font-weight: bold;">for</span> a <span style="color: #20b2aa; font-weight: bold;">in</span> anmls]
+<span class="linenr"> 6: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(pls)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#34892;&#21015;&#12399;&#28961;&#29702;&#12387;&#12413;&#12356;</span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">p = [i+j for i in range(1,4), j in range(4,7)]</span>
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">hash &#12418;&#12381;&#12398;&#12414;&#12414;&#12391;&#12399;&#28961;&#29702;&#12387;&#12413;&#12356;</span>
+<span class="linenr">12: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">h = [ i=&gt;i for i in range(1,4)]</span>
+</pre>
+</div>
+
+<pre class="example">
+[2, 4, 6, 8]
+['dogs', 'cats', 'birds']
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 比較</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> julia</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span>x=1
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x==2 &#12391;&#12354;&#12427;&#12363;&#12393;&#12358;&#12363;. false</span>
+<span class="linenr"> 4: </span>println(x==2)
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">x &#12364; 3 &#12376;&#12419;&#12394;&#12356;&#12363;&#12393;&#12358;&#12363;. true</span>
+<span class="linenr"> 7: </span>println(x!=3)
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12435;&#12394;&#24863;&#12376;&#12391;&#12418;&#26360;&#12369;&#12427;</span>
+<span class="linenr">10: </span>println(1&lt;2&lt;3)
+<span class="linenr">11: </span>println(1&lt;=2&lt;=3)
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#19978;&#12391;&#12418;&#12363;&#12356;&#12383;&#12369;&#12393; 1 &#12399;&#33258;&#21205;&#12391; true &#12395;&#22793;&#25563;&#12375;&#12390;&#12367;&#12428;&#12394;&#12356;</span>
+<span class="linenr">14: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(convert(<span style="color: #9370db;">Bool</span>,1))
+<span class="linenr">15: </span>    println(<span style="color: #ffa07a;">"convert(Bool,1) is true"</span>)
+<span class="linenr">16: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">and &#12392; or</span>
+<span class="linenr">19: </span>println(<span style="color: #1e90ff;">true</span> &amp;&amp; <span style="color: #1e90ff;">false</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">false</span>
+<span class="linenr">20: </span>println(<span style="color: #1e90ff;">true</span> || <span style="color: #1e90ff;">false</span>)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">true</span>
+</pre>
+</div>
+
+<pre class="example">
+false
+true
+true
+true
+convert(Bool,1) is true
+false
+true
+</pre>
+
+<p>
+ごく簡単なれいでくらべてみよう.<br />
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> perl</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$x</span>=1;
+<span class="linenr"> 4: </span><span style="color: #ff83fa;">print</span>($x==2); <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20309;&#12392;, &#20309;&#12418;&#26360;&#12365;&#20986;&#12373;&#12428;&#12394;&#12356;(undef &#12387;&#12390;&#12371;&#12392;?).</span>
+<span class="linenr"> 5: </span><span style="color: #ff83fa;">print</span>(<span style="color: #ffa07a;">"\n"</span>);
+<span class="linenr"> 6: </span><span style="color: #ff83fa;">print</span>($x!=3); <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1</span>
+<span class="linenr"> 7: </span><span style="color: #ff83fa;">print</span>(<span style="color: #ffa07a;">"\n"</span>);
+<span class="linenr"> 8: </span><span style="color: #20b2aa; font-weight: bold;">if</span>($x) {
+<span class="linenr"> 9: </span>   <span style="color: #ff83fa;">print</span>(<span style="color: #ffa07a;">"1 is true in perl\n"</span>);
+<span class="linenr">10: </span>}
+<span class="linenr">11: </span><span style="color: #ff83fa;">print</span>(1 <span style="color: #9370db;">and</span> 0);   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">0</span>
+<span class="linenr">12: </span><span style="color: #ff83fa;">print</span>(<span style="color: #ffa07a;">"\n"</span>);
+<span class="linenr">13: </span><span style="color: #ff83fa;">print</span>(1 <span style="color: #9370db;">or</span>  0);   <span style="color: #cd853f;"># </span><span style="color: #cd853f;">1</span>
+</pre>
+</div>
+
+<pre class="example">
+1
+1 is true in perl
+0
+1
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> python</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #9acd32;">x</span>=1
+<span class="linenr"> 2: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(x==2)
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(x!=3)
+<span class="linenr"> 4: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(1&lt;2&lt;3)
+<span class="linenr"> 5: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(1&lt;=2&lt;=3)
+<span class="linenr"> 6: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">1 &#12399; true</span>
+<span class="linenr"> 7: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(1):
+<span class="linenr"> 8: </span>    <span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #ffa07a;">"1 is true in python"</span>)
+<span class="linenr"> 9: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">and or &#12399;&#12381;&#12398;&#12414;&#12414;&#26360;&#12369;&#12400;&#12424;&#12356;.</span>
+<span class="linenr">10: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #1e90ff;">True</span> <span style="color: #20b2aa; font-weight: bold;">and</span> <span style="color: #1e90ff;">False</span>)
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">print</span>(<span style="color: #1e90ff;">True</span> <span style="color: #20b2aa; font-weight: bold;">or</span>  <span style="color: #1e90ff;">False</span>)
+</pre>
+</div>
+
+<pre class="example">
+False
+True
+True
+True
+1 is true in python
+False
+True
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> ruby</h3>
+<div class="outline-text-3" id="text-4-4">
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="linenr">1: </span>x=1
+<span class="linenr">2: </span><span style="color: #76ee00;">puts</span>(x==2)
+<span class="linenr">3: </span><span style="color: #76ee00;">puts</span>(x!=3)
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(x)
+<span class="linenr">5: </span>    <span style="color: #76ee00;">puts</span>(<span style="color: #ffa07a;">"1 is true in ruby"</span>)
+<span class="linenr">6: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+</pre>
+</div>
+
+<pre class="example">
+false
+true
+1 is true in ruby
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> R</h3>
+<div class="outline-text-3" id="text-4-5">
+<div class="org-src-container">
+
+<pre class="src src-R"><span class="linenr">1: </span>x <span style="color: #1e90ff;">&lt;-</span> 1
+<span class="linenr">2: </span>x==2
+<span class="linenr">3: </span>x!=3
+<span class="linenr">4: </span><span style="color: #20b2aa; font-weight: bold;">if</span>(x) {
+<span class="linenr">5: </span>    print(<span style="color: #ffa07a;">"1 is true in R"</span>)
+<span class="linenr">6: </span>}
+</pre>
+</div>
+
+<pre class="example">
+[1] FALSE
+[1] TRUE
+[1] "1 is true in R"
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 関数</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> julia</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span class="linenr"> 1: </span><span style="color: #20b2aa; font-weight: bold;">function</span> <span style="color: #00ff7f;">func</span>(a,b)
+<span class="linenr"> 2: </span>    <span style="color: #20b2aa; font-weight: bold;">return</span> a*b
+<span class="linenr"> 3: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12435;&#12394;&#24863;&#12376;&#12391;&#12418;&#38306;&#25968;&#12434;&#23450;&#32681;&#12391;&#12365;&#12427;.</span>
+<span class="linenr"> 6: </span><span style="color: #00ff7f;">f</span>(x) = sin(1/x)
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">default &#20516;&#12398;&#35373;&#23450;</span>
+<span class="linenr"> 9: </span><span style="color: #20b2aa; font-weight: bold;">function</span> <span style="color: #00ff7f;">hoge</span>(x,a=1)
+<span class="linenr">10: </span>     <span style="color: #20b2aa; font-weight: bold;">return</span> exp(cos(a*x))
+<span class="linenr">11: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">keyword &#12391;&#12450;&#12463;&#12475;&#12473;&#12377;&#12427;&#24341;&#25968;&#12398;&#25351;&#23450;. ";"</span>
+<span class="linenr">14: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">a,b &#12399;&#26222;&#36890;&#12395;&#12450;&#12463;&#12475;&#12473;</span>
+<span class="linenr">15: </span><span style="color: #cd853f;"># </span><span style="color: #cd853f;">max, min &#12399; max=, min= &#12392;&#12375;&#12390;&#12450;&#12463;&#12475;&#12473;</span>
+<span class="linenr">16: </span><span style="color: #20b2aa; font-weight: bold;">function</span> <span style="color: #00ff7f;">fuga</span>(a,b; max=5,min=2)
+<span class="linenr">17: </span>    x = a + b
+<span class="linenr">18: </span>    <span style="color: #20b2aa; font-weight: bold;">if</span>(x&gt;max)
+<span class="linenr">19: </span>       <span style="color: #20b2aa; font-weight: bold;">return</span> max
+<span class="linenr">20: </span>    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">21: </span>    <span style="color: #20b2aa; font-weight: bold;">if</span>(x&lt;min)
+<span class="linenr">22: </span>       <span style="color: #20b2aa; font-weight: bold;">return</span> min
+<span class="linenr">23: </span>    <span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">24: </span>    <span style="color: #20b2aa; font-weight: bold;">return</span> x
+<span class="linenr">25: </span><span style="color: #20b2aa; font-weight: bold;">end</span>
+<span class="linenr">26: </span>
+<span class="linenr">27: </span>k = func(2,5)
+<span class="linenr">28: </span>p = f(1.0)
+<span class="linenr">29: </span>q = hoge(pi)
+<span class="linenr">30: </span>r = hoge(pi,2)
+<span class="linenr">31: </span>c = fuga(2,4)
+<span class="linenr">32: </span>d = fuga(2,4,max=10)
+<span class="linenr">33: </span>println(k)
+<span class="linenr">34: </span>println(p)
+<span class="linenr">35: </span>println(q)
+<span class="linenr">36: </span>println(r)
+<span class="linenr">37: </span>println(c)
+<span class="linenr">38: </span>println(d)
+</pre>
+</div>
+
+<pre class="example">
+10
+0.8414709848078965
+0.36787944117144233
+2.718281828459045
+5
+6
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> まとめ</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+比較表だけかいてみる.<br />
+perl だけちょっとちがう感じ. 引数をかっこで渡さない.<br />
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left" />
+
+<col class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">関数定義のやり方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">julia</td>
+<td class="left">function hoge()  end</td>
+</tr>
+
+<tr>
+<td class="left">perl</td>
+<td class="left">sub hoge { }</td>
+</tr>
+
+<tr>
+<td class="left">python</td>
+<td class="left">def hoge()</td>
+</tr>
+
+<tr>
+<td class="left">ruby</td>
+<td class="left">def hoge()    end</td>
+</tr>
+
+<tr>
+<td class="left">js</td>
+<td class="left">function hoge() {  }</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SQLite3 の様々な言語での利用]]></title>
+    <link href="http://saito1369.github.io/blog/2017-02-09-SQLite3.html"/>
+    <updated>2017-02-09T00:00:00+09:00</updated>
+    <id>http://saito1369.github.io/blog/SQLite3</id>
+    <content type="html"><![CDATA[<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. perl</a>
+<ul>
+<li><a href="#sec-1-1">1.1. database の作成とデータの挿入</a></li>
+<li><a href="#sec-1-2">1.2. select 文とデータの取り出し</a></li>
+<li><a href="#sec-1-3">1.3. 参考URL</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. python</a>
+<ul>
+<li><a href="#sec-2-1">2.1. database の作成とデータの挿入</a></li>
+<li><a href="#sec-2-2">2.2. select 文とデータの取り出し</a></li>
+<li><a href="#sec-2-3">2.3. 参考URL</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. ruby</a>
+<ul>
+<li><a href="#sec-3-1">3.1. database の作成とデータの挿入</a></li>
+<li><a href="#sec-3-2">3.2. select 文とデータの取り出し</a></li>
+<li><a href="#sec-3-3">3.3. 参考URL</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. julia</a>
+<ul>
+<li><a href="#sec-4-1">4.1. database の作成とデータの挿入</a></li>
+<li><a href="#sec-4-2">4.2. select 文とデータの取り出し</a></li>
+<li><a href="#sec-4-3">4.3. 参考URL</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. R</a>
+<ul>
+<li><a href="#sec-5-1">5.1. database の作成とデータの挿入</a></li>
+<li><a href="#sec-5-2">5.2. select 文とデータの取り出し</a></li>
+<li><a href="#sec-5-3">5.3. 参考URL</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. javascript(node.js)</a>
+<ul>
+<li><a href="#sec-6-1">6.1. database の作成とデータの挿入</a></li>
+<li><a href="#sec-6-2">6.2. select 文とデータの取り出し</a></li>
+<li><a href="#sec-6-3">6.3. 参考URL</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+#+File Created: <span class="timestamp-wrapper"><span class="timestamp">&lt;2017-02-09 Thu 13:42&gt;</span></span><br />
+#+Last Updated: <span class="timestamp-wrapper"><span class="timestamp">&lt;2018-11-21 Wed 20:51&gt;</span></span><br />
+</p>
+<p>
+SQLite3 の簡単な利用方法についてまとめておく.<br />
+いくつかの script 言語での書き方を比較する.<br />
+</p>
+
+<p>
+<!-- more --><br />
+</p>
+
+<p>
+利用環境: OSX Yosemite 10.10.5<br />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">sqlite3 --version
+</pre>
+</div>
+
+<pre class="example">
+3.13.0 2016-05-18 10:57:30 fc49f556e48970561d7ab6a2f24fdd7d9eb81ff2
+</pre>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> perl</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">perl --version
+</pre>
+</div>
+
+<pre class="example">
+This is perl 5, version 18, subversion 2 (v5.18.2) built for darwin-thread-multi-2level
+(with 2 registered patches, see perl -V for more detail)
+
+Copyright 1987-2013, Larry Wall
+
+Perl may be copied only under the terms of either the Artistic License or the
+GNU General Public License, which may be found in the Perl 5 source kit.
+
+Complete documentation for Perl, including FAQ lists, should be found on
+this system using "man perl" or "perldoc perl".  If you have access to the
+Internet, point your browser at http://www.perl.org/, the Perl Home Page.
+</pre>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> database の作成とデータの挿入</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">DBI</span>;
+
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$db</span>=<span style="color: #ffa07a;">"test.db"</span>;
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$dbh</span>=DBI-&gt;<span style="color: #9370db;">connect</span>(<span style="color: #ffa07a;">"dbi:SQLite:dbname=$db"</span>);
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12486;&#12540;&#12502;&#12523;&#20316;&#25104;</span>
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$sql</span>=<span style="color: #ffa07a;">"create table if not exists test_table_pl (id int, name, age int, gender)"</span>;
+$dbh-&gt;<span style="color: #20b2aa; font-weight: bold;">do</span>($sql);  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#25147;&#12426;&#20516;&#12364;&#12394;&#12356;&#22580;&#21512;&#12399; do &#12391;&#23455;&#34892;</span>
+<span style="color: #cd853f;">#</span><span style="color: #cd853f;">my $kth=$dbh-&gt;prepare($sql);</span>
+<span style="color: #cd853f;">#</span><span style="color: #cd853f;">$kth-&gt;execute();</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">placeholder &#12395;&#12424;&#12427;&#12487;&#12540;&#12479;&#12398;&#25407;&#20837;</span>
+$sql    =<span style="color: #ffa07a;">"insert into test_table_pl values (?,?,?,?)"</span>;
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">placeholder &#12434;&#29992;&#12356;&#12427;&#22580;&#21512;&#21450;&#12403;&#25147;&#12426;&#20516;&#12364;&#12354;&#12427;&#22580;&#21512;&#12399;,</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">prepare -&gt; execute &#12391;&#23455;&#34892;</span>
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$sth</span> =$dbh-&gt;prepare($sql);
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@vls</span> =(1,<span style="color: #ffa07a;">'hoge'</span>,20,<span style="color: #ffa07a;">'m'</span>);
+$sth-&gt;execute(<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@vls</span>);
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#20999;&#26029;</span>
+$dbh-&gt;disconnect;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> select 文とデータの取り出し</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-perl"><span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">strict</span>;
+<span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">warnings</span>;
+<span style="color: #20b2aa; font-weight: bold;">use</span> <span style="color: #00ff7f;">DBI</span>;
+
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$db</span>=<span style="color: #ffa07a;">'test.db'</span>;
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$dbh</span> = DBI-&gt;<span style="color: #9370db;">connect</span>(<span style="color: #ffa07a;">"dbi:SQLite:dbname=$db"</span>);
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">select &#25991;</span>
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$sql</span> = <span style="color: #ffa07a;">"select * from test_table_pl order by id"</span>;
+<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$sth</span> = $dbh-&gt;prepare($sql);
+$sth-&gt;execute();
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12487;&#12540;&#12479;&#12398;&#21462;&#12426;&#20986;&#12375;</span>
+<span style="color: #20b2aa; font-weight: bold;">while</span>(<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">@row</span>=$sth-&gt;fetchrow_array) {
+  <span style="color: #ff83fa;">print</span> <span style="color: #9370db;">join</span>(<span style="color: #ffa07a;">"\t"</span>,<span style="color: #ffff00; background-color: #000080; font-weight: bold;">@row</span>).<span style="color: #ffa07a;">"\n"</span>;
+  <span style="color: #ff83fa;">print</span> <span style="color: #ffff00; background-color: #000080; font-weight: bold;">$row</span>[0].<span style="color: #ffa07a;">"\n"</span>;
+}
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">hashref &#12391;&#21462;&#12426;&#20986;&#12379;&#12427;(&#12364;, &#19968;&#22238;&#12392;&#12427;&#12392;&#31354;&#12395;&#12394;&#12427;)</span>
+<span style="color: #20b2aa; font-weight: bold;">while</span>(<span style="color: #20b2aa; font-weight: bold;">my</span> <span style="color: #9acd32;">$row</span>=$sth-&gt;fetchrow_hashref) {
+  <span style="color: #ff83fa;">print</span> $row-&gt;{<span style="color: #ffa07a;">id</span>}.<span style="color: #ffa07a;">"\t"</span>.$row-&gt;{<span style="color: #ffa07a;">name</span>}.<span style="color: #ffa07a;">"\n"</span>;
+}
+</pre>
+</div>
+
+<pre class="example">
+1 hoge  20  m
+1
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> 参考URL</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+<a href="http://program.station.ez-net.jp/special/perl/dbi/sqlite.asp">http://program.station.ez-net.jp/special/perl/dbi/sqlite.asp</a><br />
+<a href="http://d.hatena.ne.jp/perlcodesample/20091121/1246679588">http://d.hatena.ne.jp/perlcodesample/20091121/1246679588</a><br />
+<a href="http://www.kent-web.com/perl/sqlite/step03.html">http://www.kent-web.com/perl/sqlite/step03.html</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> python</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">python --version
+</pre>
+</div>
+
+<pre class="example">
+Python 3.5.2 :: Anaconda custom (x86_64)
+</pre>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> database の作成とデータの挿入</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> sqlite3
+<span style="color: #9acd32;">con</span> = sqlite3.connect(<span style="color: #ffa07a;">"test.db"</span>)
+<span style="color: #9acd32;">cur</span> = con.cursor()
+
+<span style="color: #9acd32;">sql</span> = <span style="color: #ffa07a;">"create table if not exists test_table_py (id int, name varchar(64), age int, gender varchar(32))"</span>
+cur.execute(sql)
+
+<span style="color: #9acd32;">sql</span> = <span style="color: #ffa07a;">"insert into test_table_py values (?,?,?,?)"</span>
+<span style="color: #9acd32;">vls</span> = (1,<span style="color: #ffa07a;">'hoge'</span>,20,<span style="color: #ffa07a;">'m'</span>)
+cur.execute(sql,vls);
+
+con.commit()  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#22793;&#26356;&#12398;&#20445;&#23384;</span>
+con.close()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> select 文とデータの取り出し</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #20b2aa; font-weight: bold;">import</span> sqlite3
+
+<span style="color: #9acd32;">con</span> = sqlite3.connect(<span style="color: #ffa07a;">"test.db"</span>)
+<span style="color: #9acd32;">cur</span> = con.cursor()
+
+<span style="color: #9acd32;">sql</span> = <span style="color: #ffa07a;">"select * from test_table_py order by id"</span>;
+cur.execute(sql)
+
+<span style="color: #9acd32;">result</span> = cur.fetchall()
+<span style="color: #20b2aa; font-weight: bold;">for</span> row <span style="color: #20b2aa; font-weight: bold;">in</span> result:
+    <span style="color: #cd853f;"># </span><span style="color: #cd853f;">tuple &#12391;&#36820;&#12387;&#12390;&#12367;&#12427;</span>
+    <span style="color: #20b2aa; font-weight: bold;">print</span>(row)
+    <span style="color: #20b2aa; font-weight: bold;">print</span>(row[0])
+</pre>
+</div>
+
+<pre class="example">
+(1, 'hoge', 20, 'm')
+1
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 参考URL</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+<a href="http://qiita.com/mas9612/items/a881e9f14d20ee1c0703">http://qiita.com/mas9612/items/a881e9f14d20ee1c0703</a><br />
+<a href="http://www.python-izm.com/contents/external/sqlite.shtml">http://www.python-izm.com/contents/external/sqlite.shtml</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> ruby</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-ruby">ruby --version
+</pre>
+</div>
+
+<pre class="example">
+ruby 1.9.3p551 (2014-11-13 revision 48407) [x86_64-darwin14.3.0]
+</pre>
+
+<p>
+require 'sqlite3' がエラーとなるときはインストールします.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">gem install sqlite3
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> database の作成とデータの挿入</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span style="color: #76ee00;">require</span> <span style="color: #ffa07a;">'sqlite3'</span>
+
+db = <span style="color: #9370db;">SQLite3</span>::<span style="color: #9370db;">Database</span>.new(<span style="color: #ffa07a;">"test.db"</span>)
+
+sql = <span style="color: #ffa07a;">"create table if not exists test_table_rb (id int, name varchar(64), age int, gender varchar(32))"</span>
+db.execute(sql)
+
+sql = <span style="color: #ffa07a;">"insert into test_table_rb values (1,'hoge',20,'m')"</span>
+db.execute(sql)
+
+sql = <span style="color: #ffa07a;">"insert into test_table_rb values (?,?,?,?)"</span>
+vls = [2,<span style="color: #ffa07a;">'fuga'</span>,30,<span style="color: #ffa07a;">'f'</span>]
+db.execute(sql,vls)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">db.execute(sql,2,'fuga',30,'f')</span>
+db.close
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> select 文とデータの取り出し</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span style="color: #76ee00;">require</span> <span style="color: #ffa07a;">'sqlite3'</span>
+
+db = <span style="color: #9370db;">SQLite3</span>::<span style="color: #9370db;">Database</span>.new(<span style="color: #ffa07a;">"test.db"</span>)
+sql = <span style="color: #ffa07a;">"select * from test_table_rb order by id"</span>
+db.execute(sql) { |id,name,age,gender|
+  <span style="color: #76ee00;">print</span> <span style="color: #ffa07a;">"</span><span style="color: #9acd32;">#{id}</span><span style="color: #ffa07a;"> </span><span style="color: #9acd32;">#{name}</span><span style="color: #ffa07a;">\n"</span>
+}
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#12371;&#12435;&#12394;&#12405;&#12358;&#12395;&#12418;&#26360;&#12369;&#12427;</span>
+db.execute(sql) <span style="color: #20b2aa; font-weight: bold;">do</span> |row|
+   <span style="color: #76ee00;">puts</span> row.join(<span style="color: #ffa07a;">"\t"</span>)
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">&#36984;&#25246;&#32080;&#26524;&#12434; hash &#12391;&#24471;&#12427;</span>
+db.results_as_hash = <span style="color: #1e90ff;">true</span>
+db.execute(sql) <span style="color: #20b2aa; font-weight: bold;">do</span> |row|
+   <span style="color: #76ee00;">puts</span> row
+   <span style="color: #76ee00;">puts</span> row[<span style="color: #ffa07a;">"name"</span>]
+<span style="color: #20b2aa; font-weight: bold;">end</span>
+db.close
+</pre>
+</div>
+
+<pre class="example">
+1 hoge
+2 fuga
+1 hoge  20  m
+2 fuga  30  f
+{"id"=&gt;1, "name"=&gt;"hoge", "age"=&gt;20, "gender"=&gt;"m", 0=&gt;1, 1=&gt;"hoge", 2=&gt;20, 3=&gt;"m"}
+hoge
+{"id"=&gt;2, "name"=&gt;"fuga", "age"=&gt;30, "gender"=&gt;"f", 0=&gt;2, 1=&gt;"fuga", 2=&gt;30, 3=&gt;"f"}
+fuga
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> 参考URL</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+<a href="http://shuzo-kino.hateblo.jp/entry/20120913/1347551619">http://shuzo-kino.hateblo.jp/entry/20120913/1347551619</a><br />
+<a href="https://sites.google.com/site/rubycocoamemo/Home/ruby-guan-lian/sqlite-wo--ruby-de-tsukau">https://sites.google.com/site/rubycocoamemo/Home/ruby-guan-lian/sqlite-wo--ruby-de-tsukau</a><br />
+<a href="http://d.hatena.ne.jp/pyopyopyo/20070325/p1">http://d.hatena.ne.jp/pyopyopyo/20070325/p1</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> julia</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">julia --version
+</pre>
+</div>
+
+<pre class="example">
+julia version 0.5.0
+</pre>
+
+<p>
+using SQLite でエラーとなる場合は Pkg.add("SQLite") でインストールします.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">julia
+</pre>
+</div>
+<pre class="example">
+   _       _ _(_)_     |  A fresh approach to technical computing
+  (_)     | (_) (_)    |  Documentation: http://docs.julialang.org
+   _ _   _| |_  __ _   |  Type "?help" for help.
+  | | | | | | |/ _` |  |
+  | | |_| | | | (_| |  |  Version 0.5.0 (2016-09-19 18:14 UTC)
+ _/ |\__'_|_|_|\__'_|  |
+|__/                   |  x86_64-apple-darwin14.5.0
+
+julia&gt; Pkg.add("SQLite")
+</pre>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> database の作成とデータの挿入</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> SQLite
+
+db  = SQLite.DB(<span style="color: #ffa07a;">"test.db"</span>)
+sql =<span style="color: #ffa07a;">"create table if not exists test_table_jl (id int, name, age int, gender)"</span>
+SQLite.query(db,sql)
+
+sql = <span style="color: #ffa07a;">"insert into test_table_jl values (1,'hoge',20,'m')"</span>
+SQLite.query(db,sql)
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">SQLite.execute!(db,sql)  # &#12371;&#12428;&#12391;&#12418;&#33391;&#12356;</span>
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">placeholder &#12434;&#20351;&#12387;&#12383;&#26360;&#12365;&#26041;</span>
+sql = <span style="color: #ffa07a;">"insert into test_table_jl values (?,?,?,?)"</span>
+stmt = SQLite.Stmt(db,sql)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">prepare &#12415;&#12383;&#12356;&#12394;&#12418;&#12435;</span>
+vls=[2,<span style="color: #ffa07a;">"fuga"</span>,22,<span style="color: #ffa07a;">"f"</span>]
+SQLite.bind!(stmt,vls)
+SQLite.execute!(stmt)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> select 文とデータの取り出し</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-julia"><span style="color: #20b2aa; font-weight: bold;">using</span> SQLite
+db  = SQLite.DB(<span style="color: #ffa07a;">"test.db"</span>)
+sql =<span style="color: #ffa07a;">"select * from test_table_jl order by id"</span>
+ext = SQLite.query(db,sql)
+println(ext)
+</pre>
+</div>
+
+<pre class="example">
+2×4 DataFrames.DataFrame
+│ Row │ id │ name   │ age │ gender │
+├─────┼────┼────────┼─────┼────────┤
+│ 1   │ 1  │ "hoge" │ 20  │ "m"    │
+│ 2   │ 2  │ "fuga" │ 22  │ "f"    │
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> 参考URL</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+<a href="https://github.com/JuliaDB/SQLite.jl/tree/2610faaaeea7cd92c38c29221101727445f7ab25">https://github.com/JuliaDB/SQLite.jl/tree/2610faaaeea7cd92c38c29221101727445f7ab25</a><br />
+<a href="https://www.r-bloggers.com/julia-and-sqlite/">https://www.r-bloggers.com/julia-and-sqlite/</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> R</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">R --version
+</pre>
+</div>
+
+<pre class="example">
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin14.5.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under the terms of the
+GNU General Public License versions 2 or 3.
+For more information about these matters see
+http://www.gnu.org/licenses/.
+</pre>
+
+<p>
+library("RSQLite") が失敗する場合は install.packages("RSQLite") でインストールします.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">R
+</pre>
+</div>
+<pre class="example">
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin14.5.0 (64-bit)
+
+R は、自由なソフトウェアであり、「完全に無保証」です。
+一定の条件に従えば、自由にこれを再配布することができます。
+配布条件の詳細に関しては、'license()' あるいは 'licence()' と入力してください。
+
+R は多くの貢献者による共同プロジェクトです。
+詳しくは 'contributors()' と入力してください。
+また、R や R のパッケージを出版物で引用する際の形式については
+'citation()' と入力してください。
+
+'demo()' と入力すればデモをみることができます。
+'help()' とすればオンラインヘルプが出ます。
+'help.start()' で HTML ブラウザによるヘルプがみられます。
+'q()' と入力すれば R を終了します。
+
+&gt; install.packages("RSQLite")
+</pre>
+</div>
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> database の作成とデータの挿入</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #1e90ff;">library</span>(<span style="color: #ffa07a;">"RSQLite"</span>)
+
+con <span style="color: #1e90ff;">&lt;-</span> dbConnect(SQLite(),<span style="color: #ffa07a;">"test.db"</span>,synchronous=<span style="color: #ffa07a;">"off"</span>)
+sql <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">"create table if not exists test_table_R (id int, name text, age int, gender text)"</span>
+dbSendQuery(con, sql)
+
+sql <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">"insert into test_table_R values (1,'hoge',20,'m')"</span>
+dbSendQuery(con,sql)
+
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">placeholder &#12434;&#20351;&#12358;&#12392;&#12365;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">select &#12391;&#12418;&#21516;&#12376;&#24863;&#12376;&#12391;&#20986;&#26469;&#12427;&#12387;&#12413;&#12356;.</span>
+<span style="color: #cd853f;"># </span><span style="color: #cd853f;">sql &lt;- "select * from ..." &#12395;&#12394;&#12427;&#12384;&#12369;. dbSendQuery &#12391;&#12356;&#12369;&#12427; see help(dbBind)</span>
+sql <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">"insert into test_table_R values (?,?,?,?)"</span>
+res <span style="color: #1e90ff;">&lt;-</span> dbSendQuery(con,sql)
+dbBind(res, c(1,<span style="color: #ffa07a;">'fuga'</span>,22,<span style="color: #ffa07a;">'f'</span>))
+dbFetch(res)
+dbDisconnect(con)
+</pre>
+</div>
+
+<p>
+R の場合, 組み込みのデータを使ってこれを SQLite に入れることがあるかも.<br />
+</p>
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #1e90ff;">library</span>(<span style="color: #ffa07a;">"RSQLite"</span>)
+con <span style="color: #1e90ff;">&lt;-</span> dbConnect(SQLite(), <span style="color: #ffa07a;">"testR.db"</span>, synchronous=<span style="color: #ffa07a;">"off"</span>)
+dbWriteTable(con,<span style="color: #ffa07a;">"iris"</span>,iris)  <span style="color: #cd853f;"># </span><span style="color: #cd853f;">iris &#12398;&#12487;&#12540;&#12479;&#12434; "iris" table &#20869;&#12395;&#20837;&#12428;&#12427;</span>
+sql <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">"select * from iris order by 'Sepal.Length' limit 5"</span>
+res <span style="color: #1e90ff;">&lt;-</span> dbGetQuery(con,sql)
+res
+</pre>
+</div>
+
+<pre class="example">
+[1] TRUE
+  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> select 文とデータの取り出し</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #1e90ff;">library</span>(<span style="color: #ffa07a;">"RSQLite"</span>)
+con <span style="color: #1e90ff;">&lt;-</span> dbConnect(SQLite(), <span style="color: #ffa07a;">"test.db"</span>, synchronous=<span style="color: #ffa07a;">"off"</span>)
+sql <span style="color: #1e90ff;">&lt;-</span> <span style="color: #ffa07a;">"select * from test_table_R order by id"</span>
+res <span style="color: #1e90ff;">&lt;-</span> dbGetQuery(con,sql)
+res
+dbDisconnect(con)
+</pre>
+</div>
+
+<pre class="example">
+  id name age gender
+1  1 hoge  20      m
+2  1 fuga  22      f
+[1] TRUE
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3"><span class="section-number-3">5.3</span> 参考URL</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+RからSQLiteを使う<br />
+<a href="https://oku.edu.mie-u.ac.jp/~okumura/stat/sqlite.html">https://oku.edu.mie-u.ac.jp/~okumura/stat/sqlite.html</a><br />
+DBI.pdf<br />
+<a href="https://cran.r-project.org/web/packages/DBI/DBI.pdf">https://cran.r-project.org/web/packages/DBI/DBI.pdf</a><br />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> javascript(node.js)</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">node --version
+</pre>
+</div>
+
+<pre class="example">
+v7.4.0
+</pre>
+</div>
+
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> database の作成とデータの挿入</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-js"><span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">sqlite3</span> = require(<span style="color: #ffa07a;">'sqlite3'</span>)
+sqlite3.verbose();
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">file</span>=<span style="color: #ffa07a;">'test.db'</span>;
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">db</span> = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">sqlite3.Database</span>(file); <span style="color: #cd853f;">// </span><span style="color: #cd853f;">file &#12398;&#20195;&#12431;&#12426;&#12395; :memory: &#12384;&#12392;&#12513;&#12514;&#12522;&#19978;&#12395;&#20316;&#25104;</span>
+db.serialize(); <span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#38750;&#21516;&#26399;&#12434;&#35299;&#38500;</span>
+db.on(<span style="color: #ffa07a;">'error'</span>, <span style="color: #20b2aa; font-weight: bold;">function</span>(<span style="color: #9acd32;">err</span>) {console.error(err); process.exit(1); });
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">sql</span>=<span style="color: #ffa07a;">'create table if not exists test_table_js (id int, name text, age int, gender text)'</span>;
+db.run(sql);
+sql = <span style="color: #ffa07a;">'insert into test_table_js values (?,?,?,?)'</span>;
+db.run(sql,1,<span style="color: #ffa07a;">'hoge'</span>,20,<span style="color: #ffa07a;">'m'</span>);
+
+<span style="color: #cd853f;">/* </span><span style="color: #cd853f;">&#20197;&#19979;&#12398;&#12424;&#12358;&#12395; hash &#12391;&#12450;&#12463;&#12475;&#12473;&#12418;&#12391;&#12365;&#12427;</span>
+<span style="color: #cd853f;">var sql = 'insert or ignore into test_table_js (id,name) values ($i,$n)';</span>
+<span style="color: #cd853f;">du.run(sql,{$i:3, $n:'fuga'});</span>
+<span style="color: #cd853f;">*/</span>
+
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">vls</span> = [2,<span style="color: #ffa07a;">'foo'</span>,22,<span style="color: #ffa07a;">'f'</span>];
+db.run(sql,vls);
+db.close();
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> select 文とデータの取り出し</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-js"><span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">sqlite3</span> = require(<span style="color: #ffa07a;">'sqlite3'</span>);
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">file</span> = <span style="color: #ffa07a;">'test.db'</span>;
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">db</span>   = <span style="color: #20b2aa; font-weight: bold;">new</span> <span style="color: #9370db;">sqlite3.Database</span>(file);
+db.serialize();
+db.on(<span style="color: #ffa07a;">'error'</span>,<span style="color: #20b2aa; font-weight: bold;">function</span>(<span style="color: #9acd32;">err</span>) {console.error(err); process.exit(1); });
+
+<span style="color: #20b2aa; font-weight: bold;">var</span> <span style="color: #9acd32;">sql</span>  =<span style="color: #ffa07a;">'select * from test_table_js order by id'</span>;
+
+<span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#12402;&#12392;&#12388;&#12378;&#12388;&#12420;&#12427;&#22580;&#21512;</span>
+db.each(sql,clbk01);
+
+<span style="color: #20b2aa; font-weight: bold;">function</span> <span style="color: #00ff7f;">clbk01</span>(<span style="color: #9acd32;">err</span>,<span style="color: #9acd32;">row</span>) {  <span style="color: #cd853f;">// </span><span style="color: #cd853f;">row: &#19968;&#12388;&#12398;&#32080;&#26524;&#34892;&#12364;&#36820;&#12427;</span>
+    <span style="color: #cd853f;">//</span><span style="color: #cd853f;">console.log(row.id+"\t"+row.name+"\t"+row.age);</span>
+    <span style="color: #20b2aa; font-weight: bold;">if</span> (err) <span style="color: #20b2aa; font-weight: bold;">throw</span> err;
+    console.log(row)
+}
+
+<span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#20840;&#20214;&#12392;&#12426;&#12384;&#12375;&#12390;&#12363;&#12425;&#12394;&#12435;&#12363;&#12420;&#12427;&#22580;&#21512;</span>
+<span style="color: #cd853f;">// </span><span style="color: #cd853f;">&#12503;&#12524;&#12540;&#12473;&#12507;&#12523;&#12480;&#20351;&#12360;&#12427;(&#19978;&#12398; each &#12391;&#12418;&#21516;&#27096;&#12395;&#20351;&#12360;&#12427;)</span>
+sql =<span style="color: #ffa07a;">'select * from test_table_js order by ?'</span>;
+db.all(sql,<span style="color: #ffa07a;">'id'</span>,clbk02);
+
+<span style="color: #20b2aa; font-weight: bold;">function</span> <span style="color: #00ff7f;">clbk02</span>(<span style="color: #9acd32;">err</span>, <span style="color: #9acd32;">rows</span>) { <span style="color: #cd853f;">// </span><span style="color: #cd853f;">rows: &#32080;&#26524;&#20840;&#37096;&#12398;&#34892;&#12364;&#25147;&#12427;</span>
+   <span style="color: #20b2aa; font-weight: bold;">if</span> (err) <span style="color: #20b2aa; font-weight: bold;">throw</span> err;
+   rows.forEach(<span style="color: #20b2aa; font-weight: bold;">function</span>(<span style="color: #9acd32;">row</span>) { console.log(row); });
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> 参考URL</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+Node.jsでSQLite3を使用する - 情報アイランド<br />
+<a href="http://info-i.net/sqlite3">http://info-i.net/sqlite3</a><br />
+Node.jsでsqlite3を使ってデータベースを操作する方法まとめ | Black Everyday Company<br />
+<a href="http://kuroeveryday.blogspot.jp/2016/05/nodejs-sqlite3.html">http://kuroeveryday.blogspot.jp/2016/05/nodejs-sqlite3.html</a><br />
+JavaScript | MDN<br />
+<a href="https://developer.mozilla.org/ja/docs/Web/JavaScript">https://developer.mozilla.org/ja/docs/Web/JavaScript</a><br />
+</p>
+</div>
+</div>
+</div>
+]]></content>
+  </entry>
+  
+</feed>
